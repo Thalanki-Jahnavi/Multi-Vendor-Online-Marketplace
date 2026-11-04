@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About OneCart</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/about.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="top-strip">
+        <p>Discover great products from trusted sellers</p>
+        <p>OneCart — one place for everything</p>
+    </div>
+
+    <div class="header-main">
+        <a class="brand" th:href="@{/}">
+            <span class="brand-icon">O</span>
+            <span>One<span>Cart</span></span>
+        </a>
+
+        <form class="search-form" th:action="@{/products}" method="get">
+            <input type="search" name="keyword" placeholder="Search products..." aria-label="Search products">
+            <button type="submit" aria-label="Search">⌕</button>
+        </form>
+
+        <div class="header-actions">
+            <a class="header-action" th:href="@{/login}">
+                <span class="action-icon">♙</span>
+                <span>Account</span>
+            </a>
+            <a class="header-action" th:href="@{/login}">
+                <span class="action-icon">♡</span>
+                <span>Wishlist</span>
+            </a>
+            <a class="header-action" th:href="@{/cart}">
+                <span class="action-icon">🛒</span>
+                <span>Cart</span>
+            </a>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/products}">Products</a>
+        <a th:href="@{/vendors}">Vendors</a>
+        <a class="active" th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+</header>
+
+<main>
+    <section class="about-hero">
+        <div class="about-hero-content">
+            <span class="eyebrow">ABOUT ONECART</span>
+            <h1>More than a marketplace.<br><span>A place to discover.</span></h1>
+            <p>
+                OneCart brings customers and independent vendors together,
+                making it easier to discover products and shop in one place.
+            </p>
+            <a class="button button-primary" th:href="@{/products}">
+                Explore products <span>→</span>
+            </a>
+        </div>
+
+        <div class="about-hero-art" aria-hidden="true">
+            <div class="about-art-circle"></div>
+            <div class="about-art-card">
+                <span class="about-art-icon">🛍️</span>
+                <strong>Discover something new</strong>
+                <small>Find your next favorite</small>
+            </div>
+            <span class="about-art-sparkle sparkle-one">✦</span>
+            <span class="about-art-sparkle sparkle-two">✧</span>
+        </div>
+    </section>
+
+    <section class="about-intro">
+        <div class="about-intro-heading">
+            <span class="eyebrow">OUR STORY</span>
+            <h2>Shopping should feel<br>simple and inspiring.</h2>
+        </div>
+        <div class="about-intro-copy">
+            <p>
+                We created OneCart with a simple idea: bring a variety of products
+                and sellers together in one convenient online marketplace.
+            </p>
+            <p>
+                Whether you're looking for everyday essentials or something
+                special, OneCart helps you explore products from different vendors
+                without making shopping complicated.
+            </p>
+        </div>
+    </section>
+
+    <section class="about-values">
+        <div class="about-section-heading">
+            <span class="eyebrow">WHAT MATTERS TO US</span>
+            <h2>Built around better shopping</h2>
+            <p>We focus on making the marketplace easy to explore and use.</p>
+        </div>
+
+        <div class="about-value-grid">
+            <article class="about-value-card">
+                <span class="about-value-icon">⌕</span>
+                <h3>Easy discovery</h3>
+                <p>Browse products and find new favorites in one convenient place.</p>
+            </article>
+
+            <article class="about-value-card">
+                <span class="about-value-icon">♧</span>
+                <h3>Vendor community</h3>
+                <p>We bring independent sellers and shoppers together through one marketplace.</p>
+            </article>
+
+            <article class="about-value-card">
+                <span class="about-value-icon">♡</span>
+                <h3>Simple experience</h3>
+                <p>We aim to keep the shopping journey clear, friendly, and straightforward.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="about-cta">
+        <div>
+            <span class="eyebrow">YOUR NEXT FIND IS WAITING</span>
+            <h2>Ready to discover OneCart?</h2>
+            <p>Explore products from vendors in one place.</p>
+        </div>
+        <a class="button button-primary" th:href="@{/products}">
+            Start exploring <span>→</span>
+        </a>
+    </section>
+</main>
+
+<footer class="site-footer" id="contact">
+    <div class="footer-main">
+        <div class="footer-brand">
+            <a class="brand brand-footer" th:href="@{/}">
+                <span class="brand-icon">O</span>
+                <span>One<span>Cart</span></span>
+            </a>
+            <p>Discover more. Shop simply.</p>
+        </div>
+
+        <div class="footer-links">
+            <strong>Explore</strong>
+            <a th:href="@{/products}">Products</a>
+            <a th:href="@{/vendors}">Vendors</a>
+            <a th:href="@{/about}">About OneCart</a>
+        </div>
+
+        <div class="footer-links">
+            <strong>Help</strong>
+            <a th:href="@{/login}">My account</a>
+            <a th:href="@{/contact}">Contact us</a>
+        </div>
+
+        <div class="footer-contact">
+            <strong>Stay connected</strong>
+            <p>Have a question? We'd love to hear from you.</p>
+            <a th:href="@{/contact}">Get in touch <span>→</span></a>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <span>© <span id="current-year"></span> OneCart. All rights reserved.</span>
+        <span>Made for everyday discoveries <span class="footer-heart">♡</span></span>
+    </div>
+</footer>
+
+<script>
+    document.getElementById("current-year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

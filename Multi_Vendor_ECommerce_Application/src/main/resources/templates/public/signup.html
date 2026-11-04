@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | OneCart</title>
+    <link rel="stylesheet" th:href="@{/css/signup.css}">
+</head>
+<body>
+<header class="site-header">
+    <a class="brand" th:href="@{/}">One<span>Cart</span></a>
+    <a class="back-link" th:href="@{/}">← Back to home</a>
+</header>
+
+<main class="signup-layout">
+    <section class="welcome-panel">
+        <p class="eyebrow">JOIN ONECART</p>
+        <h1>Your next great find is just around the corner.</h1>
+        <p>Create an account to shop your favorites or start selling with OneCart.</p>
+
+        <div class="benefit-list">
+            <div class="benefit">
+                <span class="check">✓</span>
+                <span>Discover products from multiple vendors</span>
+            </div>
+            <div class="benefit">
+                <span class="check">✓</span>
+                <span>Keep your orders and account in one place</span>
+            </div>
+            <div class="benefit">
+                <span class="check">✓</span>
+                <span>Build your store as a OneCart vendor</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="signup-panel">
+        <div class="signup-card">
+            <p class="eyebrow">GET STARTED</p>
+            <h2>Create your account</h2>
+            <p class="intro">Enter your details below to sign up.</p>
+
+            <div class="alert error-alert" th:if="${error}" th:text="${error}"></div>
+
+            <form th:action="@{/signup}" method="post" id="signupForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First name</label>
+                        <input
+                            type="text"
+                            id="firstName"
+                            name="firstName"
+                            placeholder="First name"
+                            autocomplete="given-name"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last name</label>
+                        <input
+                            type="text"
+                            id="lastName"
+                            name="lastName"
+                            placeholder="Last name"
+                            autocomplete="family-name"
+                            required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="accountType">I want to</label>
+                    <select id="accountType" name="role" required>
+                        <option value="" disabled selected>Choose account type</option>
+                        <option value="customer">Shop as a customer</option>
+                        <option value="vendor">Sell as a vendor</option>
+                    </select>
+                </div>
+
+                <div class="form-group vendor-field" id="businessNameGroup" hidden>
+                    <label for="businessName">Business name</label>
+                    <input
+                        type="text"
+                        id="businessName"
+                        name="businessName"
+                        placeholder="Your store or business name">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required>
+                    <small>Use at least 8 characters.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm password</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="Enter your password again"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required>
+                    <small class="password-error" id="passwordError" hidden>
+                        Passwords do not match.
+                    </small>
+                </div>
+
+                <button type="submit" class="submit-button">Create account</button>
+            </form>
+
+            <p class="signin-text">
+                Already have an account?
+                <a th:href="@{/login}">Sign in</a>
+            </p>
+        </div>
+    </section>
+</main>
+
+<script>
+    const accountType = document.getElementById("accountType");
+    const businessNameGroup = document.getElementById("businessNameGroup");
+    const businessName = document.getElementById("businessName");
+    const signupForm = document.getElementById("signupForm");
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const passwordError = document.getElementById("passwordError");
+
+    function updateBusinessField() {
+        const isVendor = accountType.value === "vendor";
+        businessNameGroup.hidden = !isVendor;
+        businessName.required = isVendor;
+    }
+
+    accountType.addEventListener("change", updateBusinessField);
+
+    signupForm.addEventListener("submit", function (event) {
+        if (password.value !== confirmPassword.value) {
+            event.preventDefault();
+            passwordError.hidden = false;
+            confirmPassword.focus();
+            return;
+        }
+
+        passwordError.hidden = true;
+    });
+
+    confirmPassword.addEventListener("input", function () {
+        passwordError.hidden = true;
+    });
+</script>
+</body>
+</html>
