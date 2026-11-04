@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | OneCart</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <a class="brand" th:href="@{/}">
+        <span class="brand-mark">O</span>
+        <span>OneCart</span>
+    </a>
+    <a th:href="@{/}">← Back to home</a>
+</header>
+
+<main class="page">
+    <section class="login-card">
+        <div class="card-heading">
+            <p class="eyebrow">Welcome back</p>
+            <h1>Sign in to OneCart</h1>
+            <p class="subtitle">Your favorite stores, all in one place.</p>
+        </div>
+
+        <div class="message error"
+             th:if="${param.error}">
+            Invalid email or password. Please try again.
+        </div>
+
+        <div class="message success"
+             th:if="${param.logout}">
+            You have been signed out successfully.
+        </div>
+
+        <form id="loginForm" th:action="@{/login}" method="post">
+            <div class="form-field">
+                <label for="username">Email address</label>
+                <input
+                    id="username"
+                    name="username"
+                    type="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required>
+            </div>
+
+            <div class="form-field">
+                <div class="field-heading">
+                    <label for="password">Password</label>
+                    <a class="forgot-link" th:href="@{/forgot-password}">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <div class="password-field">
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required>
+                    <button
+                        class="toggle-password"
+                        id="togglePassword"
+                        type="button"
+                        aria-label="Show password">
+                        Show
+                    </button>
+                </div>
+            </div>
+
+            <label class="remember-row" for="remember-me">
+                <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox">
+                <span>Remember me</span>
+            </label>
+
+            <button class="submit-button" id="loginButton" type="submit">
+                <span class="button-label">Sign in</span>
+                <span class="button-loading" aria-live="polite">Signing in…</span>
+            </button>
+        </form>
+
+        <p class="signup-prompt">
+            New to OneCart?
+            <a th:href="@{/signup}">Create an account</a>
+        </p>
+
+        <p class="page-note">A better way to shop from stores you love.</p>
+    </section>
+</main>
+
+<script th:src="@{/js/login.js}"></script>
+</body>
+</html>

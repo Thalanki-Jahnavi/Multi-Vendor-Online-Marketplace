@@ -1,0 +1,30 @@
+<div class="product-grid">
+    <article class="product-card" th:each="product : ${products}">
+        <div class="product-image">
+            <img
+                th:if="${product.imageUrl != null}"
+                th:src="${product.imageUrl}"
+                th:alt="${product.productName}"
+            >
+            <div th:unless="${product.imageUrl != null}" class="product-image-placeholder">
+                OneCart
+            </div>
+        </div>
+
+        <div class="product-info">
+            <p class="product-category" th:text="${product.category}">Category</p>
+            <h3 th:text="${product.productName}">Product name</h3>
+            <p class="product-brand" th:text="${product.brand}">Brand</p>
+            <p class="product-price">
+                ₹<span th:text="${product.price}">0.00</span>
+            </p>
+            <button type="button" class="add-to-cart" disabled>
+                Add to Cart
+            </button>
+        </div>
+    </article>
+
+    <p class="empty-products" th:if="${#lists.isEmpty(products)}">
+        No products are available right now. Please check back soon.
+    </p>
+</div>

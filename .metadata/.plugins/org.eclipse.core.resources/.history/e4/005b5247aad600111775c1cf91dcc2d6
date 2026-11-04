@@ -1,0 +1,128 @@
+// OneCart - Guest Home Page interactions
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Mobile navigation
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
+
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener("click", () => {
+            const isOpen = navLinks.classList.toggle("open");
+            menuToggle.setAttribute("aria-expanded", String(isOpen));
+            menuToggle.setAttribute(
+                "aria-label",
+                isOpen ? "Close navigation" : "Open navigation"
+            );
+            menuToggle.textContent = isOpen ? "×" : "☰";
+        });
+    }
+
+    // Product category filter and search
+    const productCards = Array.from(
+        document.querySelectorAll(".product-card")
+    );
+    const filterButtons = document.querySelectorAll(".filter-button");
+    const searchInput = document.getElementById("productSearch");
+    const emptyMessage = document.getElementById("emptyMessage");
+
+    let selectedCategory = "All";
+
+    function filterProducts() {
+        const searchText = searchInput
+            ? searchInput.value.trim().toLowerCase()
+            : "";
+
+        let visibleCount = 0;
+
+        productCards.forEach((card) => {
+            const category = card.dataset.category || "";
+            const name = card.dataset.name || "";
+
+            const matchesCategory =
+                selectedCategory === "All" ||
+                category === selectedCategory;
+
+            const matchesSearch = name.toLowerCase().includes(searchText);
+            const shouldShow = matchesCategory && matchesSearch;
+
+            card.hidden = !shouldShow;
+
+            if (shouldShow) {
+                visibleCount += 1;
+            }
+        });
+
+        if (emptyMessage) {
+            emptyMessage.hidden = visibleCount !== 0;
+        }
+    }
+
+    filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            selectedCategory = button.dataset.filter || "All";
+
+            filterButtons.forEach((item) => {
+                item.classList.toggle("active", item === button);
+            });
+
+            filterProducts();
+        });
+    });
+
+    if (searchInput) {
+        searchInput.addEventListener("input", filterProducts);
+    }
+
+    // Category cards select the matching product filter
+    document.querySelectorAll(".category-card").forEach((card) => {
+        card.addEventListener("click", () => {
+            const category = card.dataset.category;
+
+            if (!category) return;
+
+            selectedCategory = category;
+
+            filterButtons.forEach((button) => {
+                button.classList.toggle(
+                    "active",
+                    button.dataset.filter === category
+                );
+            });
+
+            if (searchInput) {
+                searchInput.value = "";
+            }
+
+            filterProducts();
+        });
+    });
+
+    // Demo add-to-cart feedback.
+    // This is only a frontend demonstration; it does not save a cart.
+    document.querySelectorAll(".add-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            const productName =
+                button.closest(".product-card")?.dataset.name ||
+                "Product";
+
+            const originalText = button.textContent;
+            button.textContent = "✓";
+            button.setAttribute("aria-label", `${productName} added (demo)`);
+
+            window.setTimeout(() => {
+                button.textContent = originalText;
+                button.setAttribute(
+                    "aria-label",
+                    `Add ${productName} to cart`
+                );
+            }, 1200);
+        });
+    });
+
+    // Display current year in the footer
+    const currentYear = document.getElementById("currentYear");
+
+    if (currentYear) {
+        currentYear.textContent = new Date().getFullYear();
+    }
+});

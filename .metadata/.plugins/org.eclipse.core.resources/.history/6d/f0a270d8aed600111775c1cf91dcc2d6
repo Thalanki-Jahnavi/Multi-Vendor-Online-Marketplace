@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OneCart | Online Shopping</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/guest/index.html">
+        One<span>Cart</span>
+        <small class="tagline">Shop more. Save more.</small>
+      </a>
+
+      <form class="search" id="searchForm">
+        <input id="searchInput" type="search" placeholder="Search products, brands and more">
+        <button type="submit" aria-label="Search">⌕</button>
+      </form>
+
+      <a class="top-link" href="/guest/login.html">Login</a>
+      <button class="top-link" id="cartButton" type="button">
+        🛒 Cart <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="category-strip" aria-label="Product categories">
+    <div class="categories" id="categories">
+      <button class="category active" data-category="All"><span class="emoji">🛍️</span>All</button>
+      <button class="category" data-category="Electronics"><span class="emoji">📱</span>Electronics</button>
+      <button class="category" data-category="Fashion"><span class="emoji">👕</span>Fashion</button>
+      <button class="category" data-category="Home"><span class="emoji">🛋️</span>Home</button>
+      <button class="category" data-category="Beauty"><span class="emoji">🧴</span>Beauty</button>
+      <button class="category" data-category="Sports"><span class="emoji">🏸</span>Sports</button>
+      <button class="category" data-category="Books"><span class="emoji">📚</span>Books</button>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="hero-kicker">Big savings. Better shopping.</div>
+        <h1>Find your next<br>favourite thing.</h1>
+        <p>Explore great picks from multiple vendors—all in one place.</p>
+        <button class="hero-button" id="shopNowButton" type="button">Shop now</button>
+      </div>
+      <img
+        class="hero-art"
+        src="https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=650&q=85"
+        alt="Shopping bags"
+      >
+    </section>
+
+    <section class="section" id="productsSection">
+      <div class="section-heading">
+        <h2 id="sectionTitle">Trending products</h2>
+        <button type="button" id="viewAllButton">View all →</button>
+      </div>
+      <div class="products" id="productGrid"></div>
+    </section>
+
+    <section class="vendor-banner">
+      <div>
+        <h2>Grow your business with OneCart</h2>
+        <p>Reach more customers and manage your products in one place.</p>
+      </div>
+      <a href="/guest/signup.html">Become a vendor →</a>
+    </section>
+  </main>
+
+  <footer>
+    <p>OneCart — Shop from multiple vendors in one place.</p>
+    <p>Secure shopping · Easy returns · Customer support</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

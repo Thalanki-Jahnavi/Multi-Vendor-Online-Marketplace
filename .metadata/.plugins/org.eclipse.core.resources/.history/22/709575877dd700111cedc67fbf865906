@@ -1,0 +1,36 @@
+<footer class="site-footer">
+    <div class="footer-main">
+        <div class="footer-brand">
+            <a class="brand" th:href="@{/}">
+                <span class="brand-mark">O</span>
+                <span>OneCart<small>Discover. Shop. Enjoy.</small></span>
+            </a>
+            <p>One marketplace. Many ways to find something special.</p>
+        </div>
+
+        <div class="footer-column">
+            <h3>Explore</h3>
+            <a th:href="@{/products}">Shop products</a>
+            <a th:href="@{/vendors}">Our vendors</a>
+            <a th:href="@{/categories}">Shop by category</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Your OneCart</h3>
+            <a th:href="@{/login}">Login / Sign up</a>
+            <a th:href="@{/wishlist}">Wishlist</a>
+            <a th:href="@{/cart}">Shopping cart</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Help &amp; information</h3>
+            <a th:href="@{/about}">About OneCart</a>
+            <a th:href="@{/contact}">Contact us</a>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <span>© <span th:text="${#dates.year(#dates.createNow())}">2026</span> OneCart. All rights reserved.</span>
+        <span>Made for discovering something special.</span>
+    </div>
+</footer>

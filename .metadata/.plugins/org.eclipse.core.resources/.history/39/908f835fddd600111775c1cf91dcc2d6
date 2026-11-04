@@ -1,0 +1,152 @@
+"use strict";
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const menuToggle = document.getElementById("menuToggle");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const searchForm = document.getElementById("searchForm");
+    const searchInput = document.getElementById("productSearch");
+    const newsletterForm = document.getElementById("newsletterForm");
+    const newsletterEmail = document.getElementById("newsletterEmail");
+    const newsletterMessage = document.getElementById("newsletterMessage");
+    const toast = document.getElementById("toast");
+
+    let toastTimeout;
+
+    // Current user role.
+    // The backend will provide this value after authentication.
+    const role = document.body.dataset.role || "GUEST";
+
+    // Show role-specific navigation.
+    document.body.dataset.role = role;
+
+    // Toast message.
+    function showToast(message) {
+        if (!toast) return;
+
+        toast.textContent = message;
+        toast.classList.add("visible");
+
+        clearTimeout(toastTimeout);
+
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove("visible");
+        }, 3000);
+    }
+
+    // Mobile navigation.
+    function closeMobileMenu() {
+        if (!menuToggle || !mobileMenu) return;
+
+        mobileMenu.hidden = true;
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Open navigation");
+
+        document.body.classList.remove("menu-open");
+    }
+
+    if (menuToggle && mobileMenu) {
+
+        menuToggle.addEventListener("click", () => {
+
+            const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+
+            if (isOpen) {
+                closeMobileMenu();
+            } else {
+                mobileMenu.hidden = false;
+                menuToggle.setAttribute("aria-expanded", "true");
+                menuToggle.setAttribute("aria-label", "Close navigation");
+
+                document.body.classList.add("menu-open");
+            }
+        });
+
+        mobileMenu.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", closeMobileMenu);
+        });
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape") {
+                closeMobileMenu();
+            }
+        });
+
+        window.addEventListener("resize", () => {
+            if (window.innerWidth > 820) {
+                closeMobileMenu();
+            }
+        });
+    }
+
+    // Product search.
+    if (searchForm && searchInput) {
+
+        searchForm.addEventListener("submit", event => {
+            event.preventDefault();
+
+            const query = searchInput.value.trim();
+
+            if (!query) {
+                showToast("Enter a product name to search.");
+                searchInput.focus();
+                return;
+            }
+
+            // Search results will be connected to the backend later.
+            showToast("The product catalogue is not connected yet.");
+        });
+    }
+
+    // Newsletter validation.
+    if (newsletterForm && newsletterEmail && newsletterMessage) {
+
+        newsletterForm.addEventListener("submit", event => {
+            event.preventDefault();
+
+            newsletterMessage.classList.remove("error");
+
+            const email = newsletterEmail.value.trim();
+
+            if (!email) {
+                newsletterMessage.textContent = "Please enter your email address.";
+                newsletterMessage.classList.add("error");
+                newsletterEmail.focus();
+                return;
+            }
+
+            if (!newsletterEmail.checkValidity()) {
+                newsletterMessage.textContent = "Please enter a valid email address.";
+                newsletterMessage.classList.add("error");
+                newsletterEmail.focus();
+                return;
+            }
+
+            newsletterMessage.textContent =
+                "Your email is valid. Newsletter registration will be available soon.";
+
+            newsletterEmail.value = "";
+        });
+    }
+
+    // Restricted actions.
+    // These checks improve the UI experience.
+    // Spring Security must enforce the actual permissions on the server.
+    document.querySelectorAll("[data-requires-login]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            if (role === "GUEST") {
+                showToast("Please log in to use this feature.");
+            }
+        });
+    });
+
+    // Placeholder counts until cart and wishlist data are connected.
+    const cartCount = document.getElementById("cartCount");
+    const wishlistCount = document.getElementById("wishlistCount");
+
+    if (cartCount) cartCount.textContent = "0";
+    if (wishlistCount) wishlistCount.textContent = "0";
+
+});

@@ -1,0 +1,44 @@
+package com.vendor.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http
+            .authorizeHttpRequests(auth -> auth
+                // Public pages: guests can access these
+                .requestMatchers(
+                    "/",
+                    "/login",
+                    "/signup",
+                    "/about",
+                    "/contact",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/favicon.ico"
+                ).permitAll()
+
+                // All other pages require the user to be logged in
+                .anyRequest().authenticated()
+            )
+
+            // Enable Spring Security's default login page for now
+            .formLogin(form -> form
+                .permitAll()
+            )
+
+            .logout(logout -> logout
+                .permitAll()
+            );
+
+        return http.build();
+    }
+}

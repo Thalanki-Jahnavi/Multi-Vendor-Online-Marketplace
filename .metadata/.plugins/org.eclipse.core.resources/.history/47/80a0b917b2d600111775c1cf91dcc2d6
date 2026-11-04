@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Login</title>
+    <link rel="stylesheet" href="/css/auth.css">
+    <script src="/js/auth.js" defer></script>
+</head>
+<body>
+    <main class="page">
+        <section class="welcome-panel">
+            <a class="brand" href="/guest/index.html">
+                <span class="brand-mark">O</span>
+                <span>OneCart</span>
+            </a>
+
+            <div class="welcome-copy">
+                <p class="eyebrow">Welcome to OneCart</p>
+                <h1>Good finds.<br>Better days.</h1>
+                <p>Sign in to keep your shopping in one place.</p>
+            </div>
+
+            <p class="welcome-footer">Discover something you’ll love.</p>
+            <div class="decor-circle" aria-hidden="true"></div>
+        </section>
+
+        <section class="form-panel">
+            <h2>Welcome back</h2>
+            <p class="form-intro">Enter your details to sign in to your account.</p>
+
+            <form class="form active" id="loginForm">
+                <div class="field">
+                    <label for="loginEmail">Email address</label>
+                    <input
+                        id="loginEmail"
+                        name="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="loginPassword">Password</label>
+                    <input
+                        id="loginPassword"
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-option">
+                        <input type="checkbox" id="rememberMe">
+                        Remember me
+                    </label>
+
+                    <a class="text-link" href="#" id="forgotPassword">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <button class="submit-button" type="submit">Login</button>
+                <p class="form-message" id="loginMessage" aria-live="polite"></p>
+            </form>
+
+            <p class="signup-prompt">
+                Don’t have an account?
+                <a class="text-link" href="/guest/signup.html">Sign up</a>
+            </p>
+
+            <a class="back-link" href="/guest/index.html">← Back to shopping</a>
+        </section>
+    </main>
+</body>
+</html>

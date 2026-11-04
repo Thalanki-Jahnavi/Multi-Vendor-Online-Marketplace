@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Home</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">OneCart</a>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+    </nav>
+
+    <div class="auth-links">
+        <a href="/login" class="login-btn">Login</a>
+        <a href="/signup" class="signup-btn">Sign Up</a>
+    </div>
+</header>
+
+<main class="hero">
+    <div class="hero-content">
+        <p class="tagline">YOUR ONE-STOP MARKETPLACE</p>
+
+        <h1>Everything you need,<br>
+            all in OneCart.</h1>
+
+        <p class="description">
+            Discover products from multiple sellers
+            and shop your favorites in one place.
+        </p>
+
+        <a href="/products" class="shop-btn">
+            Start Shopping
+        </a>
+    </div>
+</main>
+
+</body>
+</html>

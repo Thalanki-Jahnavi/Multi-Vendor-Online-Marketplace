@@ -1,0 +1,12 @@
+package com.vendor.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.vendor.entity.User;
+
+public interface VendorRepository extends JpaRepository<User, Integer> {
+
+    List<User> findByRoleIgnoreCase(String role);
+}

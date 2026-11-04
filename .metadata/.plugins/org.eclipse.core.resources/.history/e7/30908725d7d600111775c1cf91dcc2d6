@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Home</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="topbar">
+        <a class="logo" th:href="@{/}"><span class="cart-icon">🛒</span> OneCart</a>
+
+        <form class="search" th:action="@{/}" method="get">
+            <input type="search" name="q" placeholder="Search for products, brands and more...">
+            <button type="submit" aria-label="Search">⌕</button>
+        </form>
+
+        <div class="account-links">
+            <a th:href="@{/login}">♙ <span>Login</span></a>
+            <a class="signup-btn" th:href="@{/signup}">Sign Up</a>
+            <a th:href="@{/login}">🛒 <span>Cart</span></a>
+        </div>
+    </div>
+
+    <nav class="categories" aria-label="Product categories">
+        <a class="selected" th:href="@{/}">All</a>
+        <a th:href="@{/signup}">👗 Fashion</a>
+        <a th:href="@{/signup}">📱 Mobiles</a>
+        <a th:href="@{/signup}">💻 Electronics</a>
+        <a th:href="@{/signup}">💄 Beauty</a>
+        <a th:href="@{/signup}">🏠 Home</a>
+        <a th:href="@{/signup}">🔌 Appliances</a>
+        <a th:href="@{/signup}">🎮 Toys & Games</a>
+        <a th:href="@{/signup}">⚽ Sports</a>
+        <a th:href="@{/signup}">📚 Books</a>
+        <a th:href="@{/signup}">🪑 Furniture</a>
+        <a th:href="@{/signup}">More⌄</a>
+    </nav>
+</header>
+
+<main class="page-content">
+    <section class="hero">
+        <div class="hero-copy">
+            <span class="sale-tag">Big Shopping Days</span>
+            <h1>Up to 70% Off</h1>
+            <p>On Fashion, Electronics, Home &amp; More</p>
+            <a class="primary-btn" th:href="@{/signup}">Shop Now <span>→</span></a>
+        </div>
+        <img
+            src="https://images.unsplash.com/photo-149購?auto=format&fit=crop&w=1200&q=85"
+            alt="Shopping products"
+            onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=85';">
+    </section>
+
+    <section class="content-section">
+        <div class="section-title">
+            <h2><span>⚡</span> In The Spotlight</h2>
+            <a th:href="@{/signup}">View All →</a>
+        </div>
+
+        <div class="spotlight-grid">
+            <a class="spotlight-card" th:href="@{/signup}">
+                <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=400&q=80" alt="Camera">
+                <div><h3>Best Cameras</h3><p>From ₹24,999</p></div>
+            </a>
+            <a class="spotlight-card" th:href="@{/signup}">
+                <img src="https://images.unsplash.com/photo-160 earbuds?auto=format&fit=crop&w=400&q=80" alt="Wireless earbuds"
+                     onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80';">
+                <div><h3>Wireless Earbuds</h3><p>From ₹1,299</p></div>
+            </a>
+            <a class="spotlight-card" th:href="@{/signup}">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80" alt="Sneakers">
+                <div><h3>Trendy Footwear</h3><p>Min. 40% Off</p></div>
+            </a>
+            <a class="spotlight-card" th:href="@{/signup}">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80" alt="Wristwatch">
+                <div><h3>Stylish Watches</h3><p>From ₹1,499</p></div>
+            </a>
+            <a class="spotlight-card" th:href="@{/signup}">
+                <img src="https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=400&q=80" alt="Beauty products">
+                <div><h3>Beauty Essentials</h3><p>Up to 50% Off</p></div>
+            </a>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-title">
+            <h2><span>👑</span> Trending Works for You</h2>
+            <a th:href="@{/signup}">View All →</a>
+        </div>
+
+        <div class="product-grid">
+            <article class="product-card">
+                <a th:href="@{/signup}"><img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=500&q=80" alt="Smartphone"></a>
+                <div class="product-info"><h3>Smartphone 5G</h3><p>₹17,999 <del>₹22,999</del> <b>22% Off</b></p></div>
+            </article>
+            <article class="product-card">
+                <a th:href="@{/signup}"><img src="https://images.unsplash.com/photo-149손?auto=format&fit=crop&w=500&q=80" alt="Laptop"
+                    onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=500&q=80';"></a>
+                <div class="product-info"><h3>Laptop (i5, 8GB)</h3><p>₹42,990 <del>₹54,990</del> <b>21% Off</b></p></div>
+            </article>
+            <article class="product-card">
+                <a th:href="@{/signup}"><img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=500&q=80" alt="Backpack"></a>
+                <div class="product-info"><h3>Laptop Backpack</h3><p>₹799 <del>₹1,499</del> <b>46% Off</b></p></div>
+            </article>
+            <article class="product-card">
+                <a th:href="@{/signup}"><img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=500&q=80" alt="Women's dress"></a>
+                <div class="product-info"><h3>Women's Dress</h3><p>₹999 <del>₹1,999</del> <b>50% Off</b></p></div>
+            </article>
+            <article class="product-card">
+                <a th:href="@{/signup}"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80" alt="Smart watch"></a>
+                <div class="product-info"><h3>Smart Watch</h3><p>₹2,499 <del>₹4,999</del> <b>50% Off</b></p></div>
+            </article>
+            <article class="product-card">
+                <a th:href="@{/signup}"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80" alt="Headphones"></a>
+                <div class="product-info"><h3>Headphones</h3><p>₹1,999 <del>₹3,499</del> <b>42% Off</b></p></div>
+            </article>
+        </div>
+    </section>
+
+    <section class="brand-banners">
+        <a class="brand-banner motorola" th:href="@{/signup}">
+            <div><strong>motorola</strong><h3>Latest Smartphones</h3><p>From ₹12,999</p></div>
+            <img src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=400&q=80" alt="Smartphones">
+        </a>
+        <a class="brand-banner samsung" th:href="@{/signup}">
+            <div><strong>SAMSUNG</strong><h3>Up to 35% Off</h3><p>On TVs &amp; Appliances</p></div>
+            <img src="https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=400&q=80" alt="Television">
+        </a>
+        <a class="brand-banner boat" th:href="@{/signup}">
+            <div><strong>boAt</strong><h3>Up to 50% Off</h3><p>On Audio Devices</p></div>
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80" alt="Headphones">
+        </a>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="footer-main">
+        <div class="footer-brand">
+            <a class="logo" th:href="@{/}">🛒 OneCart</a>
+            <p>Your one-stop marketplace<br>with multiple trusted sellers.</p>
+        </div>
+        <div><h4>About</h4><a th:href="@{/about}">About Us</a><a th:href="@{/contact}">Contact Us</a><a href="#">Careers</a></div>
+        <div><h4>Help</h4><a href="#">Payments</a><a href="#">Shipping</a><a href="#">Returns &amp; Refunds</a><a href="#">FAQ</a></div>
+        <div><h4>Policy</h4><a href="#">Terms of Use</a><a href="#">Privacy Policy</a><a href="#">Cancellation &amp; Returns</a></div>
+        <div><h4>Sell on OneCart</h4><a th:href="@{/signup}">Become a Seller</a><a th:href="@{/login}">Seller Login</a></div>
+        <div><h4>Follow Us</h4><p class="social-links">◎　▶　in　𝕏</p></div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 OneCart. All rights reserved.</p>
+        <p>VISA　●　Mastercard　UPI</p>
+    </div>
+</footer>
+
+</body>
+</html>

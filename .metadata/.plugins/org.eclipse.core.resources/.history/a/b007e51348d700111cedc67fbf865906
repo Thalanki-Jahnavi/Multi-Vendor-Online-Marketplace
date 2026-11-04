@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Shop Everything</title>
+
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <script th:src="@{/js/home.js}" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-top">
+        <a class="brand" th:href="@{/}" aria-label="OneCart home">
+            <span class="brand-mark">O</span>
+            <span>One<span class="brand-highlight">Cart</span></span>
+        </a>
+
+        <form class="search-form" th:action="@{/search}" method="get" role="search">
+            <input type="search"
+                   name="q"
+                   placeholder="Search products, brands, and stores"
+                   aria-label="Search products, brands, and stores">
+            <button type="submit" aria-label="Search">⌕</button>
+        </form>
+
+        <nav class="header-actions" aria-label="Account navigation">
+            <a th:href="@{/login}">Sign in</a>
+            <a class="cart-link" th:href="@{/cart}">Cart <span aria-hidden="true">🛒</span></a>
+        </nav>
+    </div>
+
+    <nav class="category-nav" aria-label="Product categories">
+        <a th:href="@{/products}">All products</a>
+        <a th:href="@{/products(category='Fashion')}">Fashion</a>
+        <a th:href="@{/products(category='Electronics')}">Electronics</a>
+        <a th:href="@{/products(category='Home')}">Home & living</a>
+        <a th:href="@{/products(category='Beauty')}">Beauty</a>
+        <a th:href="@{/stores}">Explore stores</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="hero-content">
+            <p class="eyebrow">ONE MARKETPLACE. MANY STORES.</p>
+            <h1>Good finds.<br><span>Great little discoveries.</span></h1>
+            <p class="hero-description">
+                Shop products from independent stores, all in one place.
+            </p>
+            <div class="hero-actions">
+                <a class="button button-primary" th:href="@{/products}">Explore products</a>
+                <a class="button button-secondary" th:href="@{/stores}">Meet the stores</a>
+            </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+            <div class="hero-orbit orbit-one"></div>
+            <div class="hero-orbit orbit-two"></div>
+            <div class="hero-bag">🛍️</div>
+            <div class="floating-tag tag-top">Made to discover</div>
+            <div class="floating-tag tag-bottom">Your next favourite</div>
+        </div>
+    </section>
+
+    <section class="benefit-strip" aria-label="OneCart benefits">
+        <div><span class="benefit-icon">✦</span><span>Unique finds from many stores</span></div>
+        <div><span class="benefit-icon">✓</span><span>Shop with confidence</span></div>
+        <div><span class="benefit-icon">♡</span><span>Discover something new</span></div>
+    </section>
+
+    <section class="section" id="featured-products">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">HANDPICKED FOR YOU</p>
+                <h2>Featured finds</h2>
+                <p class="section-description">A few things worth adding to your cart.</p>
+            </div>
+            <a class="text-link" th:href="@{/products}">View all products <span aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="product-grid" th:if="${products != null and !#lists.isEmpty(products)}">
+            <article class="product-card" th:each="product : ${products}">
+                <a class="product-image-link"
+                   th:href="@{/products/{id}(id=${product.productId})}"
+                   th:aria-label="${'View ' + product.productName}">
+                    <div class="product-image-placeholder">
+                        <span>✦</span>
+                    </div>
+                </a>
+
+                <div class="product-info">
+                    <p class="product-category"
+                       th:text="${product.category != null ? product.category : 'Featured'}">
+                        Featured
+                    </p>
+                    <h3>
+                        <a th:href="@{/products/{id}(id=${product.productId})}"
+                           th:text="${product.productName}">
+                            Product name
+                        </a>
+                    </h3>
+
+                    <p class="product-brand"
+                       th:if="${product.brand != null and !#strings.isEmpty(product.brand)}"
+                       th:text="${product.brand}">
+                        Brand
+                    </p>
+
+                    <div class="product-card-bottom">
+                        <p class="product-price">
+                            ₹<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+                        </p>
+                        <a class="quick-view-link"
+                           th:href="@{/products/{id}(id=${product.productId})}"
+                           aria-label="View product">View <span aria-hidden="true">↗</span></a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="empty-state" th:if="${products == null or #lists.isEmpty(products)}">
+            <span class="empty-state-icon">✦</span>
+            <h3>Fresh finds are on the way</h3>
+            <p>Approved products will appear here when they’re available.</p>
+        </div>
+    </section>
+
+    <section class="store-section" id="stores">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">SMALL STORES, BIG IDEAS</p>
+                <h2>Stores to discover</h2>
+                <p class="section-description">Explore the people and businesses behind the products.</p>
+            </div>
+            <a class="text-link" th:href="@{/stores}">Explore all stores <span aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="store-grid" th:if="${vendors != null and !#lists.isEmpty(vendors)}">
+            <article class="store-card" th:each="vendor : ${vendors}">
+                <div class="store-avatar" aria-hidden="true">
+                    <span th:text="${#strings.substring(vendor.storeName, 0, 1)}">S</span>
+                </div>
+                <div class="store-info">
+                    <h3 th:text="${vendor.storeName}">Store name</h3>
+                    <p>Discover products from this store.</p>
+                    <a class="store-link"
+                       th:href="@{/stores/{id}(id=${vendor.userId})}">
+                        Visit store <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <div class="empty-state" th:if="${vendors == null or #lists.isEmpty(vendors)}">
+            <span class="empty-state-icon">♡</span>
+            <h3>Stores to discover soon</h3>
+            <p>New vendor stores will appear here once they’re available.</p>
+        </div>
+    </section>
+
+    <section class="vendor-cta">
+        <div>
+            <p class="eyebrow">HAVE SOMETHING TO SHARE?</p>
+            <h2>Bring your store to OneCart.</h2>
+            <p>Join a marketplace where your products can find their people.</p>
+        </div>
+        <a class="button button-light" th:href="@{/signup}">Become a vendor <span aria-hidden="true">→</span></a>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <a class="brand footer-brand" th:href="@{/}">
+        <span class="brand-mark">O</span>
+        <span>One<span class="brand-highlight">Cart</span></span>
+    </a>
+    <p>One marketplace. Many stores. More to discover.</p>
+    <div class="footer-links">
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/privacy}">Privacy</a>
+    </div>
+    <p class="copyright">© <span th:text="${#dates.year(#dates.createNow())}">2026</span> OneCart</p>
+</footer>
+
+</body>
+</html>

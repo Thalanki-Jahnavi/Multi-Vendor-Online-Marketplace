@@ -1,0 +1,37 @@
+package com.vendor.controller;
+
+import java.util.List;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.vendor.service.ProductService;
+import com.vendor.service.VendorService;
+
+@Controller
+public class HomeController {
+
+    private final ProductService productService;
+    private final VendorService vendorService;
+
+    public HomeController(
+            ProductService productService,
+            VendorService vendorService) {
+        this.productService = productService;
+        this.vendorService = vendorService;
+    }
+
+    @GetMapping("/")
+    public String home(Model model) {
+        model.addAttribute("userRole", "GUEST");
+        model.addAttribute("categories", List.of(
+                "Fashion", "Electronics", "Home & Living",
+                "Beauty", "Sports", "Gifts & More"
+        ));
+        model.addAttribute("products", productService.getHomepageProducts());
+        model.addAttribute("vendors", vendorService.getVendors());
+
+        return "home";
+    }
+}

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Shop Online</title>
+
+    <style>
+        :root {
+            --terracotta: #b6533c;
+            --cream: #fff7ea;
+            --plum: #352536;
+            --rose: #e8b8a8;
+            --sand: #f0e2cf;
+            --muted: #766d6b;
+            --border: #eadfd5;
+            --white: #fff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--cream);
+            color: var(--plum);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        button, input, select { font: inherit; }
+        button { cursor: pointer; }
+        a { color: inherit; text-decoration: none; }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--white);
+            box-shadow: 0 2px 12px #35253612;
+        }
+
+        .header-top {
+            max-width: 1240px;
+            margin: auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-shrink: 0;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: var(--terracotta);
+            color: white;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 17px;
+            flex-shrink: 0;
+        }
+
+        .main-nav a {
+            font-size: .82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .main-nav a:hover, .account-link:hover { color: var(--terracotta); }
+
+        .search-form {
+            display: flex;
+            flex: 1;
+            min-width: 140px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: #fffdfa;
+        }
+
+        .search-form input {
+            width: 100%;
+            min-width: 0;
+            padding: 12px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+        }
+
+        .search-form button {
+            padding: 0 16px;
+            border: 0;
+            background: var(--terracotta);
+            color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .account-link, .cart-button {
+            font-size: .9rem;
+            font-weight: 700;
+        }
+
+        .cart-button {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: white;
+            color: var(--plum);
+        }
+
+        #cartCount {
+            display: inline-grid;
+            min-width: 22px;
+            height: 22px;
+            margin-left: 4px;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--terracotta);
+            color: white;
+            font-size: .75rem;
+        }
+
+        .category-nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 18px 13px;
+        }
+
+        .category-button {
+            padding: 8px 15px;
+            border: 0;
+            border-radius: 20px;
+            background: transparent;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .category-button:hover, .category-button.active {
+            background: var(--sand);
+            color: var(--plum);
+        }
+
+        main {
+            max-width: 1240px;
+            margin: auto;
+            padding: 28px 24px 60px;
+        }
+
+        .hero-banner {
+            min-height: 350px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 48px 56px;
+            border-radius: 14px;
+            background: linear-gradient(110deg, #f0e2cf, #f9e8d8 58%, #e8b8a8);
+        }
+
+        .hero-copy { position: relative; z-index: 1; max-width: 550px; }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            color: var(--terracotta);
+            font-size: .76rem;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .hero-copy h1 {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(2.6rem, 5vw, 4.2rem);
+            line-height: 1.05;
+            letter-spacing: -.04em;
+        }
+
+        .hero-copy > p:not(.eyebrow) {
+            margin: 17px 0 25px;
+            color: #615456;
+            font-size: 1.05rem;
+        }
+
+        .hero-button {
+            display: inline-block;
+            padding: 13px 22px;
+            border-radius: 6px;
+            background: var(--terracotta);
+            color: white;
+            font-weight: 700;
+        }
+
+        .hero-button:hover, .checkout-button:hover { background: #99442f; }
+
+        .hero-art {
+            position: absolute;
+            inset: 0 0 0 auto;
+            width: 42%;
+            overflow: hidden;
+        }
+
+        .hero-art-circle {
+            position: absolute;
+            top: 12%;
+            right: 12%;
+            width: 270px;
+            height: 270px;
+            border: 34px solid #ffffff50;
+            border-radius: 50%;
+        }
+
+        .hero-art-label {
+            position: absolute;
+            right: 18%;
+            bottom: 17%;
+            color: #352536aa;
+            font-family: Georgia, serif;
+            font-size: 2.3rem;
+            font-weight: 800;
+            line-height: .9;
+            transform: rotate(-8deg);
+        }
+
+        .shop-section { padding-top: 48px; }
+
+        .section-heading {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            font-family: Georgia, serif;
+            font-size: 2rem;
+        }
+
+        #resultSummary, .section-heading p:not(.eyebrow) {
+            color: var(--muted);
+        }
+
+        .sort-control {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .sort-control select {
+            padding: 9px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: white;
+            color: var(--plum);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            overflow: hidden;
+            border: 1px solid #eee4dc;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 14px #35253608;
+        }
+
+        .product-image-wrap {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            background: #f4eee8;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            transition: transform .2s;
+        }
+
+        .product-card:hover .product-image { transform: scale(1.04); }
+
+        .product-category {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #ffffffed;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+
+        .product-info { padding: 15px; }
+        .product-seller { margin: 0 0 5px; color: var(--muted); font-size: .78rem; }
+        .product-name { min-height: 44px; margin: 0; font-size: 1rem; line-height: 1.4; }
+
+        .product-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .product-price { font-weight: 800; }
+
+        .add-button {
+            padding: 8px 11px;
+            border: 1px solid var(--terracotta);
+            border-radius: 5px;
+            background: white;
+            color: var(--terracotta);
+            font-size: .85rem;
+            font-weight: 700;
+        }
+
+        .add-button:hover { background: var(--terracotta); color: white; }
+
+        .empty-state { padding: 40px 15px; text-align: center; }
+        .empty-state p { color: var(--muted); }
+        [hidden] { display: none !important; }
+
+        .site-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 25px max(24px, calc((100% - 1192px) / 2));
+            border-top: 1px solid var(--border);
+            background: #fffaf4;
+        }
+
+        .site-footer p, .site-footer small { color: var(--muted); }
+        .site-footer p { margin: 0; }
+
+        .cart-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            justify-content: flex-end;
+            background: #23192373;
+        }
+
+        .cart-panel {
+            display: flex;
+            flex-direction: column;
+            width: min(100%, 430px);
+            height: 100%;
+            padding: 22px;
+            background: white;
+        }
+
+        .cart-heading, .cart-total {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cart-heading { border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        .cart-heading h2 { margin: 0; font-family: Georgia, serif; }
+        .cart-heading button { border: 0; background: var(--sand); border-radius: 50%; width: 34px; height: 34px; font-size: 1.4rem; }
+
+        .cart-items { flex: 1; overflow-y: auto; padding: 12px 0; }
+        .cart-empty { color: var(--muted); text-align: center; }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 65px 1fr auto;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cart-item img { width: 65px; height: 65px; border-radius: 6px; object-fit: cover; }
+        .cart-item-name { margin: 0 0 4px; font-weight: 700; }
+        .cart-item-price { margin: 0; color: var(--muted); font-size: .9rem; }
+        .quantity-controls { display: flex; align-items: center; gap: 9px; margin-top: 7px; }
+        .quantity-controls button { width: 25px; height: 25px; border: 1px solid var(--border); background: white; }
+        .remove-button { border: 0; background: transparent; color: var(--terracotta); font-size: .8rem; }
+
+        .cart-footer { padding-top: 15px; border-top: 1px solid var(--border); }
+        .cart-total { margin-bottom: 14px; }
+        .checkout-button, .continue-shopping-button { width: 100%; padding: 12px; border-radius: 6px; font-weight: 700; }
+        .checkout-button { border: 0; background: var(--terracotta); color: white; }
+        .checkout-button:disabled { opacity: .5; cursor: not-allowed; }
+        .continue-shopping-button { margin-top: 8px; border: 1px solid var(--border); background: white; color: var(--plum); }
+
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 30;
+            padding: 12px 17px;
+            border-radius: 7px;
+            background: var(--plum);
+            color: white;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px);
+            transition: .2s;
+        }
+
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 1050px) {
+            .main-nav { display: none; }
+            .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 720px) {
+            .header-top { flex-wrap: wrap; padding: 14px 16px; gap: 13px; }
+            .search-form { order: 3; flex-basis: 100%; }
+            .header-actions { margin-left: auto; }
+            .category-nav { justify-content: flex-start; overflow-x: auto; }
+            .category-button { flex-shrink: 0; }
+            main { padding: 18px 16px 40px; }
+            .hero-banner { min-height: 300px; padding: 28px 23px; }
+            .hero-copy h1 { font-size: 2.6rem; }
+            .hero-art { opacity: .4; }
+            .section-heading { align-items: flex-start; flex-direction: column; }
+            .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+            .product-info { padding: 11px; }
+            .product-name { min-height: 0; font-size: .9rem; }
+            .product-bottom { align-items: flex-start; flex-direction: column; }
+            .add-button { width: 100%; }
+            .site-footer { align-items: flex-start; flex-direction: column; padding: 22px 16px; }
+        }
+
+        @media (max-width: 380px) {
+            .product-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-top">
+            <a class="brand" href="/guest/index.html" aria-label="OneCart home">
+                <span class="brand-mark">O</span>
+                <span>OneCart</span>
+            </a>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a href="#shop">Shop</a>
+                <a href="#shop">Fashion</a>
+                <a href="#shop">Electronics</a>
+                <a href="#shop">Home</a>
+            </nav>
+
+            <form class="search-form" id="searchForm" role="search">
+                <input id="searchInput" type="search"
+                       placeholder="Search products and sellers"
+                       aria-label="Search products and sellers">
+                <button type="submit" aria-label="Search">Search</button>
+            </form>
+
+            <div class="header-actions">
+                <a class="account-link" href="/guest/login.html" id="accountButton">Profile</a>
+                <button class="cart-button" id="openCartButton" type="button">
+                    Bag <span id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+
+        <nav class="category-nav" aria-label="Product categories">
+            <button class="category-button active" type="button" data-category="All">All</button>
+            <button class="category-button" type="button" data-category="Electronics">Electronics</button>
+            <button class="category-button" type="button" data-category="Fashion">Fashion</button>
+            <button class="category-button" type="button" data-category="Home">Home</button>
+            <button class="category-button" type="button" data-category="Beauty">Beauty</button>
+            <button class="category-button" type="button" data-category="Fitness">Fitness</button>
+            <button class="category-button" type="button" data-category="Books">Books</button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-banner">
+            <div class="hero-copy">
+                <p class="eyebrow">OneCart edit · Everyday favourites</p>
+                <h1>Find your<br>everyday favourite.</h1>
+                <p>Fresh finds from independent sellers, all in one place.</p>
+                <a class="hero-button" href="#shop">Shop the collection</a>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+                <span class="hero-art-circle"></span>
+                <span class="hero-art-label">GOOD<br>FINDS</span>
+            </div>
+        </section>
+
+        <section class="shop-section" id="shop">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Picked for you</p>
+                    <h2>Shop our products</h2>
+                    <p id="resultSummary">Explore products from our sellers</p>
+                </div>
+                <label class="sort-control" for="sortSelect">
+                    Sort by
+                    <select id="sortSelect">
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: low to high</option>
+                        <option value="price-high">Price: high to low</option>
+                        <option value="name">Name</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="product-grid" id="productGrid"></div>
+            <div class="empty-state" id="emptyState" hidden>
+                <h3>No products found</h3>
+                <p>Try another search or choose a different category.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <a class="brand" href="/guest/index.html">
+            <span class="brand-mark">O</span>
+            <span>OneCart</span>
+        </a>
+        <p>Everyday finds from sellers you can discover.</p>
+        <small>© 2026 OneCart</small>
+    </footer>
+
+    <div class="cart-overlay" id="cartOverlay" hidden>
+        <aside class="cart-panel" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+            <div class="cart-heading">
+                <h2 id="cartTitle">Your bag</h2>
+                <button id="closeCartButton" type="button" aria-label="Close cart">×</button>
+            </div>
+            <div class="cart-items" id="cartItems"></div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Subtotal</span>
+                    <strong id="cartSubtotal">₹0</strong>
+                </div>
+                <button class="checkout-button" id="checkoutButton" type="button">Continue to checkout</button>
+                <button class="continue-shopping-button" id="continueShoppingButton" type="button">Continue shopping</button>
+            </div>
+        </aside>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

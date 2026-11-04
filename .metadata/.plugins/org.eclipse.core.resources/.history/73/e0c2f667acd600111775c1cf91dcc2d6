@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OneCart | Shop Everything</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/guest/index.html">One<span>Cart</span></a>
+
+    <form class="search" id="searchForm">
+      <input id="searchInput" type="search" placeholder="Search for products, brands and more">
+      <button type="submit" aria-label="Search">⌕</button>
+    </form>
+
+    <nav class="nav-actions">
+      <a href="/guest/login.html">Login</a>
+      <a href="/guest/signup.html">Sign up</a>
+      <a href="#" id="cartLink">Cart <span class="cart-count">0</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="category-strip" aria-label="Product categories">
+      <a href="#products">All</a>
+      <a href="#products">Fashion</a>
+      <a href="#products">Electronics</a>
+      <a href="#products">Home</a>
+      <a href="#products">Beauty</a>
+      <a href="#products">Books</a>
+    </section>
+
+    <section class="hero">
+      <div>
+        <p class="eyebrow">ONECART MARKETPLACE</p>
+        <h1>Discover more.<br>Shop it all in one cart.</h1>
+        <p class="hero-copy">Explore products from different vendors, all in one place.</p>
+        <a class="hero-button" href="#products">Explore products</a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="art-card card-one">Everyday<br><strong>essentials</strong></div>
+        <div class="art-card card-two">Fresh finds<br><strong>just for you</strong></div>
+        <div class="art-circle">OC</div>
+      </div>
+    </section>
+
+    <section class="products-section" id="products">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">PICKED FOR YOU</p>
+          <h2>Popular categories</h2>
+        </div>
+        <span>Browse the marketplace</span>
+      </div>
+
+      <div class="category-cards">
+        <a class="category-card" href="#products"><span>01</span><strong>Electronics</strong><small>Gadgets and more</small></a>
+        <a class="category-card" href="#products"><span>02</span><strong>Fashion</strong><small>Everyday styles</small></a>
+        <a class="category-card" href="#products"><span>03</span><strong>Home & living</strong><small>Make space yours</small></a>
+        <a class="category-card" href="#products"><span>04</span><strong>Beauty</strong><small>Your daily favorites</small></a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <a class="brand" href="/guest/index.html">One<span>Cart</span></a>
+    <p>Many vendors. One easy shopping experience.</p>
+  </footer>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

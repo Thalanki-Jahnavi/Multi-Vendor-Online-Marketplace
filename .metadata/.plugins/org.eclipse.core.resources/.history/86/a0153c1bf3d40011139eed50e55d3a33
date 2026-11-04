@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up | OneCart</title>
+  <style>
+    :root {
+      --emerald: #087e78;
+      --deep-green: #123e3a;
+      --mint: #e5f4f0;
+      --soft-grey: #f5f7f6;
+      --border: #dce7e3;
+      --muted: #647773;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--deep-green);
+      background: var(--soft-grey);
+    }
+
+    header {
+      height: 84px;
+      padding: 0 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: white;
+      border-bottom: 1px solid #e8eeeb;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--deep-green);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--emerald); }
+
+    nav {
+      display: flex;
+      gap: 30px;
+    }
+
+    nav a, .login-link {
+      color: #647773;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    nav a:hover, .login-link:hover { color: var(--emerald); }
+
+    main {
+      min-height: calc(100vh - 84px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+    }
+
+    .signup-card {
+      width: min(100%, 1000px);
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(18, 62, 58, 0.09);
+    }
+
+    .welcome-panel {
+      padding: 54px 42px;
+      background: var(--deep-green);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .welcome-panel .eyebrow {
+      color: #a9e2d6;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .welcome-panel h1 {
+      margin: 18px 0 14px;
+      font-size: 38px;
+      line-height: 1.15;
+    }
+
+    .welcome-panel p {
+      color: #d1e3df;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .benefits {
+      margin-top: 32px;
+      display: grid;
+      gap: 15px;
+      color: #e5f4f0;
+      font-size: 14px;
+    }
+
+    .benefits div::before {
+      content: "✓";
+      display: inline-grid;
+      place-items: center;
+      width: 23px;
+      height: 23px;
+      margin-right: 10px;
+      border-radius: 50%;
+      background: #28645d;
+      color: white;
+      font-weight: bold;
+    }
+
+    .form-panel { padding: 48px 52px; }
+
+    .form-panel h2 {
+      margin: 0 0 9px;
+      font-size: 30px;
+    }
+
+    .form-intro {
+      margin: 0 0 28px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input, select {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: white;
+      color: var(--deep-green);
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 3px rgba(8, 126, 120, 0.12);
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 50px;
+      margin-top: 4px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--emerald);
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover { background: #066b66; }
+
+    .message {
+      min-height: 20px;
+      margin: 12px 0 0;
+      color: #b42318;
+      font-size: 14px;
+    }
+
+    .signin {
+      margin: 20px 0 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .signin a {
+      color: var(--emerald);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    @media (max-width: 760px) {
+      header { padding: 0 5%; }
+      nav { gap: 14px; }
+      .signup-card { grid-template-columns: 1fr; }
+      .welcome-panel { padding: 32px; }
+      .welcome-panel h1 { font-size: 30px; }
+      .form-panel { padding: 34px 28px; }
+    }
+
+    @media (max-width: 480px) {
+      nav a:not(:first-child) { display: none; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="/guest/index.html">One<span>Cart</span></a>
+    <nav>
+      <a href="/guest/index.html">Home</a>
+      <a href="/guest/about.html">About</a>
+      <a href="/guest/contact.html">Contact</a>
+    </nav>
+    <a class="login-link" href="/guest/login.html">Login</a>
+  </header>
+
+  <main>
+    <section class="signup-card">
+      <aside class="welcome-panel">
+        <div class="eyebrow">Welcome to OneCart</div>
+        <h1>Everything you love, in one cart.</h1>
+        <p>Create an account to shop from multiple vendors and keep your orders organized in one place.</p>
+        <div class="benefits">
+          <div>Discover products from different vendors</div>
+          <div>Track your orders in one place</div>
+          <div>Enjoy a simple shopping experience</div>
+        </div>
+      </aside>
+
+      <section class="form-panel">
+        <h2>Create your account</h2>
+        <p class="form-intro">Enter your details to get started.</p>
+
+        <form id="signupForm">
+          <div class="field">
+            <label for="fullName">Full name</label>
+            <input id="fullName" name="fullName" type="text" placeholder="Enter your full name" required>
+          </div>
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" placeholder="Create password" required minlength="8">
+            </div>
+            <div class="field">
+              <label for="confirmPassword">Confirm password</label>
+              <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Repeat password" required minlength="8">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="accountType">Account type</label>
+            <select id="accountType" name="accountType" required>
+              <option value="CUSTOMER">Customer</option>
+              <option value="VENDOR">Vendor</option>
+            </select>
+          </div>
+
+          <button class="submit-btn" type="submit">Create Account</button>
+          <p class="message" id="message" aria-live="polite"></p>
+        </form>
+
+        <p class="signin">Already have an account? <a href="/guest/login.html">Sign in</a></p>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    document.getElementById("signupForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const message = document.getElementById("message");
+
+      if (password !== confirmPassword) {
+        message.textContent = "Passwords do not match.";
+        return;
+      }
+
+      message.style.color = "#087e78";
+      message.textContent = "Form looks good. Account creation will be connected to the backend later.";
+    });
+  </script>
+</body>
+</html>

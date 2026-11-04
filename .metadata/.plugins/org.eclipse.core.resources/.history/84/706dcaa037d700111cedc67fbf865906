@@ -1,0 +1,60 @@
+package com.vendor.controller;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class HomeController {
+
+    @GetMapping("/")
+    public String home(Model model) {
+        // Temporary role value for the public homepage.
+        // Replace with the authenticated user's actual role when login is connected.
+        model.addAttribute("userRole", "GUEST");
+
+        model.addAttribute("categories", List.of(
+            "Fashion", "Electronics", "Home", "Beauty", "Sports", "Gifts"
+        ));
+
+        // Temporary sample products. Replace with your database-backed service later.
+        model.addAttribute("products", List.of(
+            new HomeProduct(1L, "Wireless Headphones", "Electronics",
+                "SoundNest", new BigDecimal("2499.00"), 15, 4.6, null),
+            new HomeProduct(2L, "Everyday Tote Bag", "Fashion",
+                "Thread & Co.", new BigDecimal("1299.00"), 10, 4.8, null),
+            new HomeProduct(3L, "Ceramic Coffee Set", "Home",
+                "Clay House", new BigDecimal("899.00"), 0, 4.5, null),
+            new HomeProduct(4L, "Desk Planter", "Home",
+                "Green Corner", new BigDecimal("599.00"), 12, 4.7, null)
+        ));
+
+        model.addAttribute("vendors", List.of(
+            new HomeVendor(1L, "SoundNest", "Audio essentials for everyday life"),
+            new HomeVendor(2L, "Thread & Co.", "Thoughtful everyday fashion"),
+            new HomeVendor(3L, "Clay House", "Homeware made to feel special")
+        ));
+
+        return "home";
+    }
+
+    public record HomeProduct(
+        Long id,
+        String name,
+        String category,
+        String vendorName,
+        BigDecimal price,
+        Integer discount,
+        Double rating,
+        String imageUrl
+    ) {}
+
+    public record HomeVendor(
+        Long id,
+        String name,
+        String description
+    ) {}
+}
