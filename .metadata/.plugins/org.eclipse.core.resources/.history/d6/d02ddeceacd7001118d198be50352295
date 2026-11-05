@@ -1,0 +1,40 @@
+package com.onecart.service;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.onecart.dto.ProductCard;
+import com.vendor.entity.Product;
+import com.vendor.repository.ProductRepository;
+
+@Service
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductCard> getFeaturedProducts() {
+
+        List<Product> products =
+                productRepository.findApprovedProducts();
+
+        return products.stream()
+                .map(product -> new ProductCard(
+                        product.getProductId(),
+                        product.getProductName(),
+                        product.getPrice(),
+                        product.getDiscountPercentage() == null
+                                ? BigDecimal.ZERO
+                                : product.getDiscountPercentage(),
+                        product.getVendor().getBusinessName()
+                ))
+                .toList();
+    }
+}

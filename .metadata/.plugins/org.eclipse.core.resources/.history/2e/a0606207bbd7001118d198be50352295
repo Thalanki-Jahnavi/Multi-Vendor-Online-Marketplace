@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Home</title>
+
+    <style>
+        :root {
+            --emerald: #087e78;
+            --deep-green: #123e3a;
+            --mint: #e5f4f0;
+            --white: #ffffff;
+            --text: #243b39;
+            --muted: #6b7c79;
+            --border: #e1ebe8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8fbfa;
+            color: var(--text);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .top-bar {
+            background: var(--deep-green);
+            color: var(--white);
+            padding: 10px 5%;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            color: var(--emerald);
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .search-box {
+            display: flex;
+            flex: 1;
+            max-width: 520px;
+            min-width: 220px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px 0 0 8px;
+            outline: none;
+        }
+
+        .search-box button {
+            border: none;
+            background: var(--emerald);
+            color: white;
+            padding: 0 18px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+        }
+
+        .header-links {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .header-links a:hover {
+            color: var(--emerald);
+        }
+
+        nav {
+            background: var(--white);
+            padding: 13px 5%;
+            display: flex;
+            gap: 25px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        nav a {
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: var(--emerald);
+        }
+
+        .hero {
+            margin: 28px 5%;
+            padding: 55px 6%;
+            background: linear-gradient(115deg, var(--mint), #f4fbf8);
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .hero-content {
+            max-width: 560px;
+        }
+
+        .hero small {
+            color: var(--emerald);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero h1 {
+            color: var(--deep-green);
+            font-size: clamp(30px, 4vw, 48px);
+            line-height: 1.15;
+            margin: 15px 0;
+        }
+
+        .hero p {
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .primary-button {
+            display: inline-block;
+            background: var(--emerald);
+            color: var(--white);
+            padding: 13px 22px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .primary-button:hover {
+            background: var(--deep-green);
+        }
+
+        .hero-art {
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
+            flex-shrink: 0;
+        }
+
+        .section {
+            margin: 35px 5%;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .section-heading h2 {
+            color: var(--deep-green);
+            font-size: 26px;
+        }
+
+        .section-heading a {
+            color: var(--emerald);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .category-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 15px;
+            text-align: center;
+        }
+
+        .category-icon {
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+
+        .category-card h3 {
+            color: var(--deep-green);
+            font-size: 16px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(18, 62, 58, 0.09);
+        }
+
+        .product-image {
+            height: 190px;
+            background: var(--mint);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--emerald);
+            font-size: 56px;
+        }
+
+        .product-info {
+            padding: 16px;
+        }
+
+        .product-info h3 {
+            color: var(--deep-green);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            color: var(--emerald);
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 14px;
+        }
+
+        .product-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-to-cart {
+            flex: 1;
+            background: var(--emerald);
+            color: white;
+            border: none;
+            border-radius: 7px;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .add-to-cart:hover {
+            background: var(--deep-green);
+        }
+
+        .wishlist-button {
+            width: 40px;
+            height: 38px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 7px;
+            color: var(--deep-green);
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .wishlist-button.active {
+            color: #d83252;
+            border-color: #f2b9c4;
+            background: #fff4f6;
+        }
+
+        .empty-message {
+            grid-column: 1 / -1;
+            padding: 30px;
+            text-align: center;
+            color: var(--muted);
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        footer {
+            margin-top: 55px;
+            padding: 35px 5%;
+            background: var(--deep-green);
+            color: white;
+            text-align: center;
+        }
+
+        footer p {
+            margin-top: 10px;
+            color: #d2e5e1;
+            font-size: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .product-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero-art {
+                width: 170px;
+                height: 170px;
+                font-size: 75px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                align-items: stretch;
+            }
+
+            .search-box {
+                order: 3;
+                max-width: none;
+                flex-basis: 100%;
+            }
+
+            .header-links {
+                gap: 12px;
+            }
+
+            .hero {
+                padding: 35px 7%;
+            }
+
+            .hero-art {
+                display: none;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-bar">
+        Discover products from multiple sellers, all in one place.
+    </div>
+
+    <header>
+        <a class="logo" th:href="@{/}">OneCart</a>
+
+        <form class="search-box" th:action="@{/}" method="get">
+            <input type="text" name="search" placeholder="Search products...">
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="header-links">
+            <a th:href="@{/wishlist}">
+                ♡ Wishlist <span id="wishlist-count">0</span>
+            </a>
+            <a th:href="@{/cart}">
+                🛒 Cart <span id="cart-count">0</span>
+            </a>
+            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/signup}">Sign Up</a>
+        </div>
+    </header>
+
+    <nav>
+        <a th:href="@{/}">Home</a>
+        <a href="#categories">Categories</a>
+        <a href="#products">Products</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <small>Welcome to OneCart</small>
+            <h1>Everything you love, all in one cart.</h1>
+            <p>
+                Explore products from different sellers and find something
+                you’ll love, all in one convenient marketplace.
+            </p>
+            <a class="primary-button" href="#products">Shop Now</a>
+        </div>
+        <div class="hero-art" aria-hidden="true">🛍️</div>
+    </section>
+
+    <section class="section" id="categories">
+        <div class="section-heading">
+            <h2>Shop by Category</h2>
+        </div>
+
+        <div class="category-grid">
+            <a class="category-card" href="#products">
+                <div class="category-icon">👕</div>
+                <h3>Fashion</h3>
+            </a>
+            <a class="category-card" href="#products">
+                <div class="category-icon">📱</div>
+                <h3>Electronics</h3>
+            </a>
+            <a class="category-card" href="#products">
+                <div class="category-icon">🏠</div>
+                <h3>Home & Living</h3>
+            </a>
+            <a class="category-card" href="#products">
+                <div class="category-icon">✨</div>
+                <h3>Accessories</h3>
+            </a>
+        </div>
+    </section>
+
+    <section class="section" id="products">
+        <div class="section-heading">
+            <h2>Featured Products</h2>
+            <a href="#products">Explore products →</a>
+        </div>
+
+        <div class="product-grid">
+            <article class="product-card"
+                     th:each="product : ${products}"
+                     th:data-product-id="${product.id}"
+                     th:data-product-name="${product.name}"
+                     th:data-product-price="${product.price}">
+
+                <div class="product-image" aria-hidden="true">🛍️</div>
+
+                <div class="product-info">
+                    <h3 th:text="${product.name}">Product name</h3>
+                    <p class="product-price">
+                        ₹<span th:text="${product.price}">0</span>
+                    </p>
+
+                    <div class="product-actions">
+                        <button type="button" class="add-to-cart">
+                            Add to Cart
+                        </button>
+                        <button type="button"
+                                class="wishlist-button"
+                                aria-label="Add to wishlist"
+                                title="Add to wishlist">
+                            ♡
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <div class="empty-message" th:if="${#lists.isEmpty(products)}">
+                No products are available right now.
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <strong>OneCart</strong>
+        <p>One marketplace. Many sellers. Easy shopping.</p>
+    </footer>
+
+    <script>
+        const WISHLIST_KEY = "onecart-wishlist";
+        const CART_KEY = "onecart-cart";
+
+        function readStorage(key) {
+            try {
+                return JSON.parse(localStorage.getItem(key)) || [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function writeStorage(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function updateCounts() {
+            const wishlist = readStorage(WISHLIST_KEY);
+            const cart = readStorage(CART_KEY);
+
+            document.getElementById("wishlist-count").textContent = wishlist.length;
+
+            const cartCount = cart.reduce(function (total, item) {
+                return total + (Number(item.quantity) || 1);
+            }, 0);
+
+            document.getElementById("cart-count").textContent = cartCount;
+        }
+
+        function getProduct(card) {
+            return {
+                id: card.dataset.productId,
+                name: card.dataset.productName,
+                price: Number(card.dataset.productPrice)
+            };
+        }
+
+        document.querySelectorAll(".product-card").forEach(function (card) {
+            const product = getProduct(card);
+            const wishlistButton = card.querySelector(".wishlist-button");
+            const cartButton = card.querySelector(".add-to-cart");
+
+            function refreshWishlistButton() {
+                const wishlist = readStorage(WISHLIST_KEY);
+                const isSaved = wishlist.some(function (item) {
+                    return String(item.id) === String(product.id);
+                });
+
+                wishlistButton.classList.toggle("active", isSaved);
+                wishlistButton.textContent = isSaved ? "♥" : "♡";
+                wishlistButton.setAttribute(
+                    "aria-label",
+                    isSaved ? "Remove from wishlist" : "Add to wishlist"
+                );
+            }
+
+            wishlistButton.addEventListener("click", function () {
+                let wishlist = readStorage(WISHLIST_KEY);
+                const exists = wishlist.some(function (item) {
+                    return String(item.id) === String(product.id);
+                });
+
+                if (exists) {
+                    wishlist = wishlist.filter(function (item) {
+                        return String(item.id) !== String(product.id);
+                    });
+                } else {
+                    wishlist.push(product);
+                }
+
+                writeStorage(WISHLIST_KEY, wishlist);
+                refreshWishlistButton();
+                updateCounts();
+            });
+
+            cartButton.addEventListener("click", function () {
+                const cart = readStorage(CART_KEY);
+                const existingItem = cart.find(function (item) {
+                    return String(item.id) === String(product.id);
+                });
+
+                if (existingItem) {
+                    existingItem.quantity = (Number(existingItem.quantity) || 1) + 1;
+                } else {
+                    cart.push({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        quantity: 1
+                    });
+                }
+
+                writeStorage(CART_KEY, cart);
+                updateCounts();
+                cartButton.textContent = "Added!";
+                window.setTimeout(function () {
+                    cartButton.textContent = "Add to Cart";
+                }, 1000);
+            });
+
+            refreshWishlistButton();
+        });
+
+        updateCounts();
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+package com.example.demo.entity; // Use your actual package
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "products")
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "product_id")
+    private Long productId;
+
+    @Column(name = "product_name")
+    private String productName;
+
+    private Double price;
+
+    @Column(name = "discount_percentage")
+    private Double discountPercentage;
+
+    @Column(name = "product_status")
+    private String productStatus;
+
+    @Column(name = "approval_status")
+    private String approvalStatus;
+
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "vendor_id")
+    private Integer vendorId;
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Double getDiscountPercentage() {
+        return discountPercentage;
+    }
+
+    public void setDiscountPercentage(Double discountPercentage) {
+        this.discountPercentage = discountPercentage;
+    }
+
+    public String getProductStatus() {
+        return productStatus;
+    }
+
+    public void setProductStatus(String productStatus) {
+        this.productStatus = productStatus;
+    }
+
+    public String getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Integer getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(Integer vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public Double getDiscountedPrice() {
+        if (price == null || discountPercentage == null) {
+            return price;
+        }
+        return price - (price * discountPercentage / 100.0);
+    }
+}

@@ -1,0 +1,31 @@
+<div class="cart-drawer-items" id="cartDrawerItems"></div>
+    <!-- Empty cart notice -->
+    <div class="cart-drawer-empty" id="cartDrawerEmpty" style="display: none;">
+        <div class="cart-drawer-empty-icon">🛍️</div>
+        <h4>Your cart is empty</h4>
+        <p>Explore our products and find great items to add.</p>
+        <button type="button" class="btn-clear-filters" style="margin-top: 14px;" onclick="toggleCartDrawer(false)">Continue Shopping</button>
+    </div>
+    <!-- Footer Summary -->
+    <div class="cart-drawer-footer" id="cartDrawerFooter">
+        <div class="cart-summary-line">
+            <span>Subtotal</span>
+            <span id="cartDrawerSubtotal">₹0.00</span>
+        </div>
+        <div class="cart-summary-line">
+            <span>Estimated Shipping</span>
+            <span style="color: #2e7d32; font-weight: 700;">FREE</span>
+        </div>
+        <div class="cart-summary-total">
+            <span>Total Payable</span>
+            <span id="cartDrawerTotal">₹0.00</span>
+        </div>
+        <button type="button" class="btn-cart-checkout" onclick="alert('Proceeding to OneCart Checkout!')">
+            Proceed to Checkout →
+        </button>
+    </div>
+</aside>
+<!-- Interactive Scripts -->
+<script th:src="@{/js/products.js}"></script>
+</body>
+</html>

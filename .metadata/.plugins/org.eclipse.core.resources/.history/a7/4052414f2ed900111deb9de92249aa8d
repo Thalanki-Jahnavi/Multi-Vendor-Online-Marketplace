@@ -1,0 +1,128 @@
+package com.vendor.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import com.vendor.entity.Order;
+import com.vendor.entity.OrderItem;
+import com.vendor.entity.User;
+import com.vendor.repository.UserRepository;
+import com.vendor.service.OrderService;
+
+@Controller
+public class CheckoutController {
+
+    private final UserRepository userRepository;
+    private final OrderService orderService;
+
+    public CheckoutController(UserRepository userRepository, OrderService orderService) {
+        this.userRepository = userRepository;
+        this.orderService = orderService;
+    }
+
+    @GetMapping("/customer/checkout")
+    public String showCheckoutPage(Authentication authentication, Model model) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        userRepository.findByEmail(authentication.getName()).ifPresent(user -> {
+            model.addAttribute("customerName", user.getFirstName());
+            model.addAttribute("customerFullName",
+                    (user.getFirstName() != null ? user.getFirstName() : "")
+                    + " " + (user.getLastName() != null ? user.getLastName() : ""));
+            model.addAttribute("customerEmail", user.getEmail());
+            model.addAttribute("userId", user.getUserId());
+        });
+
+        return "customer/checkout";
+    }
+
+    @PostMapping("/customer/checkout/pay")
+    @ResponseBody
+    public ResponseEntity<?> processPaymentAndCreateOrder(
+            Authentication authentication,
+            @RequestBody Map<String, Object> payload) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        }
+
+        Optional<User> userOptional = userRepository.findByEmail(authentication.getName());
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(400).body(Map.of("error", "Customer record not found"));
+        }
+
+        User user = userOptional.get();
+
+        String fullName = (String) payload.getOrDefault("fullName", user.getFirstName());
+        String email = user.getEmail();
+        String phone = (String) payload.getOrDefault("phone", "9876543210");
+        String address = (String) payload.getOrDefault("address", "123 Main Street");
+        String paymentMethod = (String) payload.getOrDefault("paymentMethod", "CARD");
+        Double totalAmount = Double.valueOf(payload.getOrDefault("totalAmount", 0.0).toString());
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> cartItemsData = (List<Map<String, Object>>) payload.get("items");
+
+        List<OrderItem> items = new ArrayList<>();
+        if (cartItemsData != null) {
+            for (Map<String, Object> itemMap : cartItemsData) {
+                Long productId = itemMap.get("id") != null ? Long.valueOf(itemMap.get("id").toString()) : null;
+                String productName = (String) itemMap.getOrDefault("name", "Product");
+                Double price = itemMap.get("price") != null ? Double.valueOf(itemMap.get("price").toString()) : 0.0;
+                Integer quantity = itemMap.get("quantity") != null ? Integer.valueOf(itemMap.get("quantity").toString()) : 1;
+                String imageFileName = (String) itemMap.getOrDefault("image", "Bluetooth Speaker.png");
+
+                items.add(new OrderItem(productId, productName, price, quantity, imageFileName));
+            }
+        }
+
+        Order order = orderService.createOrder(
+                user.getUserId(),
+                fullName,
+                email,
+                phone,
+                address,
+                paymentMethod,
+                totalAmount,
+                items
+        );
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "orderNumber", order.getOrderNumber(),
+                "orderId", order.getOrderId(),
+                "message", "Payment Successful! Order Confirmed."
+        ));
+    }
+
+    @GetMapping("/customer/checkout/success")
+    public String showOrderSuccessPage(
+            @RequestParam(required = false) String orderNumber,
+            Authentication authentication,
+            Model model) {
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            userRepository.findByEmail(authentication.getName()).ifPresent(user -> {
+                model.addAttribute("customerName", user.getFirstName());
+            });
+        }
+
+        if (orderNumber != null) {
+            orderService.getOrderByNumber(orderNumber).ifPresent(order -> {
+                model.addAttribute("order", order);
+            });
+        }
+
+        return "customer/order-success";
+    }
+}

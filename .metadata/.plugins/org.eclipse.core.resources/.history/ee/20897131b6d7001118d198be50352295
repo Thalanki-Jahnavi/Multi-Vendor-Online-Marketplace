@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Home</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+
+<!-- Announcement bar -->
+<div class="announcement">
+    Discover products from multiple vendors in one place
+</div>
+
+<!-- Header -->
+<header class="main-header">
+    <a class="logo" th:href="@{/}">OneCart</a>
+
+    <form class="search-form" th:action="@{/shop}" method="get">
+        <input type="search" name="keyword" placeholder="Search products...">
+        <button type="submit">Search</button>
+    </form>
+
+    <div class="account-links">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/signup}">Sign up</a>
+    </div>
+</header>
+
+<!-- Navigation -->
+<nav class="main-nav">
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/shop}">Shop</a>
+    <a th:href="@{/about}">About Us</a>
+    <a th:href="@{/contact}">Contact</a>
+</nav>
+
+<main>
+    <!-- Hero section -->
+    <section class="hero">
+        <div class="hero-content">
+            <p class="eyebrow">WELCOME TO ONECART</p>
+            <h1>Find something you’ll love.</h1>
+            <p class="hero-description">
+                Explore products from different vendors, compare your favorites,
+                and shop from one convenient marketplace.
+            </p>
+            <a class="primary-button" th:href="@{/shop}">Explore Products</a>
+        </div>
+        <div class="hero-decoration" aria-hidden="true">
+            <div class="decoration-circle circle-one"></div>
+            <div class="decoration-circle circle-two"></div>
+            <div class="decoration-card">OneCart</div>
+        </div>
+    </section>
+
+    <!-- Featured products -->
+    <section class="section products-section">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">JUST FOR YOU</p>
+                <h2>Featured Products</h2>
+                <p>Discover items available in the OneCart marketplace.</p>
+            </div>
+            <a class="text-link" th:href="@{/shop}">View all products <span>→</span></a>
+        </div>
+
+        <div class="product-grid" th:if="${products != null and !products.isEmpty()}">
+            <article class="product-card" th:each="product : ${products}">
+                <a class="product-image" th:href="@{/product/{id}(id=${product.productId})}">
+                    <span>OneCart Product</span>
+                </a>
+
+                <div class="product-info">
+                    <h3 th:text="${product.productName}">Product name</h3>
+                    <p class="product-price">
+                        ₹<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+                    </p>
+                    <a class="small-button"
+                       th:href="@{/product/{id}(id=${product.productId})}">
+                        View product
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <div class="empty-state" th:if="${products == null or products.isEmpty()}">
+            <div class="empty-icon">🛍</div>
+            <h3>Products are coming soon</h3>
+            <p>Check back soon to discover products from our vendors.</p>
+        </div>
+    </section>
+
+    <!-- Stores / vendors -->
+    <section class="section stores-section">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">SHOP BY SELLER</p>
+                <h2>Explore Our Stores</h2>
+                <p>Discover independent stores and the products they bring to OneCart.</p>
+            </div>
+            <a class="text-link" th:href="@{/shop}">Explore marketplace <span>→</span></a>
+        </div>
+
+        <!-- These sample cards are visual placeholders.
+             Replace them with a Thymeleaf loop when vendor data is connected. -->
+        <div class="store-grid">
+            <article class="store-card">
+                <div class="store-banner store-banner-one">
+                    <span class="store-mark">M</span>
+                </div>
+                <div class="store-info">
+                    <span class="store-label">FEATURED STORE</span>
+                    <h3>Modern Living</h3>
+                    <p>Everyday essentials for a comfortable home.</p>
+                    <a th:href="@{/shop}">Visit store <span>→</span></a>
+                </div>
+            </article>
+
+            <article class="store-card">
+                <div class="store-banner store-banner-two">
+                    <span class="store-mark">S</span>
+                </div>
+                <div class="store-info">
+                    <span class="store-label">FEATURED STORE</span>
+                    <h3>Style Street</h3>
+                    <p>Fresh styles and everyday fashion finds.</p>
+                    <a th:href="@{/shop}">Visit store <span>→</span></a>
+                </div>
+            </article>
+
+            <article class="store-card">
+                <div class="store-banner store-banner-three">
+                    <span class="store-mark">T</span>
+                </div>
+                <div class="store-info">
+                    <span class="store-label">FEATURED STORE</span>
+                    <h3>Tech Corner</h3>
+                    <p>Useful tech accessories for work and play.</p>
+                    <a th:href="@{/shop}">Visit store <span>→</span></a>
+                </div>
+            </article>
+
+            <article class="store-card">
+                <div class="store-banner store-banner-four">
+                    <span class="store-mark">O</span>
+                </div>
+                <div class="store-info">
+                    <span class="store-label">FEATURED STORE</span>
+                    <h3>Outdoor Finds</h3>
+                    <p>Gear and accessories for your next adventure.</p>
+                    <a th:href="@{/shop}">Visit store <span>→</span></a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Vendor call-to-action -->
+    <section class="vendor-banner">
+        <div>
+            <p class="eyebrow">GROW WITH ONECART</p>
+            <h2>Have a store of your own?</h2>
+            <p>Join OneCart and introduce your products to more customers.</p>
+        </div>
+        <a class="light-button" th:href="@{/signup}">Become a vendor <span>→</span></a>
+    </section>
+
+    <!-- Marketplace benefits -->
+    <section class="benefits">
+        <div class="benefit-item">
+            <span class="benefit-icon">✦</span>
+            <div>
+                <h3>Many stores, one place</h3>
+                <p>Discover products from different vendors.</p>
+            </div>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-icon">✓</span>
+            <div>
+                <h3>Simple shopping</h3>
+                <p>Browse, compare, and find what you need.</p>
+            </div>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-icon">♡</span>
+            <div>
+                <h3>Find your favorites</h3>
+                <p>Explore new products and stores.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="site-footer">
+    <div class="footer-main">
+        <div class="footer-brand">
+            <a class="footer-logo" th:href="@{/}">OneCart</a>
+            <p>
+                A marketplace that brings products and independent stores
+                together in one convenient place.
+            </p>
+            <div class="social-links">
+                <a href="#" aria-label="Instagram">ig</a>
+                <a href="#" aria-label="Facebook">f</a>
+                <a href="#" aria-label="X">x</a>
+            </div>
+        </div>
+
+        <div class="footer-column">
+            <h3>Explore</h3>
+            <a th:href="@{/shop}">Shop all products</a>
+            <a th:href="@{/}">Featured products</a>
+            <a th:href="@{/}">Stores</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>About OneCart</h3>
+            <a th:href="@{/about}">About us</a>
+            <a th:href="@{/contact}">Contact us</a>
+            <a th:href="@{/signup}">Become a vendor</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Help & Support</h3>
+            <a th:href="@{/contact}">Help center</a>
+            <a th:href="@{/contact}">Shipping information</a>
+            <a th:href="@{/contact}">Returns & refunds</a>
+        </div>
+
+        <div class="footer-newsletter">
+            <h3>Stay in the loop</h3>
+            <p>Get updates about new products and stores.</p>
+            <form class="newsletter-form" action="#" method="get">
+                <input type="email" placeholder="Your email address" aria-label="Email address">
+                <button type="submit" aria-label="Subscribe">→</button>
+            </form>
+            <small>We’ll only send useful updates.</small>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2026 OneCart. Shop smarter, all in one place.</p>
+        <div>
+            <a href="#">Privacy policy</a>
+            <a href="#">Terms of service</a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

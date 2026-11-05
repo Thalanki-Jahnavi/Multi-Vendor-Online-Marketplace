@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | About Us</title>
+
+    <link rel="stylesheet" th:href="@{/css/guest-layout.css}">
+
+    <style>
+        :root {
+            --green: #087e78;
+            --deep-green: #123e3a;
+            --mint: #e5f4f0;
+            --text: #183b38;
+            --muted: #687d79;
+            --border: #e1ece9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--text);
+            background: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .about-main {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 44px 24px 0;
+        }
+
+        .about-hero {
+            padding: 64px 48px;
+            border-radius: 24px;
+            background: var(--mint);
+            text-align: center;
+        }
+
+        .about-tag {
+            display: inline-block;
+            margin-bottom: 18px;
+            padding: 8px 14px;
+            border-radius: 30px;
+            background: #fff;
+            color: var(--green);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .about-hero h1 {
+            margin: 0 0 18px;
+            color: var(--deep-green);
+            font-size: clamp(34px, 5vw, 54px);
+        }
+
+        .about-hero p {
+            max-width: 760px;
+            margin: 0 auto;
+            color: #526c67;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .about-section {
+            padding: 58px 0 0;
+        }
+
+        .about-section h2 {
+            margin: 0 0 18px;
+            color: var(--deep-green);
+            font-size: 30px;
+        }
+
+        .about-section p {
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .about-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .about-card {
+            padding: 30px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: #fff;
+        }
+
+        .about-card .about-icon {
+            margin-bottom: 16px;
+            font-size: 34px;
+        }
+
+        .about-card h3 {
+            margin: 0 0 12px;
+            color: var(--deep-green);
+            font-size: 21px;
+        }
+
+        .about-card p {
+            margin: 0;
+        }
+
+        .about-values {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .value-card {
+            padding: 26px;
+            border-radius: 16px;
+            background: #f5faf8;
+        }
+
+        .value-card h3 {
+            margin: 0 0 10px;
+            color: var(--green);
+        }
+
+        .value-card p {
+            margin: 0;
+        }
+
+        .about-cta {
+            margin: 58px 0;
+            padding: 36px;
+            border-radius: 20px;
+            background: var(--deep-green);
+            color: #fff;
+            text-align: center;
+        }
+
+        .about-cta h2 {
+            margin: 0 0 12px;
+            color: #fff;
+        }
+
+        .about-cta p {
+            margin: 0 0 24px;
+            color: #d4e6e2;
+        }
+
+        .about-cta a {
+            display: inline-block;
+            padding: 14px 24px;
+            border-radius: 10px;
+            background: #fff;
+            color: var(--deep-green);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        @media (max-width: 760px) {
+            .about-hero {
+                padding: 40px 24px;
+            }
+
+            .about-columns,
+            .about-values {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{public/fragments/guest-layout :: guestHeader}"></div>
+
+    <main class="about-main">
+        <section class="about-hero">
+            <span class="about-tag">ABOUT ONECART</span>
+            <h1>Many vendors. One easy place to shop.</h1>
+            <p>
+                OneCart is a multi-vendor marketplace designed to bring
+                shoppers and independent sellers together. Our goal is to
+                make discovering products simple and convenient.
+            </p>
+        </section>
+
+        <section class="about-section">
+            <div class="about-columns">
+                <article class="about-card">
+                    <div class="about-icon">🛍️</div>
+                    <h3>What is OneCart?</h3>
+                    <p>
+                        OneCart brings products from different vendors into
+                        one online marketplace. Shoppers can explore a range
+                        of products without visiting separate stores.
+                    </p>
+                </article>
+
+                <article class="about-card">
+                    <div class="about-icon">🤝</div>
+                    <h3>Our purpose</h3>
+                    <p>
+                        We aim to give customers a convenient shopping
+                        experience while helping vendors present their
+                        products to a wider audience.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <h2>What matters to us</h2>
+
+            <div class="about-values">
+                <article class="value-card">
+                    <h3>Convenience</h3>
+                    <p>Make it easier to discover products from different sellers in one place.</p>
+                </article>
+
+                <article class="value-card">
+                    <h3>Choice</h3>
+                    <p>Bring different vendors and product selections together for shoppers.</p>
+                </article>
+
+                <article class="value-card">
+                    <h3>Opportunity</h3>
+                    <p>Help vendors introduce their products to people looking for something new.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="about-cta">
+            <h2>Ready to explore OneCart?</h2>
+            <p>Discover products or create an account to join our marketplace.</p>
+            <a th:href="@{/signup}">Join OneCart</a>
+        </section>
+    </main>
+
+    <div th:replace="~{public/fragments/guest-layout :: guestFooter}"></div>
+</body>
+</html>

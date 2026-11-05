@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Home</title>
+
+    <style>
+        :root {
+            --emerald: #087e78;
+            --deep-green: #123e3a;
+            --mint: #e5f4f0;
+            --text: #18332f;
+            --muted: #687a76;
+            --white: #ffffff;
+            --border: #e4eeeb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text);
+            background: var(--white);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .topbar {
+            background: var(--deep-green);
+            color: var(--white);
+            text-align: center;
+            padding: 9px 16px;
+            font-size: 13px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 20px 7%;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            color: var(--emerald);
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .search {
+            display: flex;
+            flex: 1;
+            max-width: 520px;
+            border: 1px solid #d4e2de;
+            border-radius: 9px;
+            overflow: hidden;
+        }
+
+        .search input {
+            width: 100%;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            padding: 13px 15px;
+            font-size: 14px;
+        }
+
+        .search button {
+            border: 0;
+            background: var(--emerald);
+            color: white;
+            padding: 0 20px;
+            cursor: pointer;
+        }
+
+        .header-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header-links a:hover,
+        .nav a:hover {
+            color: var(--emerald);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .hero {
+            margin: 30px 7%;
+            min-height: 340px;
+            padding: 55px;
+            display: flex;
+            align-items: center;
+            border-radius: 18px;
+            background: linear-gradient(110deg, var(--mint), #f7fbf9);
+        }
+
+        .hero-content {
+            max-width: 570px;
+        }
+
+        .eyebrow {
+            color: var(--emerald);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            margin: 14px 0;
+            color: var(--deep-green);
+            font-size: clamp(34px, 4vw, 52px);
+            line-height: 1.1;
+        }
+
+        .hero p {
+            max-width: 480px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .primary-button {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 13px 22px;
+            border-radius: 8px;
+            background: var(--emerald);
+            color: white;
+            font-weight: 700;
+        }
+
+        .section {
+            padding: 18px 7% 55px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            color: var(--deep-green);
+            font-size: 28px;
+        }
+
+        .section-heading p {
+            margin: 8px 0 0;
+            color: var(--muted);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            background: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(18, 62, 58, 0.09);
+        }
+
+        .product-placeholder {
+            display: grid;
+            place-items: center;
+            height: 150px;
+            margin-bottom: 16px;
+            border-radius: 9px;
+            background: var(--mint);
+            color: var(--emerald);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .product-card h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+        }
+
+        .price {
+            color: var(--deep-green);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .empty-message {
+            grid-column: 1 / -1;
+            padding: 30px;
+            border: 1px dashed #b9d5ce;
+            border-radius: 12px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .footer {
+            padding: 25px 7%;
+            background: var(--deep-green);
+            color: white;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            .header {
+                flex-wrap: wrap;
+            }
+
+            .search {
+                order: 3;
+                max-width: none;
+                flex-basis: 100%;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .hero {
+                padding: 35px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .header {
+                padding: 18px 5%;
+            }
+
+            .header-links {
+                gap: 12px;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+            .hero {
+                margin: 20px 5%;
+                padding: 28px 22px;
+            }
+
+            .section {
+                padding-right: 5%;
+                padding-left: 5%;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        Discover products from multiple vendors in one place
+    </div>
+
+    <header class="header">
+        <a class="logo" th:href="@{/}">OneCart</a>
+
+        <form class="search" th:action="@{/}" method="get">
+            <input type="search" name="q" placeholder="Search products...">
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="header-links">
+            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/signup}">Sign up</a>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <a th:href="@{/}">Home</a>
+        <a href="#products">Shop</a>
+        <a th:href="@{/about}">About Us</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <div class="eyebrow">Welcome to OneCart</div>
+                <h1>Find something you’ll love.</h1>
+                <p>
+                    Explore products from different vendors, compare your favorites,
+                    and shop from one convenient marketplace.
+                </p>
+                <a class="primary-button" href="#products">Explore Products</a>
+            </div>
+        </section>
+
+        <section class="section" id="products">
+            <div class="section-heading">
+                <div>
+                    <h2>Featured Products</h2>
+                    <p>Discover items available in the OneCart marketplace.</p>
+                </div>
+            </div>
+
+            <div class="product-grid">
+                <div class="empty-message" th:if="${#lists.isEmpty(products)}">
+                    No products are available yet. Please check back soon.
+                </div>
+
+                <article class="product-card" th:each="product : ${products}">
+                    <div class="product-placeholder">OneCart Product</div>
+                    <h3 th:text="${product.name}">Product name</h3>
+                    <div class="price">
+                        ₹<span th:text="${product.price}">0.00</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        © 2026 OneCart. Shop smarter, all in one place.
+    </footer>
+</body>
+</html>

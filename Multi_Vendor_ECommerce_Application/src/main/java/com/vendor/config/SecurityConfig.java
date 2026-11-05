@@ -17,19 +17,38 @@ public class SecurityConfig {
 
         http
             .authorizeHttpRequests(auth -> auth
-            		.requestMatchers(
-            			    "/", "/about", "/contact", "/login", "/signup",
-            			    "/forgot-password", "/reset-password",
-            			    "/css/**", "/js/**", "/images/**"
-            			).permitAll()
 
+                // Public pages and static resources
+                .requestMatchers(
+                    "/",
+                    "/about",
+                    "/contact",
+                    "/login",
+                    "/signup",
+                    "/forgot-password",
+                    "/reset-password",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**"
+                ).permitAll()
+
+                // Protected pages by role
                 .requestMatchers("/customer/**").hasRole("CUSTOMER")
                 .requestMatchers("/vendor/**").hasRole("VENDOR")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/cart/**", "/wishlist/**", "/checkout/**")
-                .hasRole("CUSTOMER")
+
+                // Customer-only actions (requires login)
+                .requestMatchers(
+                    "/products",
+                    "/cart/**",
+                    "/wishlist/**",
+                    "/checkout/**"
+                ).hasRole("CUSTOMER")
+
+                // Everything else requires login
                 .anyRequest().authenticated()
             )
+
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
@@ -39,6 +58,7 @@ public class SecurityConfig {
                 .failureUrl("/login?error")
                 .permitAll()
             )
+
             .logout(logout -> logout
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
@@ -52,12 +72,12 @@ public class SecurityConfig {
         return (request, response, authentication) -> {
 
             boolean isAdmin = authentication.getAuthorities().stream()
-                    .anyMatch(authority ->
-                            authority.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(authority ->
+                    authority.getAuthority().equals("ROLE_ADMIN"));
 
             boolean isVendor = authentication.getAuthorities().stream()
-                    .anyMatch(authority ->
-                            authority.getAuthority().equals("ROLE_VENDOR"));
+                .anyMatch(authority ->
+                    authority.getAuthority().equals("ROLE_VENDOR"));
 
             if (isAdmin) {
                 response.sendRedirect("/admin/dashboard");

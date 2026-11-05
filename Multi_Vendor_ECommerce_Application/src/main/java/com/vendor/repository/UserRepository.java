@@ -1,4 +1,3 @@
-
 package com.vendor.repository;
 
 import java.util.List;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.vendor.entity.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
     // Check whether an email already exists
     boolean existsByEmail(String email);
@@ -20,4 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Retrieve all users with a specific role
     List<User> findByRoleIgnoreCase(String role);
+
+    // Find vendors/users by their user IDs
+    List<User> findByUserIdIn(List<Integer> userIds);
 }

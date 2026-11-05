@@ -1,0 +1,83 @@
+package com.vendor.config;
+
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import com.vendor.entity.Product;
+import com.vendor.repository.ProductRepository;
+
+@Component
+public class ProductDataSeeder implements CommandLineRunner {
+
+    private final ProductRepository productRepository;
+
+    public ProductDataSeeder(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @Override
+    public void run(String... args) {
+        try {
+            seedProducts();
+        } catch (Exception e) {
+            System.err.println("ProductDataSeeder encountered an error: " + e.getMessage());
+        }
+    }
+
+    public synchronized void seedProducts() {
+        List<Product> existing = productRepository.findAll();
+        System.out.println(">>> [ProductDataSeeder] Current product count in DB: " + existing.size());
+
+        // Dynamically find a valid vendor ID from existing products or default to 1
+        Integer vendorId = existing.stream()
+                .map(Product::getVendorId)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(1);
+
+        System.out.println(">>> [ProductDataSeeder] Using vendor ID: " + vendorId);
+
+        createIfMissing(existing, "Sony Wireless Noise-Canceling Headphones", "Electronics", 4999.00, 15.0, vendorId);
+        createIfMissing(existing, "Logitech Ergonomic Wireless Mouse", "Electronics", 1299.00, 10.0, vendorId);
+        createIfMissing(existing, "JBL Go Portable Bluetooth Speaker", "Electronics", 2499.00, 20.0, vendorId);
+        createIfMissing(existing, "Noise ColorFit Smart Watch Pro", "Electronics", 2999.00, 25.0, vendorId);
+        createIfMissing(existing, "Organic Pure Cotton T-Shirt", "Fashion", 799.00, 20.0, vendorId);
+        createIfMissing(existing, "Breathable Mesh Running Shoes", "Fashion", 1899.00, 30.0, vendorId);
+        createIfMissing(existing, "Water-Resistant Travel Backpack (35L)", "Accessories", 1699.00, 22.0, vendorId);
+        createIfMissing(existing, "Handcrafted Ceramic Coffee Mug (Set of 2)", "Home & Kitchen", 599.00, 12.0, vendorId);
+        createIfMissing(existing, "BassPro Studio Wireless Headphones", "Electronics", 3499.00, 18.0, vendorId);
+        createIfMissing(existing, "Urban Streetwear Cotton T-Shirt", "Fashion", 899.00, 15.0, vendorId);
+        createIfMissing(existing, "Pro Trekker Waterproof Backpack", "Accessories", 2299.00, 25.0, vendorId);
+        createIfMissing(existing, "Fitness Smart Watch Tracker", "Electronics", 2199.00, 30.0, vendorId);
+
+        System.out.println(">>> [ProductDataSeeder] Seeding finished. Total products in DB: " + productRepository.count());
+    }
+
+    private void createIfMissing(List<Product> existing, String name, String category,
+                                 Double price, Double discount, Integer vendorId) {
+        boolean alreadyExists = existing.stream()
+                .anyMatch(p -> p.getProductName() != null 
+                        && p.getProductName().equalsIgnoreCase(name));
+
+        if (!alreadyExists) {
+            try {
+                Product product = new Product();
+                product.setProductName(name);
+                product.setCategory(category);
+                product.setPrice(price);
+                product.setDiscountPercentage(discount);
+                product.setVendorId(vendorId);
+                product.setProductStatus("ACTIVE");
+                product.setApprovalStatus("APPROVED");
+
+                productRepository.save(product);
+                System.out.println(">>> [ProductDataSeeder] Successfully inserted: " + name);
+            } catch (Exception e) {
+                System.err.println(">>> [ProductDataSeeder] Failed to insert '" + name + "': " + e.getMessage());
+            }
+        }
+    }
+}

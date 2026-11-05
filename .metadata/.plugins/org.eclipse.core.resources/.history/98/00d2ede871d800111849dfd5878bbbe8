@@ -1,0 +1,62 @@
+package com.example.demo.controller; // Use your actual package
+
+import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.service.ProductService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Controller
+public class ProductController {
+
+    private final ProductService productService;
+    private final UserRepository userRepository;
+
+    public ProductController(
+            ProductService productService,
+            UserRepository userRepository
+    ) {
+        this.productService = productService;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/products")
+    public String products(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Integer vendorId,
+            @RequestParam(required = false, defaultValue = "newest") String sort,
+            Model model
+    ) {
+        Map<Integer, String> vendorNames = new HashMap<>();
+
+        for (User vendor : userRepository.findByRoleIgnoreCase("vendor")) {
+            vendorNames.put(
+                    vendor.getUserId(),
+                    vendor.getBusinessName() == null || vendor.getBusinessName().isBlank()
+                            ? vendor.getFirstName()
+                            : vendor.getBusinessName()
+            );
+        }
+
+        model.addAttribute(
+                "products",
+                productService.getApprovedProducts(keyword, category, vendorId, sort)
+        );
+        model.addAttribute("categories", productService.getApprovedCategories());
+        model.addAttribute("vendors", userRepository.findByRoleIgnoreCase("vendor"));
+        model.addAttribute("vendorNames", vendorNames);
+
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("selectedVendorId", vendorId);
+        model.addAttribute("selectedSort", sort);
+
+        return "public/products";
+    }
+}

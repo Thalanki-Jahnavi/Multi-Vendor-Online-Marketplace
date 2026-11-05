@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +8,6 @@
 </head>
 
 <body>
-
 <header class="site-header">
     <div class="header-inner">
         <a class="brand" th:href="@{/}">One<span>Cart</span></a>
@@ -28,17 +26,13 @@
 </header>
 
 <main class="page-content">
-
     <section class="welcome-banner">
         <div class="welcome-copy">
             <p class="eyebrow">WELCOME TO ONECART</p>
-
             <h1>
                 Hello, <span th:text="${firstName}">Customer</span>!
             </h1>
-
             <p>Discover something you’ll love, and keep your shopping in one place.</p>
-
             <a class="primary-button" th:href="@{/customer/products}">
                 Explore products
             </a>
@@ -52,7 +46,6 @@
     </section>
 
     <section class="quick-links" aria-label="Customer shortcuts">
-
         <a class="quick-card" th:href="@{/customer/products}">
             <span class="quick-icon">⌕</span>
             <span>
@@ -79,7 +72,6 @@
             </span>
             <span class="card-arrow">→</span>
         </a>
-
     </section>
 
     <section class="featured-section">
@@ -98,24 +90,31 @@
         <div class="product-grid"
              th:if="${products != null and !products.isEmpty()}">
 
-            <article class="product-card" th:each="product : ${products}">
-                <div class="product-image-placeholder" aria-hidden="true">
-                    OneCart
+            <article class="product-card"
+                     th:each="product : ${products}">
+
+                <div class="product-image-placeholder">
+                    <img class="featured-product-image"
+                         th:src="@{'/images/products/' + ${product.imageFileName}}"
+                         th:alt="${product.productName}"
+                         onerror="this.onerror=null;this.src='/images/products/Ceramic Coffee Mug.jpg';">
+
+                    <span class="image-fallback"
+                          th:text="${product.productName}">OneCart</span>
                 </div>
 
                 <div class="product-info">
                     <h3 th:text="${product.productName}">Product name</h3>
 
                     <p class="product-price">
-                        ₹<span th:text="${#numbers.formatDecimal(product.discountedPrice, 1, 2)}">0.00</span>
+                        ₹<span th:text="${#numbers.formatDecimal(product.discountedPrice != null ? product.discountedPrice : product.price, 1, 2)}">0.00</span>
                     </p>
 
-                    <a class="product-link" th:href="@{/customer/products}">
+                    <a class="product-link" th:href="@{/customer/products(keyword=${product.productName})}">
                         View product
                     </a>
                 </div>
             </article>
-
         </div>
 
         <div class="empty-products"
@@ -136,12 +135,10 @@
             </p>
         </div>
     </section>
-
 </main>
 
 <footer class="customer-footer">
     <div class="customer-footer__inner">
-
         <div class="customer-footer__brand">
             <a class="customer-footer__logo" th:href="@{/}">OneCart</a>
             <p>Shop more. Live better.</p>
@@ -164,7 +161,6 @@
             <a th:href="@{/contact}">Contact us</a>
             <a th:href="@{/about}">About OneCart</a>
         </div>
-
     </div>
 
     <div class="customer-footer__bottom">
@@ -172,6 +168,5 @@
         <span>Shop more. Live better.</span>
     </div>
 </footer>
-
 </body>
 </html>

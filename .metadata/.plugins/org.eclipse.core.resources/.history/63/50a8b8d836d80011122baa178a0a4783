@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard | OneCart</title>
+    <link rel="stylesheet" th:href="@{/css/customer-dashboard.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="logo" th:href="@{/}">One<span>Cart</span></a>
+
+    <nav class="main-nav">
+        <a th:href="@{/customer/dashboard}">Shop</a>
+        <a th:href="@{/customer/orders}">My Orders</a>
+        <a th:href="@{/customer/account}">My Account</a>
+    </nav>
+
+    <form class="logout-form" th:action="@{/logout}" method="post">
+        <button class="logout-button" type="submit">Sign out</button>
+    </form>
+</header>
+
+<main class="page-container">
+
+    <section class="welcome-banner">
+        <div class="welcome-copy">
+            <p class="eyebrow">CUSTOMER DASHBOARD</p>
+            <h1>Welcome back to OneCart</h1>
+            <p>Discover something you’ll love from our marketplace of vendors.</p>
+            <a class="primary-button" href="#featured-products">Explore products</a>
+        </div>
+
+        <div class="banner-art" aria-hidden="true">
+            <div class="art-circle"></div>
+            <div class="art-note note-one">Your next favorite find</div>
+            <div class="art-note note-two">OneCart ♥</div>
+        </div>
+    </section>
+
+    <section class="quick-links" aria-label="Customer shortcuts">
+        <a class="quick-card" href="#featured-products">
+            <span class="quick-icon">⌕</span>
+            <span>
+                <strong>Browse products</strong>
+                <small>Explore products from multiple vendors</small>
+            </span>
+            <span class="card-arrow">→</span>
+        </a>
+
+        <a class="quick-card" th:href="@{/customer/orders}">
+            <span class="quick-icon">▤</span>
+            <span>
+                <strong>My orders</strong>
+                <small>View your order history</small>
+            </span>
+            <span class="card-arrow">→</span>
+        </a>
+
+        <a class="quick-card" th:href="@{/customer/account}">
+            <span class="quick-icon">♙</span>
+            <span>
+                <strong>My account</strong>
+                <small>Manage your account details</small>
+            </span>
+            <span class="card-arrow">→</span>
+        </a>
+    </section>
+
+    <section class="products-section" id="featured-products">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">HANDPICKED FOR YOU</p>
+                <h2>Featured products</h2>
+                <p class="section-description">Find something great from OneCart vendors.</p>
+            </div>
+            <a class="text-link" th:href="@{/products}">View all products <span>→</span></a>
+        </div>
+
+        <div class="product-grid" th:if="${products != null and !products.isEmpty()}">
+            <article class="product-card" th:each="product : ${products}">
+                <div class="product-image-placeholder">
+                    <span>OneCart</span>
+                </div>
+
+                <div class="product-details">
+                    <p class="product-category">Marketplace find</p>
+                    <h3 th:text="${product.productName}">Product name</h3>
+
+                    <div class="price-row">
+                        <strong th:text="${'₹' + #numbers.formatDecimal(product.discountedPrice, 1, 2)}">
+                            ₹0.00
+                        </strong>
+
+                        <span class="old-price"
+                              th:if="${product.discountPercentage != null and product.discountPercentage.compareTo(T(java.math.BigDecimal).ZERO) > 0}"
+                              th:text="${'₹' + #numbers.formatDecimal(product.price, 1, 2)}">
+                            ₹0.00
+                        </span>
+                    </div>
+
+                    <span class="discount-label"
+                          th:if="${product.discountPercentage != null and product.discountPercentage.compareTo(T(java.math.BigDecimal).ZERO) > 0}"
+                          th:text="${#numbers.formatDecimal(product.discountPercentage, 1, 0) + '% off'}">
+                        0% off
+                    </span>
+
+                    <a class="product-button" th:href="@{/products/{id}(id=${product.productId})}">
+                        View product
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <div class="empty-products" th:if="${products == null or products.isEmpty()}">
+            <div class="empty-icon">⌕</div>
+            <h3>No products available yet</h3>
+            <p>Approved products from vendors will appear here.</p>
+        </div>
+    </section>
+
+    <section class="shopping-note">
+        <div class="note-check">✓</div>
+        <div>
+            <h3>You’re all set</h3>
+            <p>You’re signed in as a customer. Start exploring products and discover your next favorite find.</p>
+        </div>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <span>© OneCart</span>
+        <span>Shop more. Live better.</span>
+    </div>
+</footer>
+
+</body>
+</html>

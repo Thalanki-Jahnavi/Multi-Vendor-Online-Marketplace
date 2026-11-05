@@ -1,28 +1,23 @@
 package com.vendor.entity;
 
-import java.math.BigDecimal;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "products")
 public class Product {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Long productId;
 
     @Column(name = "product_name")
     private String productName;
 
-    @Column(name = "price")
-    private BigDecimal price;
+    private Double price;
 
     @Column(name = "discount_percentage")
-    private BigDecimal discountPercentage;
+    private Double discountPercentage;
 
     @Column(name = "product_status")
     private String productStatus;
@@ -30,8 +25,11 @@ public class Product {
     @Column(name = "approval_status")
     private String approvalStatus;
 
-    public Product() {
-    }
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "vendor_id")
+    private Integer vendorId;
 
     public Long getProductId() {
         return productId;
@@ -49,19 +47,19 @@ public class Product {
         this.productName = productName;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public BigDecimal getDiscountPercentage() {
+    public Double getDiscountPercentage() {
         return discountPercentage;
     }
 
-    public void setDiscountPercentage(BigDecimal discountPercentage) {
+    public void setDiscountPercentage(Double discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
 
@@ -81,18 +79,76 @@ public class Product {
         this.approvalStatus = approvalStatus;
     }
 
-    public BigDecimal getDiscountedPrice() {
-        if (price == null) {
-            return BigDecimal.ZERO;
-        }
+    public String getCategory() {
+        return category;
+    }
 
-        if (discountPercentage == null) {
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Integer getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(Integer vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    @Transient
+    public Double getDiscountedPrice() {
+        if (price == null || discountPercentage == null) {
             return price;
         }
+        return price - (price * discountPercentage / 100.0);
+    }
 
-        BigDecimal discount = price.multiply(discountPercentage)
-                .divide(new BigDecimal("100"));
+    @Transient
+    public Double getSavings() {
+        if (price == null || discountPercentage == null || discountPercentage <= 0) {
+            return 0.0;
+        }
+        return price * discountPercentage / 100.0;
+    }
 
-        return price.subtract(discount);
+    @Transient
+    public boolean hasDiscount() {
+        return discountPercentage != null && discountPercentage > 0;
+    }
+
+    @Transient
+    public String getImageFileName() {
+        if (productName != null) {
+            String lower = productName.toLowerCase();
+            if (lower.contains("mug") || lower.contains("coffee")) {
+                return "Ceramic Coffee Mug.jpg";
+            } else if (lower.contains("shoe") || lower.contains("running") || lower.contains("sneaker")) {
+                return "Running Shoes.jpg";
+            } else if (lower.contains("mouse")) {
+                return "Wireless Mouse.jpg";
+            } else if (lower.contains("pack") || lower.contains("bag") || lower.contains("backpack")) {
+                return "Travel back pack.jpg";
+            } else if (lower.contains("shirt") || lower.contains("t-shirt") || lower.contains("cloth")) {
+                return "Cotton T-Shirt.jpg";
+            } else if (lower.contains("watch")) {
+                return "Smart Watch.webp";
+            } else if (lower.contains("speaker")) {
+                return "Bluetooth Speaker.png";
+            } else if (lower.contains("headphone") || lower.contains("earphone") || lower.contains("headset") || lower.contains("audio")) {
+                return "Wireless Headphones.png";
+            }
+        }
+        int index = (productId != null ? Math.abs(productId.hashCode()) : 0) % 8;
+        String[] defaults = {
+            "Ceramic Coffee Mug.jpg",
+            "Running Shoes.jpg",
+            "Wireless Mouse.jpg",
+            "Travel back pack.jpg",
+            "Cotton T-Shirt.jpg",
+            "Smart Watch.webp",
+            "Bluetooth Speaker.png",
+            "Wireless Headphones.png"
+        };
+        return defaults[index];
     }
 }

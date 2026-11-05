@@ -1,10 +1,17 @@
 package com.vendor.controller;
 
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.vendor.entity.Product;
 import com.vendor.entity.User;
 import com.vendor.repository.UserRepository;
 import com.vendor.service.ProductService;
@@ -35,5 +42,110 @@ public class CustomerController {
         model.addAttribute("products", productService.getApprovedProducts());
 
         return "customer/dashboard";
+    }
+
+    @GetMapping("/customer/products")
+    public String showCustomerProductsPage(
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Integer vendorId,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false, defaultValue = "newest") String sort,
+            Model model) {
+
+        if (authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal())) {
+            userRepository.findByEmail(authentication.getName()).ifPresent(user -> {
+                model.addAttribute("customerName", user.getFirstName());
+                model.addAttribute("customerFullName",
+                        (user.getFirstName() != null ? user.getFirstName() : "")
+                        + " " + (user.getLastName() != null ? user.getLastName() : ""));
+                model.addAttribute("customerEmail", user.getEmail());
+            });
+        }
+
+        List<Product> allProducts = productService.getApprovedProducts();
+
+        List<Product> filteredProducts = productService.filterProducts(
+                allProducts,
+                keyword,
+                category,
+                vendorId,
+                minPrice,
+                maxPrice,
+                sort
+        );
+
+        TreeSet<String> categories =
+                new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+
+        TreeSet<Integer> vendorIds = new TreeSet<>();
+
+        for (Product product : allProducts) {
+            if (product.getCategory() != null
+                    && !product.getCategory().isBlank()) {
+                categories.add(product.getCategory().trim());
+            }
+
+            if (product.getVendorId() != null) {
+                vendorIds.add(product.getVendorId());
+            }
+        }
+
+        Map<String, Long> categoryCounts = allProducts.stream()
+                .filter(p -> p.getCategory() != null && !p.getCategory().isBlank())
+                .collect(Collectors.groupingBy(p -> p.getCategory().trim(), Collectors.counting()));
+
+        List<Integer> vendorIdList = vendorIds.stream()
+                .collect(Collectors.toList());
+
+        List<User> vendors = vendorIdList.isEmpty()
+                ? List.of()
+                : userRepository.findByUserIdIn(vendorIdList);
+
+        Map<Integer, String> vendorNames = vendors.stream()
+                .collect(Collectors.toMap(
+                        User::getUserId,
+                        user -> {
+                            String businessName = user.getBusinessName();
+
+                            if (businessName != null
+                                    && !businessName.isBlank()) {
+                                return businessName;
+                            }
+
+                            String firstName = user.getFirstName();
+
+                            return firstName != null && !firstName.isBlank()
+                                    ? firstName
+                                    : "Vendor";
+                        },
+                        (existing, replacement) -> existing
+                ));
+
+        boolean hasActiveFilters = (keyword != null && !keyword.isBlank())
+                || (category != null && !category.isBlank())
+                || (vendorId != null)
+                || (minPrice != null)
+                || (maxPrice != null);
+
+        model.addAttribute("products", filteredProducts);
+        model.addAttribute("totalProductsCount", allProducts.size());
+        model.addAttribute("categories", categories);
+        model.addAttribute("categoryCounts", categoryCounts);
+        model.addAttribute("vendors", vendors);
+        model.addAttribute("vendorNames", vendorNames);
+
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("selectedVendorId", vendorId);
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("hasActiveFilters", hasActiveFilters);
+
+        return "public/products";
     }
 }

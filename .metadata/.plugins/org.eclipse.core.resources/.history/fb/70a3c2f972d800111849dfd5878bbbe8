@@ -1,0 +1,80 @@
+package com.vendor.service; // Use your actual package
+
+import com.vendor.entity.Product;
+import com.vendor.repository.ProductRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+@Service
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    public List<Product> getApprovedProducts() {
+        return productRepository
+                .findByProductStatusIgnoreCaseAndApprovalStatusIgnoreCaseOrderByProductIdDesc(
+                        "ACTIVE", "APPROVED"
+                );
+    }
+
+    public List<Product> getApprovedProducts(
+            String keyword,
+            String category,
+            Integer vendorId,
+            String sort
+    ) {
+        List<Product> products = getApprovedProducts();
+
+        if (keyword != null && !keyword.isBlank()) {
+            String search = keyword.toLowerCase(Locale.ROOT);
+            products = products.stream()
+                    .filter(p -> p.getProductName() != null
+                            && p.getProductName().toLowerCase(Locale.ROOT).contains(search))
+                    .collect(Collectors.toList());
+        }
+
+        if (category != null && !category.isBlank()) {
+            products = products.stream()
+                    .filter(p -> p.getCategory() != null
+                            && p.getCategory().equalsIgnoreCase(category))
+                    .collect(Collectors.toList());
+        }
+
+        if (vendorId != null) {
+            products = products.stream()
+                    .filter(p -> vendorId.equals(p.getVendorId()))
+                    .collect(Collectors.toList());
+        }
+
+        if ("price-low".equals(sort)) {
+            products.sort(Comparator.comparing(
+                    Product::getDiscountedPrice,
+                    Comparator.nullsLast(Comparator.naturalOrder())
+            ));
+        } else if ("price-high".equals(sort)) {
+            products.sort(Comparator.comparing(
+                    Product::getDiscountedPrice,
+                    Comparator.nullsLast(Comparator.reverseOrder())
+            ));
+        }
+
+        return products;
+    }
+
+    public List<String> getApprovedCategories() {
+        return getApprovedProducts().stream()
+                .map(Product::getCategory)
+                .filter(category -> category != null && !category.isBlank())
+                .distinct()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .collect(Collectors.toList());
+    }
+}

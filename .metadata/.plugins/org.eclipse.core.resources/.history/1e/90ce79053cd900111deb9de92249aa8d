@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | OneCart</title>
+    <link rel="stylesheet" th:href="@{/css/products.css}">
+
+    <style>
+        .orders-page {
+            max-width: 1100px;
+            margin: 30px auto 80px;
+            padding: 0 20px;
+        }
+
+        .orders-header {
+            margin-bottom: 24px;
+        }
+
+        .orders-header h1 {
+            color: var(--deep-green);
+            font-size: 28px;
+            margin: 0 0 6px;
+        }
+
+        .orders-header p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .order-alert {
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .order-alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .order-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .order-card-header {
+            background: #fafafa;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .order-id-group strong {
+            color: var(--deep-green);
+            font-size: 15px;
+        }
+
+        .order-id-group span {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-left: 10px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-confirmed {
+            background: #e0f2f1;
+            color: var(--emerald-dark);
+        }
+
+        .status-cancelled {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-return {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .order-card-body {
+            padding: 20px;
+        }
+
+        .order-item-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-thumb {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f7f7f7;
+            border: 1px solid #eee;
+        }
+
+        .order-item-details {
+            flex: 1;
+        }
+
+        .order-item-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--deep-green);
+            margin-bottom: 4px;
+        }
+
+        .order-item-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .order-item-subtotal {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--deep-green);
+        }
+
+        .order-card-footer {
+            background: #fff;
+            border-top: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .order-total-block {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .order-total-block strong {
+            font-size: 18px;
+            color: var(--emerald);
+            margin-left: 6px;
+        }
+
+        .order-actions-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-cancel-order {
+            padding: 8px 16px;
+            background: #fff;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-cancel-order:hover {
+            background: #ffebee;
+        }
+
+        .btn-return-order {
+            padding: 8px 16px;
+            background: #fff;
+            border: 1px solid #f57c00;
+            color: #f57c00;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-return-order:hover {
+            background: #fff3e0;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-content-card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            width: 440px;
+            padding: 28px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .empty-orders {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 60px 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <a class="brand" th:href="@{/}">One<span>Cart</span></a>
+
+    <nav class="main-nav" aria-label="Main navigation">
+        <a th:href="@{/customer/dashboard}">Dashboard</a>
+        <a th:href="@{/customer/products}">Shop</a>
+        <a class="active" th:href="@{/customer/orders}">My Orders</a>
+        <a th:href="@{/customer/account}">My Account</a>
+    </nav>
+
+    <div class="header-actions">
+        <div class="user-menu-dropdown" id="userMenuDropdown" th:if="${customerName != null}">
+            <button type="button" class="user-menu-btn" onclick="toggleUserDropdown(event)">
+                <span class="user-avatar" th:text="${#strings.substring(customerName, 0, 1)}">C</span>
+                <span class="user-greeting-name">Hi, <strong th:text="${customerName}">Customer</strong></span>
+                <span class="user-menu-chevron">▾</span>
+            </button>
+            <div class="user-dropdown-pane" id="userDropdownPane">
+                <div class="dropdown-header">
+                    <span class="dropdown-avatar" th:text="${#strings.substring(customerName, 0, 1)}">C</span>
+                    <div class="dropdown-user-details">
+                        <strong class="dropdown-name" th:text="${customerFullName != null ? customerFullName : customerName}">Customer</strong>
+                        <span class="dropdown-email" th:text="${customerEmail != null ? customerEmail : ''}"></span>
+                    </div>
+                </div>
+                <div class="dropdown-links">
+                    <a th:href="@{/customer/dashboard}" class="dropdown-link-item"><span>📊 Dashboard</span></a>
+                    <a th:href="@{/customer/products}" class="dropdown-link-item"><span>🛍️ Explore Shop</span></a>
+                    <a th:href="@{/customer/account}" class="dropdown-link-item"><span>👤 My Account</span></a>
+                </div>
+                <div class="dropdown-footer">
+                    <form th:action="@{/logout}" method="post">
+                        <button class="dropdown-signout-btn" type="submit">🚪 Sign out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="orders-page">
+    <div class="orders-header">
+        <h1>My Orders</h1>
+        <p>Track your active shipments, view past receipts, and manage cancellations or returns.</p>
+    </div>
+
+    <!-- Alerts -->
+    <div class="order-alert order-alert-success" th:if="${msg == 'cancelled'}">
+        <span style="font-size: 20px;">✓</span>
+        <div>
+            <strong>Order Cancelled Successfully!</strong>
+            A full refund has been credited back to your original payment method, and a refund confirmation email has been dispatched to your inbox.
+        </div>
+    </div>
+
+    <div class="order-alert order-alert-success" th:if="${msg == 'request_submitted'}">
+        <span style="font-size: 20px;">✓</span>
+        <div>
+            <strong>Return / Exchange Request Registered!</strong>
+            Our courier partner will pick up the package within 48 hours. A confirmation email has been sent with tracking details.
+        </div>
+    </div>
+
+    <!-- Orders Cards -->
+    <div th:if="${orders != null and !orders.isEmpty()}">
+        <article class="order-card" th:each="order : ${orders}">
+            <div class="order-card-header">
+                <div class="order-id-group">
+                    <strong>Order #<span th:text="${order.orderNumber}">OD-12345</span></strong>
+                    <span>Placed on <span th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy, hh:mm a')}">05 Nov 2026</span></span>
+                </div>
+
+                <div>
+                    <span class="status-pill status-confirmed" th:if="${order.orderStatus == 'CONFIRMED'}">✓ Confirmed</span>
+                    <span class="status-pill status-cancelled" th:if="${order.orderStatus == 'CANCELLED'}">✕ Cancelled & Refunded</span>
+                    <span class="status-pill status-return" th:if="${order.orderStatus == 'RETURN_REQUESTED'}">↺ Return In Review</span>
+                    <span class="status-pill status-return" th:if="${order.orderStatus == 'EXCHANGE_REQUESTED'}">⇄ Exchange In Review</span>
+                </div>
+            </div>
+
+            <div class="order-card-body">
+                <div class="order-item-row" th:each="item : ${order.items}">
+                    <img class="order-item-thumb"
+                         th:src="@{'/images/products/' + ${item.imageFileName != null ? item.imageFileName : 'Bluetooth Speaker.png'}}"
+                         th:alt="${item.productName}"
+                         onerror="this.src='/images/products/Ceramic Coffee Mug.jpg';">
+
+                    <div class="order-item-details">
+                        <div class="order-item-name" th:text="${item.productName}">Product Title</div>
+                        <div class="order-item-meta">
+                            Qty: <span th:text="${item.quantity}">1</span> ×
+                            ₹<span th:text="${#numbers.formatDecimal(item.price, 1, 2)}">0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="order-item-subtotal">
+                        ₹<span th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)}">0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-card-footer">
+                <div class="order-total-block">
+                    Payment Method: <strong style="color: var(--deep-green);" th:text="${order.paymentMethod}">CARD</strong>
+                    &nbsp;|&nbsp;
+                    Total Amount: <strong th:text="'₹' + #numbers.formatDecimal(order.totalAmount, 1, 2)">₹0.00</strong>
+                </div>
+
+                <div class="order-actions-group">
+                    <form th:if="${order.orderStatus == 'CONFIRMED'}" th:action="@{/customer/orders/cancel}" method="post"
+                          onsubmit="return confirm('Are you sure you want to cancel this order? A full refund will be initiated to your payment method.');">
+                        <input type="hidden" name="orderId" th:value="${order.orderId}">
+                        <button type="submit" class="btn-cancel-order">Cancel Order & Refund</button>
+                    </form>
+
+                    <button type="button" class="btn-return-order"
+                            th:if="${order.orderStatus == 'CONFIRMED'}"
+                            th:data-id="${order.orderId}"
+                            onclick="openReturnModal(this.getAttribute('data-id'))">
+                        Return / Exchange
+                    </button>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-orders" th:if="${orders == null or orders.isEmpty()}">
+        <div style="font-size: 48px; margin-bottom: 12px;">🛍️</div>
+        <h2 style="color: var(--deep-green); margin: 0 0 8px;">No orders found</h2>
+        <p style="color: var(--text-muted); margin: 0 0 20px;">You haven't placed any orders yet. Discover our catalog!</p>
+        <a class="action-pill-btn cart-btn-primary" th:href="@{/customer/products}" style="padding: 12px 24px;">Start Shopping</a>
+    </div>
+</main>
+
+<!-- Return / Exchange Modal -->
+<div class="modal-overlay" id="returnModalOverlay">
+    <div class="modal-content-card">
+        <h3 style="margin-top: 0; color: var(--deep-green);">Request Return or Exchange</h3>
+        <p style="font-size: 13px; color: var(--text-muted);">
+            Select whether you would like a replacement or a return for refund, and provide a reason.
+        </p>
+
+        <form th:action="@{/customer/orders/return-exchange}" method="post">
+            <input type="hidden" name="orderId" id="modalOrderId">
+
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label style="font-size: 13px; font-weight: 700; color: var(--deep-green); display: block; margin-bottom: 6px;">Request Type</label>
+                <select name="requestType" class="form-control" style="width: 100%;">
+                    <option value="EXCHANGE">Exchange for Replacement (Same Product)</option>
+                    <option value="RETURN">Return for Full Money Refund</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="font-size: 13px; font-weight: 700; color: var(--deep-green); display: block; margin-bottom: 6px;">Reason for Request</label>
+                <select name="reason" class="form-control" style="width: 100%;">
+                    <option value="Defective or Damaged Product">Defective or Damaged Product</option>
+                    <option value="Wrong Item Received">Wrong Item Received</option>
+                    <option value="Item not as described">Item not as described</option>
+                    <option value="Changed mind / No longer needed">Changed mind / No longer needed</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="action-pill-btn" onclick="closeReturnModal()">Cancel</button>
+                <button type="submit" class="action-pill-btn cart-btn-primary">Submit Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleUserDropdown(event) {
+        if (event) event.stopPropagation();
+        const dropdown = document.getElementById('userMenuDropdown');
+        if (dropdown) dropdown.classList.toggle('active');
+    }
+
+    document.addEventListener('click', function (e) {
+        const dropdown = document.getElementById('userMenuDropdown');
+        if (dropdown && !dropdown.contains(e.target)) dropdown.classList.remove('active');
+    });
+
+    function openReturnModal(orderId) {
+        document.getElementById('modalOrderId').value = orderId;
+        document.getElementById('returnModalOverlay').style.display = 'flex';
+    }
+
+    function closeReturnModal() {
+        document.getElementById('returnModalOverlay').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

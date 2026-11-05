@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Shop Everything in One Place</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" th:href="@{/}">
+        <span class="brand-mark" aria-hidden="true">O</span>
+        <span>One<span class="brand-accent">Cart</span></span>
+    </a>
+
+    <nav class="main-nav">
+        <a class="active" th:href="@{/}">Home</a>
+        <a th:href="@{/products}">Shop</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <div class="header-actions">
+        <a class="login-link" th:href="@{/login}">
+            <span class="login-icon" aria-hidden="true">↪</span>
+            <span>Login</span>
+        </a>
+
+        <a class="cart-link" th:href="@{/cart}">
+            <span aria-hidden="true">🛒</span>
+            <span>Cart</span>
+            <span class="cart-count" id="cartCount">0</span>
+        </a>
+    </div>
+</header>
+
+<main>
+    <section class="hero-section">
+        <div class="hero-content">
+            <p class="eyebrow">ONE MARKETPLACE. ENDLESS FINDS.</p>
+            <h1>Everything you need,<br>all in <span>OneCart.</span></h1>
+            <p class="hero-description">
+                Discover products from trusted vendors and find something
+                you'll love—every time you shop.
+            </p>
+
+            <div class="hero-actions">
+                <a class="primary-button" th:href="@{/products}">Explore products <span>→</span></a>
+                <a class="secondary-button" th:href="@{/vendor/register}">Start selling</a>
+            </div>
+
+            <div class="hero-highlights">
+                <div>
+                    <strong>One</strong>
+                    <span>easy marketplace</span>
+                </div>
+                <div>
+                    <strong>Many</strong>
+                    <span>trusted vendors</span>
+                </div>
+                <div>
+                    <strong>More</strong>
+                    <span>to discover</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Shopping illustration">
+            <div class="hero-blob"></div>
+            <div class="hero-tag tag-top">Find your next favorite</div>
+            <div class="hero-shopping-bag">
+                <span class="bag-handle"></span>
+                <span class="bag-logo">O</span>
+                <span class="bag-label">OneCart</span>
+            </div>
+            <div class="hero-tag tag-bottom">A little something for everyone</div>
+            <div class="hero-sparkle sparkle-one">✦</div>
+            <div class="hero-sparkle sparkle-two">✧</div>
+        </div>
+    </section>
+
+    <section class="benefits-section">
+        <div class="benefit-item">
+            <span class="benefit-icon" aria-hidden="true">✓</span>
+            <div>
+                <h3>Trusted vendors</h3>
+                <p>Shop from a growing community of sellers.</p>
+            </div>
+        </div>
+
+        <div class="benefit-item">
+            <span class="benefit-icon" aria-hidden="true">⌕</span>
+            <div>
+                <h3>Easy discovery</h3>
+                <p>Explore products across different categories.</p>
+            </div>
+        </div>
+
+        <div class="benefit-item">
+            <span class="benefit-icon" aria-hidden="true">♡</span>
+            <div>
+                <h3>Made for you</h3>
+                <p>Find useful things and new favorites.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="products-section" id="featured-products">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">HANDPICKED FOR YOU</p>
+                <h2>Explore popular finds</h2>
+                <p>Discover products from OneCart vendors.</p>
+            </div>
+            <a class="text-link" th:href="@{/products}">View all products <span>→</span></a>
+        </div>
+
+        <div class="product-grid" th:if="${products != null and !products.isEmpty()}">
+            <article class="product-card" th:each="product : ${products}">
+                <a class="product-image-link"
+                   th:href="@{/products/{id}(id=${product.productId})}">
+                    <img class="product-image"
+                         th:src="@{/images/products/{image}(image=${#strings.equalsIgnoreCase(product.productName, 'Bluetooth Speaker') ? 'Bluetooth Speaker.png' : (#strings.equalsIgnoreCase(product.productName, 'Ceramic Coffee Mug') ? 'Ceramic Coffee Mug.jpg' : (#strings.equalsIgnoreCase(product.productName, 'Cotton T-Shirt') ? 'Cotton T-Shirt.jpg' : (#strings.equalsIgnoreCase(product.productName, 'Running Shoes') ? 'Running Shoes.jpg' : (#strings.equalsIgnoreCase(product.productName, 'Smart Watch') ? 'Smart Watch.webp' : (#strings.equalsIgnoreCase(product.productName, 'Travel back pack') ? 'Travel back pack.jpg' : (#strings.equalsIgnoreCase(product.productName, 'Wireless Headphones') ? 'Wireless Headphones.png' : (#strings.equalsIgnoreCase(product.productName, 'Wireless Mouse') ? 'Wireless Mouse.jpg' : ''))))))))}"
+                         th:alt="${product.productName}"
+                         onerror="this.style.display='none'">
+                </a>
+
+                <div class="product-details">
+                    <p class="product-category">OneCart find</p>
+                    <h3 th:text="${product.productName}">Product name</h3>
+
+                    <div class="product-price-row">
+                        <strong th:text="${'₹' + #numbers.formatDecimal(product.price, 1, 2)}">₹0.00</strong>
+                        <span class="discount"
+                              th:if="${product.discountPercentage != null and product.discountPercentage > 0}"
+                              th:text="${product.discountPercentage + '% off'}">0% off</span>
+                    </div>
+
+                    <div class="product-actions">
+                        <a class="view-product"
+                           th:href="@{/products/{id}(id=${product.productId})}">View product</a>
+                        <button class="wishlist-button"
+                                type="button"
+                                th:attr="data-product-id=${product.productId}"
+                                aria-label="Add to wishlist">♡</button>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="empty-state" th:if="${products == null or products.isEmpty()}">
+            <div class="empty-icon" aria-hidden="true">✦</div>
+            <h3>New finds are on the way</h3>
+            <p>Approved products will appear here when vendors list them.</p>
+        </div>
+    </section>
+
+    <section class="vendor-section">
+        <div class="vendor-content">
+            <p class="eyebrow">SELL WITH ONECART</p>
+            <h2>Have something great to share?</h2>
+            <p>
+                Bring your products to OneCart and connect with customers
+                looking for their next favorite find.
+            </p>
+            <a class="primary-button" th:href="@{/vendor/register}">Become a vendor <span>→</span></a>
+        </div>
+
+        <div class="vendor-art" aria-hidden="true">
+            <div class="vendor-circle"></div>
+            <div class="vendor-store">
+                <span class="store-roof"></span>
+                <span class="store-awning"></span>
+                <span class="store-window"></span>
+                <span class="store-door"></span>
+            </div>
+            <span class="vendor-star">✦</span>
+        </div>
+    </section>
+
+    <section class="vendors-section" th:if="${vendors != null and !vendors.isEmpty()}">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">OUR SELLER COMMUNITY</p>
+                <h2>Meet our vendors</h2>
+                <p>Explore stores that make OneCart special.</p>
+            </div>
+        </div>
+
+        <div class="vendor-grid">
+            <article class="vendor-card" th:each="vendor : ${vendors}">
+                <div class="vendor-avatar" aria-hidden="true">O</div>
+                <h3 th:text="${vendor.businessName != null and !vendor.businessName.isBlank() ? vendor.businessName : 'OneCart Vendor'}">
+                    Vendor name
+                </h3>
+                <p>Discover this vendor’s products on OneCart.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="about-strip">
+        <div>
+            <p class="eyebrow">SHOP WITH CONFIDENCE</p>
+            <h2>OneCart brings shopping together.</h2>
+            <p>One marketplace for discovering products and supporting vendors.</p>
+        </div>
+        <a class="secondary-button" th:href="@{/about}">Learn about us</a>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-main">
+        <div class="footer-brand-column">
+            <a class="brand footer-brand" th:href="@{/}">
+                <span class="brand-mark" aria-hidden="true">O</span>
+                <span>One<span class="brand-accent">Cart</span></span>
+            </a>
+            <p>Everything you need, all in one place.</p>
+        </div>
+
+        <div class="footer-column">
+            <h3>Explore</h3>
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/products}">Shop products</a>
+            <a th:href="@{/about}">About us</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Help</h3>
+            <a th:href="@{/contact}">Contact us</a>
+            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/signup}">Sign up</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Sell with us</h3>
+            <a th:href="@{/vendor/register}">Become a vendor</a>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2026 OneCart. All rights reserved.</p>
+        <p>Made for discovering more.</p>
+    </div>
+</footer>
+
+<script>
+    const CART_STORAGE_KEY = "onecart-cart";
+    const WISHLIST_STORAGE_KEY = "onecart-wishlist";
+
+    function readStorage(key) {
+        try {
+            return JSON.parse(localStorage.getItem(key) || "[]");
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function updateCartCount() {
+        const cart = readStorage(CART_STORAGE_KEY);
+        const count = cart.reduce((total, item) => {
+            return total + (Number(item.quantity) || 1);
+        }, 0);
+
+        const cartCount = document.getElementById("cartCount");
+        if (cartCount) {
+            cartCount.textContent = count;
+        }
+    }
+
+    function updateWishlistButtons() {
+        const wishlist = readStorage(WISHLIST_STORAGE_KEY).map(String);
+
+        document.querySelectorAll(".wishlist-button").forEach(button => {
+            const productId = String(button.dataset.productId);
+            const isSaved = wishlist.includes(productId);
+
+            button.classList.toggle("is-saved", isSaved);
+            button.textContent = isSaved ? "♥" : "♡";
+            button.setAttribute(
+                "aria-label",
+                isSaved ? "Remove from wishlist" : "Add to wishlist"
+            );
+        });
+    }
+
+    document.querySelectorAll(".wishlist-button").forEach(button => {
+        button.addEventListener("click", () => {
+            const productId = String(button.dataset.productId);
+            let wishlist = readStorage(WISHLIST_STORAGE_KEY).map(String);
+
+            if (wishlist.includes(productId)) {
+                wishlist = wishlist.filter(id => id !== productId);
+            } else {
+                wishlist.push(productId);
+            }
+
+            localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist));
+            updateWishlistButtons();
+        });
+    });
+
+    updateCartCount();
+    updateWishlistButtons();
+</script>
+
+</body>
+</html>
