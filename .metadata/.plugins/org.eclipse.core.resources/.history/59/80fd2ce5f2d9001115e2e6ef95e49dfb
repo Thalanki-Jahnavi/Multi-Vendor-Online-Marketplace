@@ -1,0 +1,142 @@
+package com.vendor.service;
+
+import org.springframework.stereotype.Service;
+
+import com.vendor.entity.Order;
+import com.vendor.entity.OrderItem;
+
+@Service
+public class EmailNotificationService {
+
+    /**
+     * Sends an Order Placed & Payment Confirmation Email to the customer
+     */
+    public void sendOrderConfirmationEmail(Order order) {
+        StringBuilder itemsList = new StringBuilder();
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                itemsList.append(String.format("   • %s (Qty: %d) - ₹%.2f\n",
+                        item.getProductName(), item.getQuantity(), item.getSubtotal()));
+            }
+        }
+
+        String subject = "Order Confirmed! Your OneCart Order #" + order.getOrderNumber();
+        String message = String.format("""
+            ================================================================================
+            📧 [ONECART EMAIL NOTIFICATION]
+            To: %s (%s)
+            Subject: %s
+            --------------------------------------------------------------------------------
+            Dear %s,
+
+            Thank you for shopping with OneCart! Your order has been placed successfully and payment of ₹%.2f was received.
+
+            ORDER SUMMARY:
+            Order Number: %s
+            Payment Method: %s (Status: %s)
+            Delivery Address: %s
+            Estimated Delivery: Within 3-5 business days
+
+            ITEMS ORDERED:
+            %s
+            Total Amount: ₹%.2f
+
+            We will notify you once your order is dispatched.
+            OneCart Customer Support | support@onecart.com
+            ================================================================================
+            """,
+                order.getCustomerEmail(),
+                order.getCustomerName() != null ? order.getCustomerName() : "Customer",
+                subject,
+                order.getCustomerName() != null ? order.getCustomerName() : "Valued Customer",
+                order.getTotalAmount() != null ? order.getTotalAmount() : 0.0,
+                order.getOrderNumber(),
+                order.getPaymentMethod(),
+                order.getPaymentStatus(),
+                order.getShippingAddress(),
+                itemsList.toString(),
+                order.getTotalAmount() != null ? order.getTotalAmount() : 0.0
+        );
+
+        System.out.println(message);
+    }
+
+    /**
+     * Sends an Order Cancellation and Money Refund Email to the customer
+     */
+    public void sendOrderCancellationAndRefundEmail(Order order, Double refundAmount) {
+        String subject = "Order Cancelled & Refund Initiated - OneCart Order #" + order.getOrderNumber();
+        String message = String.format("""
+            ================================================================================
+            📧 [ONECART EMAIL NOTIFICATION]
+            To: %s (%s)
+            Subject: %s
+            --------------------------------------------------------------------------------
+            Dear %s,
+
+            Your OneCart Order #%s has been successfully CANCELLED.
+
+            REFUND DETAILS:
+            • Refund Amount: ₹%.2f
+            • Refund Status: COMPLETED / REFUNDED TO SOURCE
+            • Payment Mode: %s
+            • Timeline: The amount has been credited back to your original payment method / account.
+
+            If you did not request this cancellation or have any questions, please contact our 24/7 helpdesk.
+
+            Thank you,
+            OneCart Customer Support | refunds@onecart.com
+            ================================================================================
+            """,
+                order.getCustomerEmail(),
+                order.getCustomerName() != null ? order.getCustomerName() : "Customer",
+                subject,
+                order.getCustomerName() != null ? order.getCustomerName() : "Valued Customer",
+                order.getOrderNumber(),
+                refundAmount != null ? refundAmount : (order.getTotalAmount() != null ? order.getTotalAmount() : 0.0),
+                order.getPaymentMethod() != null ? order.getPaymentMethod() : "Original Payment Method"
+        );
+
+        System.out.println(message);
+    }
+
+    /**
+     * Sends a Return or Exchange Request Confirmation Email
+     */
+    public void sendReturnOrExchangeEmail(Order order, String requestType, String reason) {
+        String subject = String.format("%s Request Registered - OneCart Order #%s", requestType, order.getOrderNumber());
+        String message = String.format("""
+            ================================================================================
+            📧 [ONECART EMAIL NOTIFICATION]
+            To: %s (%s)
+            Subject: %s
+            --------------------------------------------------------------------------------
+            Dear %s,
+
+            We have received your %s request for Order #%s.
+
+            REQUEST DETAILS:
+            • Request Type: %s
+            • Reason: %s
+            • Status: IN REVIEW / COURIER PICKUP SCHEDULED
+            • Pickup Window: Our courier partner will pick up the package within 48 hours.
+
+            Once inspected, your replacement or refund will be processed immediately.
+
+            Thank you,
+            OneCart Customer Support | returns@onecart.com
+            ================================================================================
+            """,
+                order.getCustomerEmail(),
+                order.getCustomerName() != null ? order.getCustomerName() : "Customer",
+                subject,
+                order.getCustomerName() != null ? order.getCustomerName() : "Valued Customer",
+                requestType,
+                order.getOrderNumber(),
+                requestType,
+                reason != null ? reason : "Not specified"
+        );
+
+        System.out.println(message);
+    }
+}

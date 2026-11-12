@@ -1,6 +1,8 @@
+
 package com.vendor.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "users")
@@ -29,9 +31,57 @@ public class User {
     @Column(name = "business_name")
     private String businessName;
 
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "gst_number")
+    private String gstNumber;
+
+    @Column(name = "address_line")
+    private String addressLine;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "state")
+    private String state;
+
+    @Column(name = "postal_code")
+    private String postalCode;
+
+    @Column(name = "gender")
+    private String gender;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
+
+    @Column(name = "phone_verified")
+    private Boolean phoneVerified = false;
+
+    @Column(name = "store_logo", length = 500)
+    private String storeLogo;
+
+    @Column(name = "store_banner", length = 500)
+    private String storeBanner;
+
+    // Vendor verification status
+    @Column(name = "vendor_verification_status",
+            nullable = false, length = 20)
+    private String vendorVerificationStatus = "PENDING";
+
+    // Vendor account status
+    @Column(name = "account_status",
+            nullable = false, length = 20)
+    private String accountStatus = "ACTIVE";
+
+    // Default constructor
     public User() {
     }
 
+    // User ID
     public Integer getUserId() {
         return userId;
     }
@@ -40,6 +90,7 @@ public class User {
         this.userId = userId;
     }
 
+    // First Name
     public String getFirstName() {
         return firstName;
     }
@@ -48,6 +99,7 @@ public class User {
         this.firstName = firstName;
     }
 
+    // Last Name
     public String getLastName() {
         return lastName;
     }
@@ -56,6 +108,7 @@ public class User {
         this.lastName = lastName;
     }
 
+    // Email
     public String getEmail() {
         return email;
     }
@@ -64,6 +117,7 @@ public class User {
         this.email = email;
     }
 
+    // Password
     public String getPassword() {
         return password;
     }
@@ -72,6 +126,7 @@ public class User {
         this.password = password;
     }
 
+    // Role
     public String getRole() {
         return role;
     }
@@ -80,11 +135,138 @@ public class User {
         this.role = role;
     }
 
+    // Business Name
     public String getBusinessName() {
         return businessName;
     }
 
     public void setBusinessName(String businessName) {
         this.businessName = businessName;
+    }
+
+    // Phone
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    // GST Number
+    public String getGstNumber() {
+        return gstNumber;
+    }
+
+    public void setGstNumber(String gstNumber) {
+        this.gstNumber = gstNumber;
+    }
+
+    // Address
+    public String getAddressLine() {
+        return addressLine;
+    }
+
+    public void setAddressLine(String addressLine) {
+        this.addressLine = addressLine;
+    }
+
+    // City
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    // State
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    // Postal Code
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    // Gender
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    // Date of Birth
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    // Email Verification
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    // Phone Verification
+    public Boolean getPhoneVerified() {
+        return phoneVerified;
+    }
+
+    public void setPhoneVerified(Boolean phoneVerified) {
+        this.phoneVerified = phoneVerified;
+    }
+
+    // Store Logo
+    public String getStoreLogo() {
+        return storeLogo;
+    }
+
+    public void setStoreLogo(String storeLogo) {
+        this.storeLogo = storeLogo;
+    }
+
+    // Store Banner
+    public String getStoreBanner() {
+        return storeBanner;
+    }
+
+    public void setStoreBanner(String storeBanner) {
+        this.storeBanner = storeBanner;
+    }
+
+    // Vendor Verification Status
+    public String getVendorVerificationStatus() {
+        return vendorVerificationStatus;
+    }
+
+    public void setVendorVerificationStatus(String vendorVerificationStatus) {
+        this.vendorVerificationStatus = vendorVerificationStatus;
+    }
+
+    // Account Status
+    public String getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(String accountStatus) {
+        this.accountStatus = accountStatus;
     }
 }

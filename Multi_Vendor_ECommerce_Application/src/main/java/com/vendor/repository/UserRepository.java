@@ -1,3 +1,4 @@
+
 package com.vendor.repository;
 
 import java.util.List;
@@ -11,15 +12,15 @@ import com.vendor.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    // Check whether an email already exists
-    boolean existsByEmail(String email);
-
-    // Find a user by email for login authentication
+    // Find user by email
     Optional<User> findByEmail(String email);
 
-    // Retrieve all users with a specific role
+    // Check whether email already exists
+    boolean existsByEmail(String email);
+
+    // Find users by role (ADMIN, CUSTOMER, VENDOR)
     List<User> findByRoleIgnoreCase(String role);
 
-    // Find vendors/users by their user IDs
+    // Find users using multiple user IDs
     List<User> findByUserIdIn(List<Integer> userIds);
 }

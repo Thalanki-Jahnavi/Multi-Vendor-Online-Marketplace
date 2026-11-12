@@ -1,0 +1,740 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Products | OneCart Admin</title>
+
+    <!-- COMMON ADMIN SIDEBAR CSS -->
+	<link rel="stylesheet" th:href="@{/css/admin-dashboard.css}">
+	<link rel="stylesheet" th:href="@{/css/admin-sidebar.css}">
+	<link rel="stylesheet" th:href="@{/css/products.css}">
+
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --emerald: #087e78;
+            --deep-green: #123e3a;
+            --mint: #e5f4f0;
+            --background: #f4f8f7;
+            --text: #153e3a;
+            --muted: #78908e;
+            --border: #e1ece9;
+            --white: #ffffff;
+        }
+
+        /* IMPORTANT:
+           Do not reset margin and padding globally.
+           The shared sidebar has its own spacing. */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        /* MAIN CONTENT */
+
+        .main-content {
+            min-height: 100vh;
+            padding: 35px 42px;
+        }
+
+        /* BREADCRUMB */
+
+        .breadcrumb {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb strong {
+            color: var(--emerald);
+        }
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-bottom: 25px;
+        }
+
+        /* ALERT */
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 9px;
+            margin-bottom: 22px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #e5f5ed;
+            color: #087e55;
+            border: 1px solid #c8e9d8;
+        }
+
+        /* STATISTICS */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .stat-value {
+            font-size: 29px;
+            font-weight: bold;
+            color: var(--emerald);
+            margin-top: 12px;
+        }
+
+        /* PRODUCTS CARD */
+
+        .products-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 25px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+        }
+
+        /* SEARCH */
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-box {
+            width: 310px;
+            max-width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .search-box:focus {
+            border-color: var(--emerald);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 13px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .btn-search {
+            background: var(--emerald);
+            color: white;
+        }
+
+        .btn-search:hover {
+            background: var(--deep-green);
+        }
+
+        .btn-clear {
+            background: #edf4f2;
+            color: var(--deep-green);
+        }
+
+        /* TABLE */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1250px;
+        }
+
+        thead {
+            background: #f1f7f5;
+        }
+
+        th {
+            padding: 15px 13px;
+            text-align: left;
+            font-size: 11px;
+            color: #66817c;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 13px;
+            border-bottom: 1px solid #edf2f0;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #f8fbfa;
+        }
+
+        /* PRODUCT DETAILS */
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 200px;
+        }
+
+        .product-image {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .product-name {
+            font-weight: bold;
+            color: var(--deep-green);
+            margin-bottom: 5px;
+        }
+
+        .product-brand {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* STATUS BADGES */
+
+        .status {
+            display: inline-block;
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .approved,
+        .active {
+            background: #e5f5ed;
+            color: #07834d;
+        }
+
+        .pending {
+            background: #fff2dc;
+            color: #c47a16;
+        }
+
+        .rejected {
+            background: #fde9e9;
+            color: #c43e3e;
+        }
+
+        .inactive {
+            background: #edf0f2;
+            color: #68777e;
+        }
+
+        /* ACTION BUTTONS */
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn-activate {
+            background: #e5f5ed;
+            color: #07834d;
+        }
+
+        .btn-activate:hover {
+            background: #ccebdc;
+        }
+
+        .btn-deactivate {
+            background: #fde9e9;
+            color: #c43e3e;
+        }
+
+        .btn-deactivate:hover {
+            background: #f8d5d5;
+        }
+
+        /* EMPTY STATE */
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1200px) {
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .main-content {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .search-form {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .products-card {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- =====================================
+         COMMON ADMIN SIDEBAR
+    ====================================== -->
+
+    <div th:replace="~{fragments/admin-sidebar :: sidebar('products')}"></div>
+
+
+    <!-- =====================================
+         MAIN CONTENT
+    ====================================== -->
+
+    <main class="main-content">
+
+        <!-- BREADCRUMB -->
+
+        <div class="breadcrumb">
+            OneCart / <strong>Admin</strong> / Products
+        </div>
+
+
+        <!-- PAGE TITLE -->
+
+        <h1>Product Management</h1>
+
+        <p class="subtitle">
+            View, monitor and manage all products listed by vendors on OneCart.
+        </p>
+
+
+        <!-- SUCCESS MESSAGE -->
+
+        <div class="alert alert-success"
+             th:if="${successMessage != null}"
+             th:text="${successMessage}">
+            Product updated successfully.
+        </div>
+
+
+        <!-- =====================================
+             PRODUCT STATISTICS
+        ====================================== -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+                <div class="stat-label">Total Products</div>
+                <div class="stat-value" th:text="${totalProducts}">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Approved Products</div>
+                <div class="stat-value" th:text="${approvedProducts}">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Pending Approval</div>
+                <div class="stat-value" th:text="${pendingProducts}">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Active Products</div>
+                <div class="stat-value" th:text="${activeProducts}">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Inactive Products</div>
+                <div class="stat-value" th:text="${inactiveProducts}">0</div>
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             ALL PRODUCTS TABLE
+        ====================================== -->
+
+        <section class="products-card">
+
+            <div class="card-header">
+
+                <h2>All Products</h2>
+
+                <!-- SEARCH FORM -->
+
+                <form class="search-form"
+                      th:action="@{/admin/products}"
+                      method="get">
+
+                    <input
+                        type="text"
+                        class="search-box"
+                        name="keyword"
+                        th:value="${keyword}"
+                        placeholder="Search product, brand, category or SKU...">
+
+                    <button type="submit" class="btn btn-search">
+                        Search
+                    </button>
+
+                    <a th:href="@{/admin/products}"
+                       class="btn btn-clear">
+                        Clear
+                    </a>
+
+                </form>
+
+            </div>
+
+
+            <!-- PRODUCT TABLE -->
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Vendor</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Approval</th>
+                            <th>Product Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                        <tr th:each="product : ${products}">
+
+                            <!-- PRODUCT ID -->
+
+                            <td th:text="${product.productId}">
+                                1
+                            </td>
+
+
+                            <!-- PRODUCT DETAILS -->
+
+                            <td>
+
+                                <div class="product-info">
+
+                                    <img
+                                        th:if="${product.imageFileName != null
+                                            and !#strings.isEmpty(product.imageFileName)}"
+
+                                        th:src="${#strings.startsWith(product.imageFileName, '/')
+                                            ? product.imageFileName
+                                            : '/images/products/' + product.imageFileName}"
+
+                                        class="product-image"
+                                        alt="Product image">
+
+                                    <div
+                                        th:unless="${product.imageFileName != null
+                                            and !#strings.isEmpty(product.imageFileName)}"
+
+                                        class="product-image"
+                                        style="display:grid;place-items:center;">
+                                        📦
+                                    </div>
+
+                                    <div>
+
+                                        <div class="product-name"
+                                             th:text="${product.productName}">
+                                            Product Name
+                                        </div>
+
+                                        <div class="product-brand"
+                                             th:text="${product.brand != null
+                                                ? product.brand : 'No brand'}">
+                                            Brand
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- CATEGORY -->
+
+                            <td th:text="${product.category != null
+                                ? product.category : 'N/A'}">
+                                Category
+                            </td>
+
+
+                            <!-- VENDOR NAME -->
+
+                            <td th:text="${product.vendorId != null
+                                and vendorNames[product.vendorId] != null
+                                ? vendorNames[product.vendorId]
+                                : 'Unknown Vendor'}">
+                                Vendor Name
+                            </td>
+
+
+                            <!-- PRICE -->
+
+                            <td>
+                                ₹<span
+                                    th:text="${#numbers.formatDecimal(
+                                        product.price != null ? product.price : 0,
+                                        1, 2)}">
+                                    0.00
+                                </span>
+                            </td>
+
+
+                            <!-- STOCK -->
+
+                            <td th:text="${product.stockQuantity != null
+                                ? product.stockQuantity : 0}">
+                                0
+                            </td>
+
+
+                            <!-- APPROVAL STATUS -->
+
+                            <td>
+
+                                <span class="status"
+
+                                      th:classappend="${
+                                          #strings.equalsIgnoreCase(
+                                              product.approvalStatus, 'APPROVED')
+                                              ? ' approved'
+                                              : (#strings.equalsIgnoreCase(
+                                                  product.approvalStatus, 'PENDING')
+                                                  ? ' pending' : ' rejected')
+                                      }"
+
+                                      th:text="${product.approvalStatus != null
+                                          ? product.approvalStatus : 'UNKNOWN'}">
+
+                                    PENDING
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- PRODUCT STATUS -->
+
+                            <td>
+
+                                <span class="status"
+
+                                      th:classappend="${
+                                          #strings.equalsIgnoreCase(
+                                              product.productStatus, 'ACTIVE')
+                                              ? ' active' : ' inactive'
+                                      }"
+
+                                      th:text="${product.productStatus != null
+                                          ? product.productStatus : 'UNKNOWN'}">
+
+                                    ACTIVE
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <div class="actions">
+
+                                    <!-- DEACTIVATE -->
+
+                                    <form
+                                        th:if="${#strings.equalsIgnoreCase(
+                                            product.productStatus, 'ACTIVE')}"
+
+                                        th:action="@{/admin/products/{id}/deactivate(
+                                            id=${product.productId})}"
+
+                                        method="post"
+
+                                        onsubmit="return confirm(
+                                            'Are you sure you want to deactivate this product?'
+                                        );">
+
+                                        <button type="submit"
+                                                class="btn btn-deactivate">
+                                            Deactivate
+                                        </button>
+
+                                    </form>
+
+
+                                    <!-- ACTIVATE -->
+
+                                    <form
+                                        th:unless="${#strings.equalsIgnoreCase(
+                                            product.productStatus, 'ACTIVE')}"
+
+                                        th:action="@{/admin/products/{id}/activate(
+                                            id=${product.productId})}"
+
+                                        method="post"
+
+                                        onsubmit="return confirm(
+                                            'Are you sure you want to activate this product?'
+                                        );">
+
+                                        <button type="submit"
+                                                class="btn btn-activate">
+                                            Activate
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                        <!-- EMPTY RESULT -->
+
+                        <tr th:if="${#lists.isEmpty(products)}">
+
+                            <td colspan="9" class="empty">
+                                No products found.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <p class="footer-note">
+                Product approval and product activation are managed separately.
+            </p>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

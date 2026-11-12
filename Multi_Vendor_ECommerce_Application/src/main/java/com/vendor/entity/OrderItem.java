@@ -1,3 +1,4 @@
+
 package com.vendor.entity;
 
 import jakarta.persistence.*;
@@ -12,7 +13,11 @@ public class OrderItem {
     private Long orderItemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(
+            name = "order_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private Order order;
 
     @Column(name = "product_id")
@@ -33,16 +38,29 @@ public class OrderItem {
     @Column(name = "image_file_name")
     private String imageFileName;
 
+    // Individual vendor fulfilment status
+    @Column(name = "fulfillment_status", length = 30)
+    private String fulfillmentStatus = "CONFIRMED";
+
     public OrderItem() {
     }
 
-    public OrderItem(Long productId, String productName, Double price, Integer quantity, String imageFileName) {
+    public OrderItem(
+            Long productId,
+            String productName,
+            Double price,
+            Integer quantity,
+            String imageFileName
+    ) {
         this.productId = productId;
         this.productName = productName;
         this.price = price;
         this.quantity = quantity;
         this.imageFileName = imageFileName;
-        this.subtotal = (price != null && quantity != null) ? price * quantity : 0.0;
+        this.subtotal =
+                (price != null && quantity != null)
+                        ? price * quantity : 0.0;
+        this.fulfillmentStatus = "CONFIRMED";
     }
 
     public Long getOrderItemId() {
@@ -107,5 +125,13 @@ public class OrderItem {
 
     public void setImageFileName(String imageFileName) {
         this.imageFileName = imageFileName;
+    }
+
+    public String getFulfillmentStatus() {
+        return fulfillmentStatus;
+    }
+
+    public void setFulfillmentStatus(String fulfillmentStatus) {
+        this.fulfillmentStatus = fulfillmentStatus;
     }
 }

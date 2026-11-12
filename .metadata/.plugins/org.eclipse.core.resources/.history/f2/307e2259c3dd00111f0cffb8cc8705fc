@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | OneCart</title>
+    <link rel="stylesheet" th:href="@{/css/admin-dashboard.css}">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">O</div>
+            <div>
+                <h2>OneCart</h2>
+                <span>ADMIN PANEL</span>
+            </div>
+        </div>
+
+        <div class="sidebar-label">MAIN MENU</div>
+        <a class="nav-link active" th:href="@{/admin/dashboard}">
+            <span class="nav-icon">▦</span> Dashboard
+        </a>
+
+        <div class="sidebar-label">MARKETPLACE MANAGEMENT</div>
+        <a class="nav-link" th:href="@{/admin/customers}">
+            <span class="nav-icon">♙</span> Customers
+        </a>
+        <a class="nav-link" th:href="@{/admin/vendors}">
+            <span class="nav-icon">♧</span> Vendors
+        </a>
+        <a class="nav-link" th:href="@{/admin/products}">
+            <span class="nav-icon">▣</span> Products
+        </a>
+        <a class="nav-link" th:href="@{/admin/product-approvals}">
+            <span class="nav-icon">✓</span> Product Approvals
+            <span class="nav-count" th:text="${pendingApprovals}">0</span>
+        </a>
+        <a class="nav-link" th:href="@{/admin/categories}">
+            <span class="nav-icon">▤</span> Categories
+        </a>
+        <a class="nav-link" th:href="@{/admin/orders}">
+            <span class="nav-icon">▧</span> Orders
+        </a>
+
+        <div class="sidebar-label">ANALYTICS</div>
+        <a class="nav-link" th:href="@{/admin/reports}">
+            <span class="nav-icon">▥</span> Reports & Analytics
+        </a>
+
+        <div class="sidebar-label">ACCOUNT</div>
+        <a class="nav-link" th:href="@{/admin/profile}">
+            <span class="nav-icon">⚙</span> My Profile
+        </a>
+
+        <form th:action="@{/logout}" method="post" class="logout-form">
+            <button type="submit" class="nav-link logout-link">
+                <span class="nav-icon">↪</span> Logout
+            </button>
+        </form>
+
+        <div class="sidebar-footer">
+            <div class="footer-avatar">OC</div>
+            <div>
+                <strong>OneCart Admin</strong>
+                <span>Administrator</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <div class="breadcrumb">OneCart / <span>Dashboard</span></div>
+                <h1>Dashboard Overview</h1>
+                <p>Here's what's happening in your marketplace today.</p>
+            </div>
+
+            <div class="topbar-profile">
+                <div class="profile-avatar"
+                     th:text="${#strings.substring(adminName,0,1)}">A</div>
+                <div class="profile-info">
+                    <strong th:text="${adminName}">Administrator</strong>
+                    <span>Super Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- STATISTICS -->
+        <section class="stats-grid">
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon mint">♙</span>
+                    <span class="stat-label">CUSTOMERS</span>
+                </div>
+                <h2 th:text="${totalCustomers}">0</h2>
+                <p>Registered customers</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon blue">♧</span>
+                    <span class="stat-label">VENDORS</span>
+                </div>
+                <h2 th:text="${totalVendors}">0</h2>
+                <p>Registered vendors</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon purple">▣</span>
+                    <span class="stat-label">TOTAL PRODUCTS</span>
+                </div>
+                <h2 th:text="${totalProducts}">0</h2>
+                <p>Products in marketplace</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon orange">◷</span>
+                    <span class="stat-label">PENDING APPROVALS</span>
+                </div>
+                <h2 th:text="${pendingApprovals}">0</h2>
+                <p>Products awaiting review</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon green">✓</span>
+                    <span class="stat-label">APPROVED PRODUCTS</span>
+                </div>
+                <h2 th:text="${approvedProducts}">0</h2>
+                <p>Approved products</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon blue">▧</span>
+                    <span class="stat-label">TOTAL ORDERS</span>
+                </div>
+                <h2 th:text="${totalOrders}">0</h2>
+                <p>Marketplace orders</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon orange">◷</span>
+                    <span class="stat-label">PENDING ORDERS</span>
+                </div>
+                <h2 th:text="${pendingOrders}">0</h2>
+                <p>Orders awaiting action</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-icon green">✓</span>
+                    <span class="stat-label">COMPLETED ORDERS</span>
+                </div>
+                <h2 th:text="${completedOrders}">0</h2>
+                <p>Delivered orders</p>
+            </article>
+
+            <article class="stat-card revenue-card">
+                <div class="stat-top">
+                    <span class="stat-icon mint">₹</span>
+                    <span class="stat-label">TOTAL REVENUE</span>
+                </div>
+                <h2>
+                    ₹<span th:text="${#numbers.formatDecimal(totalRevenue,1,2)}">0.00</span>
+                </h2>
+                <p>Paid, non-cancelled orders</p>
+            </article>
+
+        </section>
+
+        <!-- QUICK ACTIONS -->
+        <section class="section-card quick-actions">
+            <div class="section-heading">
+                <div>
+                    <h2>Quick Actions</h2>
+                    <p>Manage your marketplace efficiently.</p>
+                </div>
+            </div>
+
+            <div class="action-grid">
+                <a th:href="@{/admin/product-approvals}" class="action-button">
+                    <span>✓</span>
+                    <div>
+                        <strong>Review Products</strong>
+                        <small>Approve or reject products</small>
+                    </div>
+                    <b>→</b>
+                </a>
+
+                <a th:href="@{/admin/orders}" class="action-button">
+                    <span>▧</span>
+                    <div>
+                        <strong>Manage Orders</strong>
+                        <small>Monitor customer orders</small>
+                    </div>
+                    <b>→</b>
+                </a>
+
+                <a th:href="@{/admin/customers}" class="action-button">
+                    <span>♙</span>
+                    <div>
+                        <strong>View Customers</strong>
+                        <small>Manage customer accounts</small>
+                    </div>
+                    <b>→</b>
+                </a>
+
+                <a th:href="@{/admin/vendors}" class="action-button">
+                    <span>♧</span>
+                    <div>
+                        <strong>View Vendors</strong>
+                        <small>Manage marketplace sellers</small>
+                    </div>
+                    <b>→</b>
+                </a>
+            </div>
+        </section>
+
+        <!-- RECENT ORDERS -->
+        <section class="section-card">
+            <div class="section-heading">
+                <div>
+                    <h2>Recent Orders</h2>
+                    <p>Latest marketplace transactions.</p>
+                </div>
+                <a th:href="@{/admin/orders}" class="view-all">View all →</a>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ORDER ID</th>
+                        <th>CUSTOMER</th>
+                        <th>AMOUNT</th>
+                        <th>PAYMENT</th>
+                        <th>ORDER STATUS</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="order : ${recentOrders}">
+                        <td class="order-id" th:text="${order.orderNumber}">OD-1001</td>
+                        <td th:text="${order.customerName}">Customer</td>
+                        <td>
+                            ₹<span th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount,1,2) : '0.00'}">0.00</span>
+                        </td>
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="${order.paymentStatus != null ? ' ' + #strings.toLowerCase(order.paymentStatus) : ''}"
+                                  th:text="${order.paymentStatus}">PAID</span>
+                        </td>
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="${order.orderStatus != null ? ' ' + #strings.toLowerCase(order.orderStatus) : ''}"
+                                  th:text="${order.orderStatus}">CONFIRMED</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(recentOrders)}">
+                        <td colspan="5" class="empty-state">No orders found yet.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- PENDING PRODUCTS -->
+        <section class="section-card">
+            <div class="section-heading">
+                <div>
+                    <h2>Products Waiting for Approval</h2>
+                    <p>Review products submitted by vendors.</p>
+                </div>
+                <a th:href="@{/admin/product-approvals}" class="view-all">Review all →</a>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>PRODUCT</th>
+                        <th>CATEGORY</th>
+                        <th>PRICE</th>
+                        <th>VENDOR ID</th>
+                        <th>STATUS</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="product : ${pendingProducts}">
+                        <td class="product-name" th:text="${product.productName}">Product</td>
+                        <td th:text="${product.category}">Category</td>
+                        <td>
+                            ₹<span th:text="${product.price != null ? #numbers.formatDecimal(product.price,1,2) : '0.00'}">0.00</span>
+                        </td>
+                        <td th:text="${product.vendorId}">1</td>
+                        <td><span class="status-badge pending">PENDING</span></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(pendingProducts)}">
+                        <td colspan="5" class="empty-state">No products are waiting for approval.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- RECENT CUSTOMERS AND VENDORS -->
+        <section class="bottom-grid">
+
+            <div class="section-card">
+                <div class="section-heading">
+                    <div>
+                        <h2>Recent Customers</h2>
+                        <p>Latest customer accounts.</p>
+                    </div>
+                    <a th:href="@{/admin/customers}" class="view-all">View all →</a>
+                </div>
+
+                <div class="people-list">
+                    <div class="person-row" th:each="customer : ${recentCustomers}">
+                        <div class="person-avatar"
+                             th:text="${customer.firstName != null ? #strings.substring(customer.firstName,0,1) : 'C'}">C</div>
+                        <div class="person-details">
+                            <strong th:text="${customer.firstName + ' ' + (customer.lastName != null ? customer.lastName : '')}">Customer</strong>
+                            <span th:text="${customer.email}">customer@email.com</span>
+                        </div>
+                    </div>
+                    <p class="empty-state" th:if="${#lists.isEmpty(recentCustomers)}">No customers found.</p>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-heading">
+                    <div>
+                        <h2>Recent Vendors</h2>
+                        <p>Latest vendor accounts.</p>
+                    </div>
+                    <a th:href="@{/admin/vendors}" class="view-all">View all →</a>
+                </div>
+
+                <div class="people-list">
+                    <div class="person-row" th:each="vendor : ${recentVendors}">
+                        <div class="person-avatar vendor-avatar"
+                             th:text="${vendor.businessName != null and !vendor.businessName.isBlank() ? #strings.substring(vendor.businessName,0,1) : 'V'}">V</div>
+                        <div class="person-details">
+                            <strong th:text="${vendor.businessName != null and !vendor.businessName.isBlank() ? vendor.businessName : vendor.firstName}">Vendor</strong>
+                            <span th:text="${vendor.email}">vendor@email.com</span>
+                        </div>
+                    </div>
+                    <p class="empty-state" th:if="${#lists.isEmpty(recentVendors)}">No vendors found.</p>
+                </div>
+            </div>
+
+        </section>
+
+        <footer class="page-footer">
+            © 2026 OneCart. Admin Management Panel.
+        </footer>
+
+    </main>
+</div>
+
+</body>
+</html>

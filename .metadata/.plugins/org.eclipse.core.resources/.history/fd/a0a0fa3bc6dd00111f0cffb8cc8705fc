@@ -1,0 +1,190 @@
+
+package com.vendor.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Sort;
+
+import com.vendor.entity.Product;
+import com.vendor.entity.User;
+import com.vendor.repository.ProductRepository;
+import com.vendor.repository.UserRepository;
+import com.vendor.service.AdminService;
+
+@Controller
+public class AdminController {
+
+    private final AdminService adminService;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+
+    public AdminController(
+            AdminService adminService,
+            UserRepository userRepository,
+            ProductRepository productRepository) {
+
+        this.adminService = adminService;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
+    }
+
+    // Admin Dashboard
+    @GetMapping("/admin/dashboard")
+    public String showDashboard(
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        Map<String, Object> dashboardData =
+                adminService.getDashboardData();
+
+        model.addAllAttributes(dashboardData);
+        addAdminDetails(admin, model);
+
+        model.addAttribute("activePage", "dashboard");
+
+        return "admin/dashboard";
+    }
+
+    // Customer Management
+    @GetMapping("/admin/customers")
+    public String showCustomers(
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        List<User> customers =
+                userRepository.findByRoleIgnoreCase("CUSTOMER");
+
+        model.addAttribute("customers", customers);
+        model.addAttribute("totalCustomers", customers.size());
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "customers");
+
+        return "admin/customers";
+    }
+
+    // Vendor Management
+    @GetMapping("/admin/vendors")
+    public String showVendors(
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        List<User> vendors =
+                userRepository.findByRoleIgnoreCase("VENDOR");
+
+        model.addAttribute("vendors", vendors);
+        model.addAttribute("totalVendors", vendors.size());
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "vendors");
+
+        return "admin/vendors";
+    }
+
+    // Product Management
+    @GetMapping("/admin/products")
+    public String showProducts(
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        List<Product> products = productRepository.findAll(
+                Sort.by(Sort.Direction.DESC, "productId")
+        );
+
+        long totalProducts = products.size();
+
+        long approvedProducts = products.stream()
+                .filter(p -> "APPROVED".equalsIgnoreCase(
+                        p.getApprovalStatus()))
+                .count();
+
+        long pendingProducts = products.stream()
+                .filter(p -> "PENDING".equalsIgnoreCase(
+                        p.getApprovalStatus()))
+                .count();
+
+        long inactiveProducts = products.stream()
+                .filter(p -> "INACTIVE".equalsIgnoreCase(
+                        p.getProductStatus()))
+                .count();
+
+        if (keyword != null && !keyword.isBlank()) {
+
+            String search = keyword.trim().toLowerCase();
+
+            products = products.stream()
+                    .filter(p ->
+                            (p.getProductName() != null &&
+                             p.getProductName().toLowerCase()
+                                     .contains(search))
+                            ||
+                            (p.getCategory() != null &&
+                             p.getCategory().toLowerCase()
+                                     .contains(search))
+                            ||
+                            (p.getBrand() != null &&
+                             p.getBrand().toLowerCase()
+                                     .contains(search))
+                            ||
+                            (p.getSku() != null &&
+                             p.getSku().toLowerCase()
+                                     .contains(search))
+                    )
+                    .toList();
+        }
+
+        model.addAttribute("products", products);
+        model.addAttribute("totalProducts", totalProducts);
+        model.addAttribute("approvedProducts", approvedProducts);
+        model.addAttribute("pendingProducts", pendingProducts);
+        model.addAttribute("inactiveProducts", inactiveProducts);
+        model.addAttribute("keyword", keyword);
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "products");
+
+        return "admin/products";
+    }
+
+    // Verify admin account
+    private User getAdmin(Authentication authentication) {
+
+        if (authentication == null ||
+                !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Please login first");
+        }
+
+        User admin = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException("Admin account not found"));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getRole())) {
+            throw new AccessDeniedException("Admin access required");
+        }
+
+        return admin;
+    }
+
+    // Common admin details
+    private void addAdminDetails(User admin, Model model) {
+
+        model.addAttribute("adminName", admin.getFirstName());
+        model.addAttribute("adminEmail", admin.getEmail());
+    }
+}

@@ -1,0 +1,181 @@
+
+package com.vendor.controller;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.vendor.entity.Product;
+import com.vendor.entity.User;
+import com.vendor.repository.ProductRepository;
+import com.vendor.repository.UserRepository;
+
+@Controller
+public class AddProductController {
+
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+
+    private static final String UPLOAD_DIR =
+            "src/main/resources/static/images/products/";
+
+    public AddProductController(
+            ProductRepository productRepository,
+            UserRepository userRepository) {
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/vendor/products/add")
+    public String showAddProductPage(
+            Authentication authentication,
+            Model model) {
+
+        User vendor = getLoggedInVendor(authentication);
+
+        if (vendor == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("vendor", vendor);
+        return "vendor/add-product";
+    }
+
+    @PostMapping("/vendor/products/add")
+    public String addProduct(
+            Authentication authentication,
+            @RequestParam String productName,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String sku,
+            @RequestParam Double price,
+            @RequestParam(required = false) Double discountPercentage,
+            @RequestParam Integer stockQuantity,
+            @RequestParam(required = false) String weightKg,
+            @RequestParam(required = false) String color,
+            @RequestParam(required = false) String size,
+            @RequestParam(defaultValue = "true") Boolean returnable,
+            @RequestParam(defaultValue = "false") Boolean replaceable,
+            @RequestParam(defaultValue = "0") Integer warrantyMonths,
+            @RequestParam(required = false) MultipartFile productImage,
+            RedirectAttributes redirectAttributes) {
+
+        User vendor = getLoggedInVendor(authentication);
+
+        if (vendor == null) {
+            return "redirect:/login";
+        }
+
+        if (productName == null || productName.isBlank()
+                || price == null || price <= 0
+                || stockQuantity == null || stockQuantity < 0) {
+
+            redirectAttributes.addFlashAttribute(
+                    "error", "Enter valid product name, price and stock.");
+            return "redirect:/vendor/products/add";
+        }
+
+        try {
+            Product product = new Product();
+
+            product.setVendorId(vendor.getUserId());
+            product.setProductName(productName.trim());
+            product.setDescription(clean(description));
+            product.setCategory(clean(category));
+            product.setBrand(clean(brand));
+            product.setSku(clean(sku));
+            product.setPrice(price);
+            product.setDiscountPercentage(
+                    discountPercentage == null ? 0.0 : discountPercentage);
+            product.setStockQuantity(stockQuantity);
+            product.setWeightKg(
+                    weightKg == null || weightKg.isBlank()
+                    ? null
+                    : new java.math.BigDecimal(weightKg));
+            product.setColor(clean(color));
+            product.setSize(clean(size));
+            product.setReturnable(returnable);
+            product.setReplaceable(replaceable);
+            product.setWarrantyMonths(warrantyMonths);
+
+            product.setProductStatus("ACTIVE");
+            product.setApprovalStatus("PENDING");
+
+            if (productImage != null && !productImage.isEmpty()) {
+
+                String originalName = productImage.getOriginalFilename();
+                String extension = "";
+
+                if (originalName != null && originalName.contains(".")) {
+                    extension = originalName.substring(
+                            originalName.lastIndexOf("."));
+                }
+
+                String fileName = UUID.randomUUID() + extension;
+
+                Path uploadPath = Paths.get(UPLOAD_DIR);
+                Files.createDirectories(uploadPath);
+
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(productImage.getInputStream(), filePath);
+
+                product.setImageFileName(fileName);
+            }
+
+            productRepository.save(product);
+
+            redirectAttributes.addFlashAttribute(
+                    "success", "Product added successfully. Awaiting admin approval.");
+
+            return "redirect:/vendor/products";
+
+        } catch (IOException | NumberFormatException e) {
+
+            redirectAttributes.addFlashAttribute(
+                    "error", "Unable to upload product image or save product.");
+
+            return "redirect:/vendor/products/add";
+        }
+    }
+
+    private User getLoggedInVendor(Authentication authentication) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            return null;
+        }
+
+        Optional<User> userOptional =
+                userRepository.findByEmail(authentication.getName());
+
+        if (userOptional.isEmpty()) {
+            return null;
+        }
+
+        User user = userOptional.get();
+
+        if (!"vendor".equalsIgnoreCase(user.getRole())) {
+            return null;
+        }
+
+        return user;
+    }
+
+    private String clean(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
+    }
+}

@@ -1,3 +1,4 @@
+
 package com.vendor.config;
 
 import org.springframework.context.annotation.Bean;
@@ -29,7 +30,8 @@ public class SecurityConfig {
                     "/reset-password",
                     "/css/**",
                     "/js/**",
-                    "/images/**"
+                    "/images/**",
+                    "/store-uploads/**"
                 ).permitAll()
 
                 // Protected pages by role
@@ -37,7 +39,7 @@ public class SecurityConfig {
                 .requestMatchers("/vendor/**").hasRole("VENDOR")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                // Customer-only actions (requires login)
+                // Customer-only actions
                 .requestMatchers(
                     "/products",
                     "/cart/**",
@@ -69,6 +71,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
+
         return (request, response, authentication) -> {
 
             boolean isAdmin = authentication.getAuthorities().stream()

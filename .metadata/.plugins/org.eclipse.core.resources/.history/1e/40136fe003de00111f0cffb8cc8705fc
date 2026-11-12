@@ -1,0 +1,526 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders | OneCart Admin</title>
+
+    <link rel="stylesheet" th:href="@{/css/admin-dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-orders.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-sidebar.css}">
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- ADMIN DASHBOARD SIDEBAR -->
+    <aside class="sidebar">
+
+        <a th:href="@{/admin/dashboard}" class="brand">
+            <div class="brand-icon">O</div>
+            <span class="brand-text">OneCart</span>
+        </a>
+
+        <div class="sidebar-menu">
+
+            <p class="menu-heading">MAIN MENU</p>
+
+            <a th:href="@{/admin/dashboard}" class="menu-link">
+                <span class="menu-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <p class="menu-heading">MARKETPLACE MANAGEMENT</p>
+
+            <a th:href="@{/admin/customers}" class="menu-link">
+                <span class="menu-icon">♙</span>
+                <span>Customers</span>
+            </a>
+
+            <a th:href="@{/admin/vendors}" class="menu-link">
+                <span class="menu-icon">♧</span>
+                <span>Vendors</span>
+            </a>
+
+            <a th:href="@{/admin/products}" class="menu-link">
+                <span class="menu-icon">▦</span>
+                <span>Products</span>
+            </a>
+
+            <a th:href="@{/admin/product-approvals}" class="menu-link">
+                <span class="menu-icon">✓</span>
+                <span>Product Approvals</span>
+            </a>
+
+            <a th:href="@{/admin/categories}" class="menu-link">
+                <span class="menu-icon">▤</span>
+                <span>Categories</span>
+            </a>
+
+            <a th:href="@{/admin/orders}" class="menu-link active">
+                <span class="menu-icon">▣</span>
+                <span>Orders</span>
+            </a>
+
+            <p class="menu-heading">ANALYTICS</p>
+
+            <a th:href="@{/admin/reports}" class="menu-link">
+                <span class="menu-icon">▥</span>
+                <span>Reports &amp; Analytics</span>
+            </a>
+
+            <div class="sidebar-bottom">
+                <a th:href="@{/logout}" class="menu-link">
+                    <span class="menu-icon">↪</span>
+                    <span>Logout</span>
+                </a>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <header class="top-header">
+
+            <div>
+                <h2>Order Management</h2>
+                <p>Monitor and manage all customer orders.</p>
+            </div>
+
+            <div class="admin-profile">
+                <div class="profile-circle">O</div>
+
+                <div>
+                    <strong th:text="${adminName != null ? adminName : 'Admin'}">
+                        Admin
+                    </strong>
+                    <small>Super Admin</small>
+                </div>
+            </div>
+
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <section class="page-content">
+
+            <div class="breadcrumb">
+                OneCart / <strong>Orders</strong>
+            </div>
+
+            <div class="page-title">
+                <h1>Orders</h1>
+                <p>View customer purchases, payment details and order status.</p>
+            </div>
+
+            <!-- ORDER STATISTICS -->
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL ORDERS</div>
+                    <div class="stat-value" th:text="${totalOrders}">0</div>
+                    <div class="stat-description">All customer orders</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">CONFIRMED ORDERS</div>
+                    <div class="stat-value" th:text="${confirmedOrders}">0</div>
+                    <div class="stat-description">Orders confirmed</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">DELIVERED ORDERS</div>
+                    <div class="stat-value" th:text="${deliveredOrders}">0</div>
+                    <div class="stat-description">Successfully delivered</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">CANCELLED ORDERS</div>
+                    <div class="stat-value" th:text="${cancelledOrders}">0</div>
+                    <div class="stat-description">Cancelled orders</div>
+                </div>
+
+            </div>
+
+            <!-- PAYMENT STATISTICS -->
+            <div class="payment-summary">
+
+                <div class="payment-item">
+                    <span>Paid Payments</span>
+                    <strong th:text="${paidOrders}">0</strong>
+                </div>
+
+                <div class="payment-item">
+                    <span>Pending Payments</span>
+                    <strong th:text="${pendingPayments}">0</strong>
+                </div>
+
+                <div class="payment-item">
+                    <span>Refunded Payments</span>
+                    <strong th:text="${refundedOrders}">0</strong>
+                </div>
+
+            </div>
+
+            <!-- ALL ORDERS -->
+            <div class="orders-container">
+
+                <div class="orders-heading">
+
+                    <div>
+                        <h2>All Orders</h2>
+                        <p>Review customer order information.</p>
+                    </div>
+
+                    <span class="total-badge"
+                          th:text="|${#lists.size(orders)} Orders|">
+                        0 Orders
+                    </span>
+
+                </div>
+
+                <!-- SEARCH AND FILTERS -->
+                <form th:action="@{/admin/orders}"
+                      method="get"
+                      class="filter-form">
+
+                    <input
+                        type="text"
+                        name="keyword"
+                        placeholder="Search by order number, customer name or email..."
+                        th:value="${keyword}">
+
+                    <select name="orderStatus">
+                        <option value="">All Order Status</option>
+
+                        <option value="CONFIRMED"
+                                th:selected="${selectedOrderStatus == 'CONFIRMED'}">
+                            Confirmed
+                        </option>
+
+                        <option value="DELIVERED"
+                                th:selected="${selectedOrderStatus == 'DELIVERED'}">
+                            Delivered
+                        </option>
+
+                        <option value="CANCELLED"
+                                th:selected="${selectedOrderStatus == 'CANCELLED'}">
+                            Cancelled
+                        </option>
+
+                        <option value="RETURN_REQUESTED"
+                                th:selected="${selectedOrderStatus == 'RETURN_REQUESTED'}">
+                            Return Requested
+                        </option>
+
+                        <option value="EXCHANGE_REQUESTED"
+                                th:selected="${selectedOrderStatus == 'EXCHANGE_REQUESTED'}">
+                            Exchange Requested
+                        </option>
+                    </select>
+
+                    <select name="paymentStatus">
+                        <option value="">All Payment Status</option>
+
+                        <option value="PAID"
+                                th:selected="${selectedPaymentStatus == 'PAID'}">
+                            Paid
+                        </option>
+
+                        <option value="PENDING"
+                                th:selected="${selectedPaymentStatus == 'PENDING'}">
+                            Pending
+                        </option>
+
+                        <option value="REFUNDED"
+                                th:selected="${selectedPaymentStatus == 'REFUNDED'}">
+                            Refunded
+                        </option>
+                    </select>
+
+                    <button type="submit" class="filter-button">
+                        Apply
+                    </button>
+
+                    <a th:href="@{/admin/orders}" class="reset-button">
+                        Reset
+                    </a>
+
+                </form>
+
+                <!-- ORDERS TABLE -->
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>ORDER NUMBER</th>
+                                <th>CUSTOMER</th>
+                                <th>ORDER DATE</th>
+                                <th>AMOUNT</th>
+                                <th>PAYMENT METHOD</th>
+                                <th>PAYMENT STATUS</th>
+                                <th>ORDER STATUS</th>
+                                <th>DETAILS</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <th:block th:each="order : ${orders}">
+
+                                <!-- ORDER ROW -->
+                                <tr>
+
+                                    <td>
+                                        <strong class="order-number"
+                                                th:text="${order.orderNumber}">
+                                            ORD-1001
+                                        </strong>
+
+                                        <small class="order-id"
+                                               th:text="|ID: ${order.orderId}|">
+                                            ID: 1
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        <strong
+                                            th:text="${order.customerName != null ? order.customerName : 'N/A'}">
+                                            Customer
+                                        </strong>
+
+                                        <small
+                                            th:text="${order.customerEmail != null ? order.customerEmail : 'No email'}">
+                                            customer@email.com
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            th:text="${order.createdAt != null ? order.createdAt : 'N/A'}">
+                                            Order Date
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <strong class="amount"
+                                                th:text="${order.totalAmount != null ? '₹' + #numbers.formatDecimal(order.totalAmount, 1, 2) : '₹0.00'}">
+                                            ₹0.00
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            th:text="${order.paymentMethod != null ? order.paymentMethod : 'N/A'}">
+                                            UPI
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="status"
+                                              th:classappend="${order.paymentStatus != null ? ' payment-' + #strings.toLowerCase(order.paymentStatus) : ''}"
+                                              th:text="${order.paymentStatus != null ? order.paymentStatus : 'N/A'}">
+                                            PAID
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="status"
+                                              th:classappend="${order.orderStatus != null ? ' order-' + #strings.toLowerCase(order.orderStatus) : ''}"
+                                              th:text="${order.orderStatus != null ? order.orderStatus.replace('_', ' ') : 'N/A'}">
+                                            CONFIRMED
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <button
+                                            type="button"
+                                            class="details-button"
+                                            th:attr="data-target=${'details-' + order.orderId}"
+                                            onclick="toggleDetails(this)">
+                                            View
+                                        </button>
+                                    </td>
+
+                                </tr>
+
+                                <!-- EXPANDED ORDER DETAILS -->
+                                <tr class="details-row"
+                                    th:id="${'details-' + order.orderId}"
+                                    style="display: none;">
+
+                                    <td colspan="8">
+
+                                        <div class="details-panel">
+
+                                            <div class="details-header">
+                                                <h3>Order Details</h3>
+
+                                                <span class="detail-order-number"
+                                                      th:text="${order.orderNumber}">
+                                                    ORD-1001
+                                                </span>
+                                            </div>
+
+                                            <div class="details-grid">
+
+                                                <div class="detail-item">
+                                                    <label>Customer Name</label>
+                                                    <strong
+                                                        th:text="${order.customerName != null ? order.customerName : 'N/A'}">
+                                                        Customer
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item">
+                                                    <label>Customer Email</label>
+                                                    <strong
+                                                        th:text="${order.customerEmail != null ? order.customerEmail : 'N/A'}">
+                                                        customer@email.com
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item">
+                                                    <label>Customer Phone</label>
+                                                    <strong
+                                                        th:text="${order.customerPhone != null ? order.customerPhone : 'N/A'}">
+                                                        Phone
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item">
+                                                    <label>Payment Method</label>
+                                                    <strong
+                                                        th:text="${order.paymentMethod != null ? order.paymentMethod : 'N/A'}">
+                                                        UPI
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item">
+                                                    <label>Payment Status</label>
+                                                    <strong
+                                                        th:text="${order.paymentStatus != null ? order.paymentStatus : 'N/A'}">
+                                                        PAID
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item">
+                                                    <label>Total Amount</label>
+                                                    <strong class="detail-amount"
+                                                            th:text="${order.totalAmount != null ? '₹' + #numbers.formatDecimal(order.totalAmount, 1, 2) : '₹0.00'}">
+                                                        ₹0.00
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item">
+                                                    <label>Order Status</label>
+                                                    <strong
+                                                        th:text="${order.orderStatus != null ? order.orderStatus.replace('_', ' ') : 'N/A'}">
+                                                        CONFIRMED
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item">
+                                                    <label>Order Date</label>
+                                                    <strong
+                                                        th:text="${order.createdAt != null ? order.createdAt : 'N/A'}">
+                                                        Date
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item">
+                                                    <label>Customer ID</label>
+                                                    <strong th:text="${order.customerId}">
+                                                        1
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item full-width">
+                                                    <label>Shipping Address</label>
+                                                    <strong
+                                                        th:text="${order.shippingAddress != null ? order.shippingAddress : 'Address not available'}">
+                                                        Shipping Address
+                                                    </strong>
+                                                </div>
+
+                                                <div class="detail-item full-width">
+                                                    <label>Return / Exchange Reason</label>
+                                                    <strong
+                                                        th:text="${order.returnReason != null ? order.returnReason : 'No return or exchange request'}">
+                                                        No return request
+                                                    </strong>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+
+                            </th:block>
+
+                            <!-- EMPTY STATE -->
+                            <tr th:if="${#lists.isEmpty(orders)}">
+                                <td colspan="8" class="empty-state">
+                                    <div class="empty-icon">▣</div>
+                                    <h3>No orders found</h3>
+                                    <p>
+                                        There are no orders matching your search or filters.
+                                    </p>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            © 2026 OneCart. Admin Management Panel.
+        </footer>
+
+    </main>
+
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+    function toggleDetails(button) {
+
+        const targetId = button.getAttribute("data-target");
+        const detailsRow = document.getElementById(targetId);
+
+        if (!detailsRow) {
+            return;
+        }
+
+        const isHidden =
+            window.getComputedStyle(detailsRow).display === "none";
+
+        if (isHidden) {
+            detailsRow.style.display = "table-row";
+            button.textContent = "Hide";
+            button.classList.add("details-open");
+        } else {
+            detailsRow.style.display = "none";
+            button.textContent = "View";
+            button.classList.remove("details-open");
+        }
+    }
+</script>
+
+</body>
+</html>

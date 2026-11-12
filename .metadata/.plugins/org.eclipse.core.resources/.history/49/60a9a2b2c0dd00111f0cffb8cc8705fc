@@ -1,0 +1,5 @@
+package com.vendor.service;
+
+public class AdminService {
+
+}

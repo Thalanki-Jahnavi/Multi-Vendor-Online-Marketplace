@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vendors | OneCart Admin</title>
+
+    <link rel="stylesheet" th:href="@{/css/admin-dashboard.css}">
+
+    <style>
+        .vendors-content {
+            padding: 30px;
+        }
+
+        .vendors-header {
+            margin-bottom: 26px;
+        }
+
+        .vendors-header .breadcrumb {
+            color: #78908e;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        .vendors-header .breadcrumb span {
+            color: #087e78;
+            font-weight: 600;
+        }
+
+        .vendors-header h1 {
+            color: #123e3a;
+            font-size: 32px;
+            margin: 0 0 12px;
+        }
+
+        .vendors-header p {
+            color: #78908e;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .vendor-stat-card {
+            background: white;
+            border: 1px solid #e0eeeb;
+            border-radius: 16px;
+            padding: 25px;
+            width: 220px;
+            margin-bottom: 26px;
+        }
+
+        .vendor-stat-card span {
+            color: #78908e;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .vendor-stat-card h2 {
+            color: #087e78;
+            font-size: 32px;
+            margin: 12px 0 0;
+        }
+
+        .vendor-table-card {
+            background: white;
+            border: 1px solid #e0eeeb;
+            border-radius: 17px;
+            padding: 26px;
+            overflow: hidden;
+        }
+
+        .vendor-table-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .vendor-table-heading h2 {
+            color: #123e3a;
+            font-size: 21px;
+            margin: 0;
+        }
+
+        .vendor-search {
+            width: 280px;
+            max-width: 100%;
+            padding: 13px 16px;
+            border: 1px solid #d9e8e5;
+            border-radius: 9px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .vendor-search:focus {
+            border-color: #087e78;
+            box-shadow: 0 0 0 3px rgba(8, 126, 120, 0.10);
+        }
+
+        .vendor-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .vendor-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        .vendor-table thead {
+            background: #f2f8f6;
+        }
+
+        .vendor-table th {
+            text-align: left;
+            padding: 17px;
+            color: #66817e;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .vendor-table td {
+            padding: 18px 17px;
+            border-bottom: 1px solid #edf2f0;
+            color: #123e3a;
+            font-size: 14px;
+        }
+
+        .vendor-table tbody tr:hover {
+            background: #f9fcfb;
+        }
+
+        .vendor-name {
+            font-weight: 700;
+        }
+
+        .vendor-status {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: #e4f4ed;
+            color: #16845e;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-details-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: #e5f4f0;
+            color: #087e78;
+            padding: 9px 13px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .view-details-btn:hover {
+            background: #087e78;
+            color: white;
+        }
+
+        .vendor-empty {
+            text-align: center;
+            padding: 30px;
+            color: #78908e;
+        }
+
+        @media (max-width: 768px) {
+            .vendors-content {
+                padding: 18px;
+            }
+
+            .vendor-table-card {
+                padding: 16px;
+            }
+
+            .vendor-table-heading {
+                align-items: stretch;
+            }
+
+            .vendor-search {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/sidebar :: adminSidebar}"></div>
+
+<main class="main-content">
+
+    <div class="vendors-content">
+
+        <!-- PAGE HEADER -->
+        <header class="vendors-header">
+
+            <div class="breadcrumb">
+                OneCart / <span>Admin</span> / Vendors
+            </div>
+
+            <h1>Vendor Management</h1>
+
+            <p>View and manage vendors registered on OneCart.</p>
+
+        </header>
+
+        <!-- TOTAL VENDORS -->
+        <section class="vendor-stat-card">
+
+            <span>Total Vendors</span>
+
+            <h2 th:text="${totalVendors}">0</h2>
+
+        </section>
+
+        <!-- VENDOR TABLE -->
+        <section class="vendor-table-card">
+
+            <div class="vendor-table-heading">
+
+                <h2>Registered Vendors</h2>
+
+                <input
+                    type="text"
+                    id="vendorSearch"
+                    class="vendor-search"
+                    placeholder="Search by store, owner or email..."
+                    autocomplete="off">
+
+            </div>
+
+            <div class="vendor-table-wrapper">
+
+                <table class="vendor-table">
+
+                    <thead>
+                    <tr>
+                        <th>VENDOR ID</th>
+                        <th>STORE NAME</th>
+                        <th>OWNER NAME</th>
+                        <th>EMAIL ADDRESS</th>
+                        <th>PHONE</th>
+                        <th>CITY</th>
+                        <th>STATUS</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="vendorTableBody">
+
+                    <tr th:each="vendor : ${vendors}">
+
+                        <td th:text="${vendor.userId}">1</td>
+
+                        <td class="vendor-name"
+                            th:text="${vendor.businessName != null and !vendor.businessName.isBlank() ? vendor.businessName : 'My Store'}">
+                            Store Name
+                        </td>
+
+                        <td th:text="${(vendor.firstName != null ? vendor.firstName : '') + ' ' + (vendor.lastName != null ? vendor.lastName : '')}">
+                            Owner Name
+                        </td>
+
+                        <td th:text="${vendor.email}">
+                            vendor@email.com
+                        </td>
+
+                        <td th:text="${vendor.phone != null ? vendor.phone : 'N/A'}">
+                            N/A
+                        </td>
+
+                        <td th:text="${vendor.city != null ? vendor.city : 'N/A'}">
+                            N/A
+                        </td>
+
+                        <td>
+                            <span class="vendor-status">Registered</span>
+                        </td>
+
+                        <td>
+                            <a th:href="@{/admin/vendors/{id}(id=${vendor.userId})}"
+                               class="view-details-btn">
+                                View Details →
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(vendors)}">
+                        <td colspan="8" class="vendor-empty">
+                            No vendors registered yet.
+                        </td>
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p id="noVendorResults"
+               class="vendor-empty"
+               style="display:none;">
+                No matching vendors found.
+            </p>
+
+        </section>
+
+    </div>
+
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput = document.getElementById("vendorSearch");
+        const tableBody = document.getElementById("vendorTableBody");
+        const noResults = document.getElementById("noVendorResults");
+
+        searchInput.addEventListener("input", function () {
+
+            const searchValue = this.value.toLowerCase().trim();
+
+            const rows = tableBody.querySelectorAll("tr");
+            let visibleCount = 0;
+
+            rows.forEach(function (row) {
+
+                if (row.querySelector(".vendor-empty")) {
+                    return;
+                }
+
+                const matches =
+                    row.innerText.toLowerCase().includes(searchValue);
+
+                row.style.display = matches ? "" : "none";
+
+                if (matches) {
+                    visibleCount++;
+                }
+            });
+
+            noResults.style.display =
+                visibleCount === 0 ? "block" : "none";
+
+        });
+
+    });
+</script>
+
+</body>
+</html>

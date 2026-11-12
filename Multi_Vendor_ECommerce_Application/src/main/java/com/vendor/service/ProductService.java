@@ -1,3 +1,4 @@
+
 package com.vendor.service;
 
 import java.util.Comparator;
@@ -20,14 +21,18 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+    // Get products that customers are allowed to browse
     public List<Product> getApprovedProducts() {
+
         return productRepository
-                .findByProductStatusIgnoreCaseAndApprovalStatusIgnoreCaseOrderByProductIdDesc(
+                .findByProductStatusIgnoreCaseAndApprovalStatusIgnoreCaseAndStockQuantityGreaterThanOrderByProductIdDesc(
                         "ACTIVE",
-                        "APPROVED"
+                        "APPROVED",
+                        0
                 );
     }
 
+    // Filter and sort marketplace products
     public List<Product> filterProducts(
             List<Product> products,
             String keyword,
@@ -39,7 +44,9 @@ public class ProductService {
 
         Stream<Product> result = products.stream();
 
+        // Search by product name
         if (keyword != null && !keyword.isBlank()) {
+
             String searchText = keyword.trim().toLowerCase();
 
             result = result.filter(product ->
@@ -50,7 +57,9 @@ public class ProductService {
             );
         }
 
+        // Filter by category
         if (category != null && !category.isBlank()) {
+
             String selectedCategory = category.trim();
 
             result = result.filter(product ->
@@ -60,63 +69,104 @@ public class ProductService {
             );
         }
 
+        // Filter by vendor
         if (vendorId != null) {
+
             result = result.filter(product ->
                     Objects.equals(product.getVendorId(), vendorId)
             );
         }
 
+        // Filter by minimum effective price
         if (minPrice != null) {
+
             result = result.filter(product -> {
-                Double effectivePrice = product.getDiscountedPrice() != null ? product.getDiscountedPrice() : product.getPrice();
-                return effectivePrice != null && effectivePrice >= minPrice;
+
+                Double effectivePrice =
+                        product.getDiscountedPrice() != null
+                                ? product.getDiscountedPrice()
+                                : product.getPrice();
+
+                return effectivePrice != null
+                        && effectivePrice >= minPrice;
             });
         }
 
+        // Filter by maximum effective price
         if (maxPrice != null) {
+
             result = result.filter(product -> {
-                Double effectivePrice = product.getDiscountedPrice() != null ? product.getDiscountedPrice() : product.getPrice();
-                return effectivePrice != null && effectivePrice <= maxPrice;
+
+                Double effectivePrice =
+                        product.getDiscountedPrice() != null
+                                ? product.getDiscountedPrice()
+                                : product.getPrice();
+
+                return effectivePrice != null
+                        && effectivePrice <= maxPrice;
             });
         }
 
         Comparator<Product> comparator;
 
         switch (sort == null ? "newest" : sort.toLowerCase()) {
+
             case "price-low":
+
                 comparator = Comparator.comparing(
-                        product -> product.getDiscountedPrice() != null ? product.getDiscountedPrice() : product.getPrice(),
+                        product -> product.getDiscountedPrice() != null
+                                ? product.getDiscountedPrice()
+                                : product.getPrice(),
                         Comparator.nullsLast(Double::compareTo)
                 );
+
                 break;
 
             case "price-high":
-                comparator = Comparator.<Product, Double>comparing(
-                        product -> product.getDiscountedPrice() != null ? product.getDiscountedPrice() : product.getPrice(),
-                        Comparator.nullsLast(Double::compareTo)
-                ).reversed();
+
+                comparator = Comparator
+                        .<Product, Double>comparing(
+                                product -> product.getDiscountedPrice() != null
+                                        ? product.getDiscountedPrice()
+                                        : product.getPrice(),
+                                Comparator.nullsLast(Double::compareTo)
+                        )
+                        .reversed();
+
                 break;
 
             case "name":
+
                 comparator = Comparator.comparing(
                         Product::getProductName,
-                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
+                        Comparator.nullsLast(
+                                String.CASE_INSENSITIVE_ORDER
+                        )
                 );
+
                 break;
 
             case "discount":
-                comparator = Comparator.<Product, Double>comparing(
-                        product -> product.getDiscountPercentage() != null ? product.getDiscountPercentage() : 0.0,
-                        Comparator.nullsLast(Double::compareTo)
-                ).reversed();
+
+                comparator = Comparator
+                        .<Product, Double>comparing(
+                                product -> product.getDiscountPercentage() != null
+                                        ? product.getDiscountPercentage()
+                                        : 0.0,
+                                Comparator.nullsLast(Double::compareTo)
+                        )
+                        .reversed();
+
                 break;
 
             case "newest":
             default:
+
                 comparator = Comparator.comparing(
                         Product::getProductId,
                         Comparator.nullsLast(Long::compareTo)
                 ).reversed();
+
                 break;
         }
 

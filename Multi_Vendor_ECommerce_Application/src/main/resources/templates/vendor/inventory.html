@@ -1,0 +1,845 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Inventory | OneCart Seller Center</title>
+
+    <link rel="stylesheet" th:href="@{/css/vendor-dashboard.css}">
+
+    <style>
+        .inventory-content {
+            padding: 30px;
+        }
+
+        .inventory-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .inventory-heading h1 {
+            margin: 8px 0;
+            font-size: 28px;
+            color: #123e3a;
+        }
+
+        .inventory-heading p {
+            color: #78918c;
+            font-size: 13px;
+        }
+
+        .eyebrow {
+            color: #087e78;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+        }
+
+        .inventory-heading strong {
+            color: #087e78;
+        }
+
+        .inventory-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .inventory-stat {
+            padding: 22px;
+            background: white;
+            border: 1px solid #e4eeeb;
+            border-radius: 13px;
+            box-shadow: 0 5px 18px rgba(18, 62, 58, .035);
+        }
+
+        .inventory-stat span {
+            display: block;
+            color: #78918c;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .5px;
+        }
+
+        .inventory-stat h2 {
+            margin: 12px 0 5px;
+            color: #123e3a;
+            font-size: 30px;
+        }
+
+        .inventory-stat small {
+            color: #78918c;
+            font-size: 11px;
+        }
+
+        .inventory-stat.low h2 {
+            color: #bd8100;
+        }
+
+        .inventory-stat.out h2 {
+            color: #c94e48;
+        }
+
+        .inventory-card {
+            padding: 24px;
+            background: white;
+            border: 1px solid #e4eeeb;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(18, 62, 58, .035);
+        }
+
+        .inventory-card-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .inventory-card-heading h3 {
+            color: #123e3a;
+            font-size: 17px;
+        }
+
+        .inventory-card-heading p {
+            color: #78918c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .inventory-toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .inventory-search,
+        .inventory-filter {
+            height: 43px;
+            padding: 0 13px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            outline: none;
+            color: #123e3a;
+            background: white;
+            font-size: 12px;
+        }
+
+        .inventory-search {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .inventory-search:focus,
+        .inventory-filter:focus {
+            border-color: #087e78;
+        }
+
+        .inventory-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .inventory-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .inventory-table thead {
+            background: #f0f7f5;
+        }
+
+        .inventory-table th {
+            padding: 15px;
+            text-align: left;
+            color: #54736d;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .inventory-table td {
+            padding: 16px 15px;
+            border-bottom: 1px solid #edf2f0;
+            color: #23463f;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .inventory-table tbody tr:hover {
+            background: #f8fbfa;
+        }
+
+        .inventory-product-name {
+            color: #123e3a;
+            font-weight: 700;
+        }
+
+        .stock-badge {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .stock-good {
+            background: #e1f5ed;
+            color: #168052;
+        }
+
+        .stock-low {
+            background: #fff3d9;
+            color: #a66c00;
+        }
+
+        .stock-out {
+            background: #fce9e7;
+            color: #bd5147;
+        }
+
+        .stock-update-form {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .stock-update-form input {
+            width: 75px;
+            height: 36px;
+            padding: 0 8px;
+            border: 1px solid #dce8e5;
+            border-radius: 7px;
+            outline: none;
+            color: #123e3a;
+            font-size: 12px;
+        }
+
+        .stock-update-form input:focus {
+            border-color: #087e78;
+        }
+
+        .stock-update-form button {
+            height: 36px;
+            padding: 0 12px;
+            border: none;
+            border-radius: 7px;
+            background: #087e78;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .stock-update-form button:hover {
+            background: #065f59;
+        }
+
+        .inventory-alert {
+            padding: 13px 16px;
+            border-radius: 9px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .inventory-success {
+            background: #effaf4;
+            color: #17664a;
+            border: 1px solid #cbe9dc;
+        }
+
+        .inventory-error {
+            background: #fff1ef;
+            color: #b33d35;
+            border: 1px solid #f1cfcb;
+        }
+
+        .inventory-empty {
+            padding: 55px 20px;
+            text-align: center;
+            color: #78918c;
+        }
+
+        .inventory-empty h3 {
+            margin: 12px 0 8px;
+            color: #123e3a;
+        }
+
+        .inventory-empty p {
+            font-size: 13px;
+        }
+
+        .inventory-empty-icon {
+            font-size: 38px;
+        }
+
+        .no-inventory-results {
+            display: none;
+            padding: 25px;
+            text-align: center;
+            color: #78918c;
+            font-size: 13px;
+        }
+
+        .inventory-note {
+            margin-top: 18px;
+            padding: 13px 15px;
+            border-radius: 9px;
+            background: #f0f7f5;
+            color: #66827b;
+            font-size: 11px;
+        }
+
+        .inventory-note strong {
+            color: #123e3a;
+        }
+
+        .inventory-add-btn {
+            display: inline-block;
+            padding: 11px 18px;
+            background: #087e78;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .inventory-add-btn:hover {
+            background: #065f59;
+            color: white;
+        }
+
+        @media(max-width: 1050px) {
+            .inventory-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media(max-width: 650px) {
+            .inventory-content {
+                padding: 18px 13px;
+            }
+
+            .inventory-heading h1 {
+                font-size: 23px;
+            }
+
+            .inventory-stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .inventory-stat {
+                padding: 16px;
+            }
+
+            .inventory-card {
+                padding: 14px;
+            }
+
+            .inventory-toolbar {
+                flex-direction: column;
+            }
+
+            .inventory-search,
+            .inventory-filter {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">O</div>
+
+            <div>
+                <h2>OneCart</h2>
+                <span>SELLER CENTER</span>
+            </div>
+        </div>
+
+        <div class="store-info">
+            <div class="store-avatar">🏪</div>
+
+            <div class="store-text">
+                <strong th:text="${vendor.businessName != null and !vendor.businessName.isEmpty() ? vendor.businessName : 'My Store'}">
+                    My Store
+                </strong>
+                <small>Vendor Account</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <p class="nav-heading">MAIN MENU</p>
+
+            <a th:href="@{/vendor/dashboard}" class="nav-link">
+                <span class="nav-icon">▦</span>
+                Dashboard
+            </a>
+
+            <p class="nav-heading">STORE MANAGEMENT</p>
+
+            <a th:href="@{/vendor/store}" class="nav-link">
+                <span class="nav-icon">🏬</span>
+                My Store
+            </a>
+
+            <a th:href="@{/vendor/products}" class="nav-link">
+                <span class="nav-icon">▣</span>
+                Products
+            </a>
+
+            <a th:href="@{/vendor/inventory}" class="nav-link active">
+                <span class="nav-icon">▤</span>
+                Inventory
+            </a>
+
+            <p class="nav-heading">BUSINESS</p>
+
+			
+			<a th:href="@{/vendor/orders}" class="nav-link">
+			    <span class="nav-icon">▧</span>
+			    Orders
+			</a>
+
+
+
+            <p class="nav-heading">ACCOUNT</p>
+
+            <a th:href="@{/vendor/profile}" class="nav-link">
+                <span class="nav-icon">♙</span>
+                My Profile
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="help-card">
+                <div class="help-icon">?</div>
+                <strong>Need help?</strong>
+                <p>Manage your store with OneCart Seller Center.</p>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-button">
+                    <span>↪</span> Logout
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button class="menu-toggle"
+                        id="menuToggle"
+                        type="button">
+                    ☰
+                </button>
+
+                <div>
+                    <h2>Inventory Management</h2>
+                    <p>Monitor and manage your product stock.</p>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="profile-area">
+
+                    <div class="profile-avatar">
+                        <span th:text="${vendor.firstName != null and !vendor.firstName.isEmpty() ? #strings.substring(vendor.firstName, 0, 1).toUpperCase() : 'V'}">
+                            V
+                        </span>
+                    </div>
+
+                    <div class="profile-details">
+                        <strong th:text="${(vendor.firstName != null ? vendor.firstName : '') + ' ' + (vendor.lastName != null ? vendor.lastName : '')}">
+                            Vendor Name
+                        </strong>
+                        <small>Vendor</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- INVENTORY PAGE BODY -->
+        <section class="page-content inventory-content">
+
+            <div class="inventory-alert inventory-success"
+                 th:if="${success}"
+                 th:text="${success}">
+            </div>
+
+            <div class="inventory-alert inventory-error"
+                 th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+
+            <!-- HEADING -->
+            <section class="inventory-heading">
+
+                <div>
+                    <span class="eyebrow">
+                        SELLER CENTER / INVENTORY MANAGEMENT
+                    </span>
+
+                    <h1>Inventory Overview</h1>
+
+                    <p>
+                        Track your available stock and update product quantities.
+                    </p>
+                </div>
+
+                <a th:href="@{/vendor/products/add}"
+                   class="inventory-add-btn">
+                    ＋ Add New Product
+                </a>
+
+            </section>
+
+
+            <!-- INVENTORY STATISTICS -->
+            <section class="inventory-stats">
+
+                <div class="inventory-stat">
+                    <span>TOTAL PRODUCTS</span>
+                    <h2 th:text="${totalProducts}">0</h2>
+                    <small>Products in your store</small>
+                </div>
+
+                <div class="inventory-stat">
+                    <span>TOTAL STOCK UNITS</span>
+                    <h2 th:text="${totalUnits}">0</h2>
+                    <small>Combined available quantity</small>
+                </div>
+
+                <div class="inventory-stat low">
+                    <span>LOW STOCK</span>
+                    <h2 th:text="${lowStockCount}">0</h2>
+                    <small>Products needing attention</small>
+                </div>
+
+                <div class="inventory-stat out">
+                    <span>OUT OF STOCK</span>
+                    <h2 th:text="${outOfStockCount}">0</h2>
+                    <small>Products with zero quantity</small>
+                </div>
+
+            </section>
+
+
+            <!-- INVENTORY TABLE -->
+            <section class="inventory-card">
+
+                <div class="inventory-card-heading">
+                    <div>
+                        <h3>Stock Management</h3>
+                        <p>View your products and update their available quantities.</p>
+                    </div>
+                </div>
+
+
+                <!-- SEARCH AND FILTER -->
+                <div class="inventory-toolbar">
+
+                    <input type="search"
+                           id="inventorySearch"
+                           class="inventory-search"
+                           placeholder="Search product name or ID...">
+
+                    <select id="inventoryFilter"
+                            class="inventory-filter">
+
+                        <option value="">All Stock Levels</option>
+                        <option value="in">In Stock</option>
+                        <option value="low">Low Stock</option>
+                        <option value="out">Out of Stock</option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- EMPTY STATE -->
+                <div class="inventory-empty"
+                     th:if="${#lists.isEmpty(products)}">
+
+                    <div class="inventory-empty-icon">📦</div>
+
+                    <h3>No inventory available</h3>
+
+                    <p>
+                        Add products to your store to start managing inventory.
+                    </p>
+
+                    <br>
+
+                    <a th:href="@{/vendor/products/add}"
+                       class="inventory-add-btn">
+                        Add Your First Product
+                    </a>
+
+                </div>
+
+
+                <!-- PRODUCTS TABLE -->
+                <div class="inventory-table-wrapper"
+                     th:unless="${#lists.isEmpty(products)}">
+
+                    <table class="inventory-table"
+                           id="inventoryTable">
+
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Available Stock</th>
+                                <th>Stock Status</th>
+                                <th>Update Quantity</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="product : ${products}"
+                                th:attr="data-name=${product.productName},
+                                         data-id=${product.productId},
+                                         data-stock=${product.stockQuantity != null ? product.stockQuantity : 0}">
+
+                                <td th:text="${product.productId}">
+                                    1
+                                </td>
+
+                                <td class="inventory-product-name"
+                                    th:text="${product.productName}">
+                                    Product Name
+                                </td>
+
+                                <td th:text="${product.category}">
+                                    Category
+                                </td>
+
+                                <td>
+                                    <strong th:text="${product.stockQuantity != null ? product.stockQuantity : 0}">
+                                        0
+                                    </strong>
+                                    units
+                                </td>
+
+                                <td>
+
+                                    <span class="stock-badge"
+                                          th:classappend="${product.stockQuantity == null or product.stockQuantity <= 0
+                                              ? ' stock-out'
+                                              : (product.stockQuantity <= lowStockLimit
+                                                  ? ' stock-low' : ' stock-good')}"
+                                          th:text="${product.stockQuantity == null or product.stockQuantity <= 0
+                                              ? 'Out of Stock'
+                                              : (product.stockQuantity <= lowStockLimit
+                                                  ? 'Low Stock' : 'In Stock')}">
+                                        In Stock
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <form class="stock-update-form"
+                                          th:action="@{/vendor/inventory/update}"
+                                          method="post">
+
+                                        <input type="hidden"
+                                               name="productId"
+                                               th:value="${product.productId}">
+
+                                        <input type="number"
+                                               name="stockQuantity"
+                                               min="0"
+                                               step="1"
+                                               required
+                                               th:value="${product.stockQuantity != null ? product.stockQuantity : 0}"
+                                               aria-label="New stock quantity">
+
+                                        <button type="submit">
+                                            Save
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                    <div class="no-inventory-results"
+                         id="noInventoryResults">
+                        No matching products found.
+                    </div>
+
+                </div>
+
+
+                <!-- STOCK LEGEND -->
+                <div class="inventory-note">
+                    <strong>Stock levels:</strong>
+                    In Stock: above 5 units &nbsp; | &nbsp;
+                    Low Stock: 1–5 units &nbsp; | &nbsp;
+                    Out of Stock: 0 units.
+                </div>
+
+            </section>
+
+
+            <footer class="footer">
+                © 2026 OneCart. Vendor Seller Center.
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- SEARCH AND FILTER -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput =
+            document.getElementById("inventorySearch");
+
+        const filterSelect =
+            document.getElementById("inventoryFilter");
+
+        const table =
+            document.getElementById("inventoryTable");
+
+        const noResults =
+            document.getElementById("noInventoryResults");
+
+        function filterInventory() {
+
+            if (!table) {
+                return;
+            }
+
+            const keyword =
+                searchInput.value.toLowerCase().trim();
+
+            const selectedFilter =
+                filterSelect.value;
+
+            const rows =
+                table.querySelectorAll("tbody tr");
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+
+                const name =
+                    (row.dataset.name || "").toLowerCase();
+
+                const id =
+                    (row.dataset.id || "").toLowerCase();
+
+                const stock =
+                    Number(row.dataset.stock || 0);
+
+                const matchesSearch =
+                    name.includes(keyword) ||
+                    id.includes(keyword);
+
+                let matchesStock = true;
+
+                if (selectedFilter === "in") {
+                    matchesStock = stock > 5;
+                }
+
+                if (selectedFilter === "low") {
+                    matchesStock = stock > 0 && stock <= 5;
+                }
+
+                if (selectedFilter === "out") {
+                    matchesStock = stock <= 0;
+                }
+
+                const visible =
+                    matchesSearch && matchesStock;
+
+                row.style.display = visible ? "" : "none";
+
+                if (visible) {
+                    visibleCount++;
+                }
+
+            });
+
+            if (noResults) {
+                noResults.style.display =
+                    visibleCount === 0 ? "block" : "none";
+            }
+
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener(
+                "input",
+                filterInventory
+            );
+        }
+
+        if (filterSelect) {
+            filterSelect.addEventListener(
+                "change",
+                filterInventory
+            );
+        }
+
+    });
+</script>
+
+<script th:src="@{/js/vendor-dashboard.js}"></script>
+
+</body>
+</html>

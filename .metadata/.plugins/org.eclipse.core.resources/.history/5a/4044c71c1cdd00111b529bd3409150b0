@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Product | OneCart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f8f7;
+            color: #123e3a;
+        }
+
+        .header {
+            background: white;
+            padding: 22px 35px;
+            border-bottom: 1px solid #e4eeeb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 22px;
+        }
+
+        .header p {
+            color: #78918c;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .back-link {
+            color: #087e78;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .main {
+            max-width: 850px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 32px;
+            border: 1px solid #e4eeeb;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(18, 62, 58, 0.04);
+        }
+
+        .form-card h1 {
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .intro {
+            color: #78918c;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #123e3a;
+            background: white;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #087e78;
+            box-shadow: 0 0 0 3px rgba(8, 126, 120, 0.08);
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #bd5147;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .note {
+            background: #eff8f5;
+            color: #54736d;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .submit-btn {
+            background: #087e78;
+            color: white;
+            border: none;
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #065f59;
+        }
+
+        .cancel-btn {
+            background: #edf3f1;
+            color: #123e3a;
+            text-decoration: none;
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        @media(max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            .form-card {
+                padding: 22px;
+            }
+
+            .header {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div>
+            <h2>OneCart Seller Center</h2>
+            <p>Add a new product to your store</p>
+        </div>
+
+        <a th:href="@{/vendor/products}" class="back-link">
+            ← Back to Products
+        </a>
+    </header>
+
+    <main class="main">
+
+        <section class="form-card">
+
+            <h1>Add New Product</h1>
+
+            <p class="intro">
+                Enter your product details below.
+            </p>
+
+            <div class="error"
+                 th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+            <div class="note">
+                Your product will be saved with Pending approval status.
+                An administrator must approve it before it appears to customers.
+            </div>
+
+            <form th:action="@{/vendor/products/add}" method="post">
+
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="productName">Product Name *</label>
+                        <input type="text"
+                               id="productName"
+                               name="productName"
+                               placeholder="Example: Wireless Headphones"
+                               maxlength="255"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+
+                        <select id="category" name="category" required>
+                            <option value="" disabled selected>
+                                Select category
+                            </option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Home & Kitchen">Home & Kitchen</option>
+                            <option value="Beauty">Beauty</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Books">Books</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price">Price (₹) *</label>
+                        <input type="number"
+                               id="price"
+                               name="price"
+                               placeholder="Example: 999"
+                               min="0.01"
+                               step="0.01"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="discountPercentage">Discount (%)</label>
+                        <input type="number"
+                               id="discountPercentage"
+                               name="discountPercentage"
+                               placeholder="Example: 10"
+                               min="0"
+                               max="100"
+                               step="0.01"
+                               value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stockQuantity">Stock Quantity *</label>
+                        <input type="number"
+                               id="stockQuantity"
+                               name="stockQuantity"
+                               placeholder="Example: 50"
+                               min="0"
+                               required>
+                    </div>
+
+                </div>
+
+                <div class="buttons">
+                    <button type="submit" class="submit-btn">
+                        Save Product
+                    </button>
+
+                    <a th:href="@{/vendor/products}" class="cancel-btn">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

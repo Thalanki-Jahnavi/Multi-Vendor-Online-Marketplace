@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product | OneCart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f8f7;
+            color: #123e3a;
+        }
+
+        .header {
+            background: white;
+            padding: 22px 35px;
+            border-bottom: 1px solid #e4eeeb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 22px;
+        }
+
+        .header p {
+            color: #78918c;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .back-link {
+            color: #087e78;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .main {
+            max-width: 850px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 32px;
+            border: 1px solid #e4eeeb;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(18, 62, 58, 0.04);
+        }
+
+        h1 {
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .intro {
+            color: #78918c;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #123e3a;
+            background: white;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #087e78;
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #bd5147;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .note {
+            background: #eff8f5;
+            color: #54736d;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .submit-btn {
+            background: #087e78;
+            color: white;
+            border: none;
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #065f59;
+        }
+
+        .cancel-btn {
+            background: #edf3f1;
+            color: #123e3a;
+            text-decoration: none;
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        @media(max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            .form-card {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div>
+            <h2>OneCart Seller Center</h2>
+            <p>Update your store product</p>
+        </div>
+
+        <a th:href="@{/vendor/products}" class="back-link">
+            ← Back to Products
+        </a>
+    </header>
+
+    <main class="main">
+
+        <section class="form-card">
+
+            <h1>Edit Product</h1>
+
+            <p class="intro">
+                Update your product information below.
+            </p>
+
+            <div class="error"
+                 th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+            <div class="note">
+                After saving changes, this product will require admin approval again.
+            </div>
+
+            <form th:action="@{/vendor/products/edit/{id}(id=${product.productId})}"
+                  method="post">
+
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="productName">Product Name *</label>
+
+                        <input type="text"
+                               id="productName"
+                               name="productName"
+                               th:value="${product.productName}"
+                               maxlength="255"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+
+                        <select id="category" name="category" required>
+                            <option value="Electronics"
+                                    th:selected="${product.category == 'Electronics'}">
+                                Electronics
+                            </option>
+
+                            <option value="Fashion"
+                                    th:selected="${product.category == 'Fashion'}">
+                                Fashion
+                            </option>
+
+                            <option value="Home & Kitchen"
+                                    th:selected="${product.category == 'Home & Kitchen'}">
+                                Home & Kitchen
+                            </option>
+
+                            <option value="Beauty"
+                                    th:selected="${product.category == 'Beauty'}">
+                                Beauty
+                            </option>
+
+                            <option value="Sports"
+                                    th:selected="${product.category == 'Sports'}">
+                                Sports
+                            </option>
+
+                            <option value="Accessories"
+                                    th:selected="${product.category == 'Accessories'}">
+                                Accessories
+                            </option>
+
+                            <option value="Books"
+                                    th:selected="${product.category == 'Books'}">
+                                Books
+                            </option>
+
+                            <option value="Other"
+                                    th:selected="${product.category == 'Other'}">
+                                Other
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price">Price (₹) *</label>
+
+                        <input type="number"
+                               id="price"
+                               name="price"
+                               th:value="${product.price}"
+                               min="0.01"
+                               step="0.01"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="discountPercentage">Discount (%)</label>
+
+                        <input type="number"
+                               id="discountPercentage"
+                               name="discountPercentage"
+                               th:value="${product.discountPercentage}"
+                               min="0"
+                               max="100"
+                               step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stockQuantity">Stock Quantity *</label>
+
+                        <input type="number"
+                               id="stockQuantity"
+                               name="stockQuantity"
+                               th:value="${product.stockQuantity}"
+                               min="0"
+                               required>
+                    </div>
+
+                </div>
+
+                <div class="buttons">
+
+                    <button type="submit" class="submit-btn">
+                        Save Changes
+                    </button>
+
+                    <a th:href="@{/vendor/products}" class="cancel-btn">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

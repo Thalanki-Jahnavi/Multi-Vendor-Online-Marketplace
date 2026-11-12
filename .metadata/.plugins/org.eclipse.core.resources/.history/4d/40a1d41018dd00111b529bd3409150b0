@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vendor Dashboard | OneCart</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/vendor-dashboard.css}">
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">O</div>
+            <div>
+                <h2>OneCart</h2>
+                <span>SELLER CENTER</span>
+            </div>
+        </div>
+
+        <div class="store-info">
+            <div class="store-avatar">🏪</div>
+            <div class="store-text">
+                <strong th:text="${vendorName}">My Store</strong>
+                <small>Vendor Account</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <p class="nav-heading">MAIN MENU</p>
+
+            <a th:href="@{/vendor/dashboard}"
+               class="nav-link active">
+                <span class="nav-icon">▦</span>
+                Dashboard
+            </a>
+
+            <p class="nav-heading">STORE MANAGEMENT</p>
+
+			<a th:href="@{/vendor/store}" class="nav-link">
+			    <span class="nav-icon">🏬</span>
+			    My Store
+			</a>
+
+			<a th:href="@{/vendor/products}" class="nav-link">
+			    <span class="nav-icon">▣</span>
+			    Products
+			</a>
+
+
+			<a th:href="@{/vendor/inventory}" class="nav-link">
+			    <span class="nav-icon">▤</span>
+			    Inventory
+			</a>
+
+            <p class="nav-heading">BUSINESS</p>
+
+            <a href="#" class="nav-link disabled-link"
+               title="Order Management will be implemented next">
+                <span class="nav-icon">▧</span>
+                Orders
+                <span class="coming-soon">Soon</span>
+            </a>
+
+            <a href="#" class="nav-link disabled-link"
+               title="Sales Reports will be implemented next">
+                <span class="nav-icon">↗</span>
+                Sales & Reports
+                <span class="coming-soon">Soon</span>
+            </a>
+
+            <p class="nav-heading">ACCOUNT</p>
+
+			<a th:href="@{/vendor/profile}" class="nav-link">
+			    <span class="nav-icon">♙</span>
+			    My Profile
+			</a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="help-card">
+                <div class="help-icon">?</div>
+                <strong>Need help?</strong>
+                <p>Manage your store with OneCart Seller Center.</p>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-button">
+                    <span>↪</span> Logout
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button class="menu-toggle"
+                        id="menuToggle"
+                        type="button">
+                    ☰
+                </button>
+
+                <div>
+                    <h2>Dashboard Overview</h2>
+                    <p>Welcome back! Here's what's happening with your store.</p>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="today-date" id="todayDate"></div>
+
+                <div class="profile-area">
+                    <div class="profile-avatar">
+                        <span th:text="${#strings.substring(vendor.firstName, 0, 1)}">V</span>
+                    </div>
+
+                    <div class="profile-details">
+                        <strong th:text="${vendor.firstName + ' ' + vendor.lastName}">
+                            Vendor Name
+                        </strong>
+                        <small>Vendor</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE BODY -->
+        <section class="page-content">
+
+            <div class="welcome-section">
+
+                <div>
+                    <span class="eyebrow">SELLER CENTER</span>
+
+                    <h1>
+                        Hello,
+                        <span th:text="${vendor.firstName}">Vendor</span>!
+                    </h1>
+
+                    <p>
+                        Here's a quick overview of your store's performance.
+                    </p>
+                </div>
+
+                <div class="store-status">
+                    <span class="status-dot"></span>
+                    Your vendor account
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT AND ORDER CARDS -->
+            <div class="section-heading">
+                <div>
+                    <h3>Store Overview</h3>
+                    <p>Track your products, inventory and orders.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon products-icon">▣</div>
+                        <span class="stat-label">PRODUCTS</span>
+                    </div>
+
+                    <h2 th:text="${dashboard.totalProducts}">0</h2>
+                    <p>Total products listed</p>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon active-icon">✓</div>
+                        <span class="stat-label">ACTIVE PRODUCTS</span>
+                    </div>
+
+                    <h2 th:text="${dashboard.activeProducts}">0</h2>
+                    <p>Products with ACTIVE status</p>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon stock-icon">!</div>
+                        <span class="stat-label">OUT OF STOCK</span>
+                    </div>
+
+                    <h2 th:text="${dashboard.outOfStockProducts}">0</h2>
+                    <p>Products requiring restock</p>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon orders-icon">▤</div>
+                        <span class="stat-label">TOTAL ORDERS</span>
+                    </div>
+
+                    <h2 th:text="${dashboard.totalOrders}">0</h2>
+                    <p>Orders containing your products</p>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon pending-icon">◷</div>
+                        <span class="stat-label">PENDING ORDERS</span>
+                    </div>
+
+                    <h2 th:text="${dashboard.pendingOrders}">0</h2>
+                    <p>Awaiting fulfillment</p>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon completed-icon">✓</div>
+                        <span class="stat-label">COMPLETED ORDERS</span>
+                    </div>
+
+                    <h2 th:text="${dashboard.completedOrders}">0</h2>
+                    <p>Successfully delivered</p>
+                </div>
+
+            </div>
+
+
+            <!-- REVENUE -->
+            <div class="section-heading revenue-heading">
+                <div>
+                    <h3>Revenue Overview</h3>
+                    <p>Revenue from paid orders, excluding cancelled orders.</p>
+                </div>
+            </div>
+
+            <div class="revenue-grid">
+
+                <div class="revenue-card total-revenue">
+                    <div class="revenue-icon">₹</div>
+
+                    <div>
+                        <span>Total Sales</span>
+
+                        <h2>
+                            ₹<span th:text="${#numbers.formatDecimal(dashboard.totalSales, 1, 2)}">
+                                0.00
+                            </span>
+                        </h2>
+
+                        <small>All eligible paid orders</small>
+                    </div>
+                </div>
+
+
+                <div class="revenue-card monthly-revenue">
+                    <div class="revenue-icon">↗</div>
+
+                    <div>
+                        <span>Monthly Revenue</span>
+
+                        <h2>
+                            ₹<span th:text="${#numbers.formatDecimal(dashboard.monthlyRevenue, 1, 2)}">
+                                0.00
+                            </span>
+                        </h2>
+
+                        <small>Current calendar month</small>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- RECENT ORDERS -->
+            <div class="section-heading table-heading">
+                <div>
+                    <h3>Recent Orders</h3>
+                    <p>Latest orders containing your products.</p>
+                </div>
+            </div>
+
+            <div class="table-card">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>ORDER ID</th>
+                                <th>CUSTOMER</th>
+                                <th>PRODUCTS</th>
+                                <th>DATE</th>
+                                <th>YOUR TOTAL</th>
+                                <th>PAYMENT</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="order : ${dashboard.recentOrders}">
+
+                                <td class="order-id"
+                                    th:text="${order.orderNumber}">
+                                    OD-0001
+                                </td>
+
+                                <td th:text="${order.customerName}">
+                                    Customer
+                                </td>
+
+                                <td class="product-summary"
+                                    th:text="${order.productSummary}">
+                                    Product
+                                </td>
+
+                                <td th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'dd MMM yyyy') : '-'}">
+                                    10 Nov 2026
+                                </td>
+
+                                <td class="amount">
+                                    ₹<span th:text="${#numbers.formatDecimal(order.vendorTotal, 1, 2)}">
+                                        0.00
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="payment-badge"
+                                          th:text="${order.paymentStatus}">
+                                        PAID
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="order-status"
+                                          th:classappend="${#strings.toLowerCase(order.orderStatus)}"
+                                          th:text="${order.orderStatus}">
+                                        CONFIRMED
+                                    </span>
+                                </td>
+
+                            </tr>
+
+
+                            <tr th:if="${#lists.isEmpty(dashboard.recentOrders)}">
+                                <td colspan="7" class="empty-state">
+                                    <div class="empty-icon">▤</div>
+                                    <strong>No orders yet</strong>
+                                    <p>Your recent customer orders will appear here.</p>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT PRODUCTS -->
+            <div class="section-heading table-heading">
+                <div>
+                    <h3>Recently Added Products</h3>
+                    <p>Your latest products in the marketplace.</p>
+                </div>
+            </div>
+
+            <div class="table-card">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>PRODUCT NAME</th>
+                                <th>CATEGORY</th>
+                                <th>PRICE</th>
+                                <th>STOCK</th>
+                                <th>PRODUCT STATUS</th>
+                                <th>APPROVAL</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="product : ${dashboard.recentProducts}">
+
+                                <td class="product-name"
+                                    th:text="${product.productName}">
+                                    Product name
+                                </td>
+
+                                <td th:text="${product.category}">
+                                    Category
+                                </td>
+
+                                <td class="amount">
+                                    ₹<span th:text="${#numbers.formatDecimal(product.price != null ? product.price : 0, 1, 2)}">
+                                        0.00
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span th:text="${product.stockQuantity != null ? product.stockQuantity : 0}"
+                                          th:class="${product.stockQuantity == null or product.stockQuantity <= 0 ? 'stock-danger' : 'stock-normal'}">
+                                        0
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="order-status"
+                                          th:text="${product.productStatus != null ? product.productStatus : 'N/A'}">
+                                        ACTIVE
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="approval-badge"
+                                          th:text="${product.approvalStatus != null ? product.approvalStatus : 'N/A'}">
+                                        APPROVED
+                                    </span>
+                                </td>
+
+                            </tr>
+
+
+                            <tr th:if="${#lists.isEmpty(dashboard.recentProducts)}">
+                                <td colspan="6" class="empty-state">
+                                    <div class="empty-icon">▣</div>
+                                    <strong>No products added yet</strong>
+                                    <p>Your products will appear here after you add them.</p>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <footer class="footer">
+                © 2026 OneCart. Vendor Seller Center.
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script th:src="@{/js/vendor-dashboard.js}"></script>
+
+</body>
+</html>

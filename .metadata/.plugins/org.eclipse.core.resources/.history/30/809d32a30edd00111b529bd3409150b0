@@ -1,0 +1,794 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Products | OneCart Seller Center</title>
+
+    <link rel="stylesheet" th:href="@{/css/vendor-dashboard.css}">
+
+    <style>
+        /* PRODUCTS PAGE */
+
+        .products-page-content {
+            padding: 30px;
+        }
+
+        .products-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .products-heading h1 {
+            margin: 7px 0;
+            color: #123e3a;
+            font-size: 28px;
+        }
+
+        .products-heading p {
+            color: #78918c;
+            font-size: 13px;
+        }
+
+        .products-eyebrow {
+            color: #087e78;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .products-heading strong {
+            color: #087e78;
+        }
+
+        .add-product-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 21px;
+            border-radius: 8px;
+            background: #087e78;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .add-product-btn:hover {
+            background: #065f59;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* SUMMARY */
+
+        .product-summary-card {
+            max-width: 290px;
+            padding: 22px;
+            margin-bottom: 24px;
+            border: 1px solid #e4eeeb;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 6px 20px rgba(18, 62, 58, .035);
+        }
+
+        .product-summary-card span {
+            color: #78918c;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+
+        .product-summary-card h2 {
+            margin-top: 12px;
+            color: #087e78;
+            font-size: 34px;
+        }
+
+        /* SUCCESS MESSAGE */
+
+        .product-success {
+            padding: 13px 16px;
+            margin-bottom: 20px;
+            border: 1px solid #cbe9dc;
+            border-radius: 9px;
+            background: #effaf4;
+            color: #17664a;
+            font-size: 13px;
+        }
+
+        /* PRODUCTS CONTAINER */
+
+        .products-container {
+            min-height: 300px;
+            padding: 24px;
+            overflow: hidden;
+            border: 1px solid #e4eeeb;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 8px 25px rgba(18, 62, 58, .035);
+        }
+
+        .products-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .products-search {
+            min-width: 200px;
+            flex: 1;
+            height: 43px;
+            padding: 0 13px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            outline: none;
+            background: white;
+            color: #123e3a;
+            font-size: 12px;
+        }
+
+        .products-search:focus,
+        .products-toolbar select:focus {
+            border-color: #087e78;
+        }
+
+        .products-toolbar select {
+            height: 43px;
+            padding: 0 12px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            outline: none;
+            background: white;
+            color: #123e3a;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* TABLE */
+
+        .products-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .products-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .products-table thead {
+            background: #f0f7f5;
+        }
+
+        .products-table th {
+            padding: 15px;
+            text-align: left;
+            color: #54736d;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .products-table td {
+            padding: 16px 15px;
+            border-bottom: 1px solid #edf2f0;
+            color: #23463f;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .products-table tbody tr:hover {
+            background: #f8fbfa;
+        }
+
+        .table-product-name {
+            color: #123e3a !important;
+            font-weight: 700;
+        }
+
+        .table-price {
+            color: #087e78 !important;
+            font-weight: 800;
+        }
+
+        /* STATUS BADGES */
+
+        .product-status-badge,
+        .approval-status-badge {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status-active,
+        .approval-approved {
+            background: #e1f5ed;
+            color: #168052;
+        }
+
+        .status-inactive,
+        .approval-rejected {
+            background: #fce9e7;
+            color: #bd5147;
+        }
+
+        .approval-pending {
+            background: #fff3d9;
+            color: #a66c00;
+        }
+
+        /* EDIT BUTTON */
+
+        .edit-product-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 7px;
+            background: #087e78;
+            color: white;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .edit-product-btn:hover {
+            background: #065f59;
+            color: white;
+        }
+
+        /* EMPTY STATE */
+
+        .products-empty-state {
+            padding: 55px 20px;
+            text-align: center;
+            color: #78918c;
+        }
+
+        .products-empty-state h3 {
+            margin: 12px 0 8px;
+            color: #123e3a;
+            font-size: 19px;
+        }
+
+        .products-empty-state p {
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .products-empty-icon {
+            font-size: 38px;
+        }
+
+        .products-no-results {
+            display: none;
+            padding: 25px;
+            text-align: center;
+            color: #78918c;
+            font-size: 13px;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 900px) {
+            .products-page-content {
+                padding: 22px;
+            }
+        }
+
+        @media(max-width: 650px) {
+            .products-page-content {
+                padding: 18px 13px;
+            }
+
+            .products-heading h1 {
+                font-size: 23px;
+            }
+
+            .products-container {
+                padding: 15px;
+            }
+
+            .products-toolbar select {
+                flex: 1;
+            }
+
+            .product-summary-card {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <!-- BRAND -->
+        <div class="brand">
+            <div class="brand-icon">O</div>
+
+            <div>
+                <h2>OneCart</h2>
+                <span>SELLER CENTER</span>
+            </div>
+        </div>
+
+        <!-- STORE INFORMATION -->
+        <div class="store-info">
+
+            <div class="store-avatar">🏪</div>
+
+            <div class="store-text">
+                <strong th:text="${vendor.businessName != null and !vendor.businessName.isEmpty() ? vendor.businessName : 'My Store'}">
+                    My Store
+                </strong>
+
+                <small>Vendor Account</small>
+            </div>
+
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="sidebar-nav">
+
+            <p class="nav-heading">MAIN MENU</p>
+
+            <a th:href="@{/vendor/dashboard}" class="nav-link">
+                <span class="nav-icon">▦</span>
+                Dashboard
+            </a>
+
+            <p class="nav-heading">STORE MANAGEMENT</p>
+
+            <a th:href="@{/vendor/store}" class="nav-link">
+                <span class="nav-icon">🏬</span>
+                My Store
+            </a>
+
+            <a th:href="@{/vendor/products}" class="nav-link active">
+                <span class="nav-icon">▣</span>
+                Products
+            </a>
+
+            <a th:href="@{/vendor/products/add}" class="nav-link">
+                <span class="nav-icon">＋</span>
+                Add Product
+            </a>
+
+            <!-- INVENTORY IS NOW ACTIVE -->
+            <a th:href="@{/vendor/inventory}" class="nav-link">
+                <span class="nav-icon">▤</span>
+                Inventory
+            </a>
+
+            <p class="nav-heading">BUSINESS</p>
+
+            <a href="#" class="nav-link disabled-link">
+                <span class="nav-icon">▧</span>
+                Orders
+                <span class="coming-soon">Soon</span>
+            </a>
+
+            <a href="#" class="nav-link disabled-link">
+                <span class="nav-icon">↗</span>
+                Sales &amp; Reports
+                <span class="coming-soon">Soon</span>
+            </a>
+
+            <p class="nav-heading">ACCOUNT</p>
+
+            <a th:href="@{/vendor/profile}" class="nav-link">
+                <span class="nav-icon">♙</span>
+                My Profile
+            </a>
+
+        </nav>
+
+        <!-- SIDEBAR BOTTOM -->
+        <div class="sidebar-bottom">
+
+            <div class="help-card">
+                <div class="help-icon">?</div>
+
+                <strong>Need help?</strong>
+
+                <p>Manage your store with OneCart Seller Center.</p>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-button">
+                    <span>↪</span> Logout
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button class="menu-toggle"
+                        id="menuToggle"
+                        type="button"
+                        aria-label="Toggle menu">
+                    ☰
+                </button>
+
+                <div>
+                    <h2>My Products</h2>
+                    <p>Manage and monitor your store products.</p>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="profile-area">
+
+                    <div class="profile-avatar">
+                        <span th:text="${vendor.firstName != null and !vendor.firstName.isEmpty() ? #strings.substring(vendor.firstName, 0, 1).toUpperCase() : 'V'}">
+                            V
+                        </span>
+                    </div>
+
+                    <div class="profile-details">
+                        <strong th:text="${(vendor.firstName != null ? vendor.firstName : '') + ' ' + (vendor.lastName != null ? vendor.lastName : '')}">
+                            Vendor Name
+                        </strong>
+
+                        <small>Vendor</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PRODUCTS PAGE BODY -->
+        <section class="page-content products-page-content">
+
+            <!-- SUCCESS MESSAGE -->
+            <div class="product-success"
+                 th:if="${success}"
+                 th:text="${success}">
+            </div>
+
+            <!-- PAGE HEADING -->
+            <section class="products-heading">
+
+                <div>
+
+                    <span class="products-eyebrow">
+                        SELLER CENTER / PRODUCT MANAGEMENT
+                    </span>
+
+                    <h1>My Products</h1>
+
+                    <p>
+                        Welcome,
+                        <strong th:text="${vendor.businessName != null and !#strings.isEmpty(vendor.businessName)
+                            ? vendor.businessName : vendor.firstName}">
+                            Vendor
+                        </strong>.
+                        Manage all your listed products here.
+                    </p>
+
+                </div>
+
+                <a th:href="@{/vendor/products/add}"
+                   class="add-product-btn">
+                    ＋ Add New Product
+                </a>
+
+            </section>
+
+
+            <!-- SUMMARY CARD -->
+            <section class="product-summary-card">
+
+                <span>TOTAL PRODUCTS LISTED</span>
+
+                <h2 th:text="${totalProducts}">0</h2>
+
+            </section>
+
+
+            <!-- PRODUCTS TABLE CARD -->
+            <section class="products-container">
+
+                <!-- SEARCH AND FILTER -->
+                <div class="products-toolbar">
+
+                    <input type="text"
+                           id="searchInput"
+                           class="products-search"
+                           placeholder="Search by product name or ID..."
+                           aria-label="Search products">
+
+                    <select id="statusFilter"
+                            aria-label="Filter by product status">
+
+                        <option value="">All Product Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+
+                    </select>
+
+                    <select id="approvalFilter"
+                            aria-label="Filter by approval status">
+
+                        <option value="">All Approval Status</option>
+                        <option value="approved">Approved</option>
+                        <option value="pending">Pending</option>
+                        <option value="rejected">Rejected</option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- EMPTY PRODUCTS -->
+                <div class="products-empty-state"
+                     th:if="${#lists.isEmpty(products)}">
+
+                    <div class="products-empty-icon">🛍️</div>
+
+                    <h3>No products added yet</h3>
+
+                    <p>
+                        Start building your store by adding your first product.
+                    </p>
+
+                    <a th:href="@{/vendor/products/add}"
+                       class="add-product-btn">
+                        Add Your First Product
+                    </a>
+
+                </div>
+
+
+                <!-- PRODUCTS TABLE -->
+                <div class="products-table-wrapper"
+                     th:unless="${#lists.isEmpty(products)}">
+
+                    <table class="products-table" id="productsTable">
+
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Product Status</th>
+                                <th>Approval</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="product : ${products}"
+                                th:attr="data-name=${product.productName},
+                                         data-id=${product.productId},
+                                         data-status=${product.productStatus},
+                                         data-approval=${product.approvalStatus}">
+
+                                <td th:text="${product.productId}">
+                                    1
+                                </td>
+
+                                <td class="table-product-name"
+                                    th:text="${product.productName}">
+                                    Product Name
+                                </td>
+
+                                <td th:text="${product.category}">
+                                    Category
+                                </td>
+
+                                <td class="table-price">
+                                    ₹<span th:text="${product.price}">0</span>
+                                </td>
+
+                                <td th:text="${product.stockQuantity}">
+                                    0
+                                </td>
+
+                                <td>
+
+                                    <span class="product-status-badge"
+                                          th:classappend="${#strings.equalsIgnoreCase(product.productStatus, 'active')
+                                              ? ' status-active' : ' status-inactive'}"
+                                          th:text="${product.productStatus}">
+                                        Active
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="approval-status-badge"
+                                          th:classappend="${#strings.equalsIgnoreCase(product.approvalStatus, 'approved')
+                                              ? ' approval-approved'
+                                              : (#strings.equalsIgnoreCase(product.approvalStatus, 'pending')
+                                                  ? ' approval-pending' : ' approval-rejected')}"
+                                          th:text="${product.approvalStatus}">
+                                        Pending
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <a class="edit-product-btn"
+                                       th:href="@{/vendor/products/edit/{id}(id=${product.productId})}">
+                                        Edit
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                    <div class="products-no-results" id="noResults">
+                        No matching products found.
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <footer class="footer">
+                © 2026 OneCart. Vendor Seller Center.
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- PRODUCT SEARCH AND FILTER -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput =
+            document.getElementById("searchInput");
+
+        const statusFilter =
+            document.getElementById("statusFilter");
+
+        const approvalFilter =
+            document.getElementById("approvalFilter");
+
+        const table =
+            document.getElementById("productsTable");
+
+        const noResults =
+            document.getElementById("noResults");
+
+        function filterProducts() {
+
+            if (!table) {
+                return;
+            }
+
+            const searchValue =
+                searchInput.value.toLowerCase().trim();
+
+            const statusValue =
+                statusFilter.value.toLowerCase();
+
+            const approvalValue =
+                approvalFilter.value.toLowerCase();
+
+            const rows =
+                table.querySelectorAll("tbody tr");
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+
+                const name =
+                    (row.dataset.name || "").toLowerCase();
+
+                const id =
+                    (row.dataset.id || "").toLowerCase();
+
+                const status =
+                    (row.dataset.status || "").toLowerCase();
+
+                const approval =
+                    (row.dataset.approval || "").toLowerCase();
+
+                const matchesSearch =
+                    name.includes(searchValue) ||
+                    id.includes(searchValue);
+
+                const matchesStatus =
+                    statusValue === "" ||
+                    status === statusValue;
+
+                const matchesApproval =
+                    approvalValue === "" ||
+                    approval === approvalValue;
+
+                const visible =
+                    matchesSearch &&
+                    matchesStatus &&
+                    matchesApproval;
+
+                row.style.display = visible ? "" : "none";
+
+                if (visible) {
+                    visibleCount++;
+                }
+
+            });
+
+            if (noResults) {
+                noResults.style.display =
+                    visibleCount === 0 ? "block" : "none";
+            }
+
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener("input", filterProducts);
+        }
+
+        if (statusFilter) {
+            statusFilter.addEventListener("change", filterProducts);
+        }
+
+        if (approvalFilter) {
+            approvalFilter.addEventListener("change", filterProducts);
+        }
+
+    });
+</script>
+
+<script th:src="@{/js/vendor-dashboard.js}"></script>
+
+</body>
+</html>

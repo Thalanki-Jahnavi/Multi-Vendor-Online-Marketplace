@@ -1,0 +1,495 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Details | OneCart Admin</title>
+
+    <link rel="stylesheet" th:href="@{/css/admin-dashboard.css}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f8f7;
+            font-family: Arial, sans-serif;
+            color: #123e3a;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 7px;
+            font-size: 27px;
+            color: #123e3a;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #71817e;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            background: #087e78;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #123e3a;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            margin-bottom: 25px;
+        }
+
+        .details-card,
+        .orders-card {
+            background: white;
+            border: 1px solid #e5eeeb;
+            border-radius: 13px;
+            padding: 24px;
+            box-shadow: 0 3px 12px rgba(18, 62, 58, 0.04);
+        }
+
+        .card-heading {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 22px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #edf2f0;
+            color: #123e3a;
+        }
+
+        .customer-avatar {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #e5f4f0;
+            color: #087e78;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .customer-name {
+            font-size: 21px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .customer-email {
+            color: #71817e;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .info-list {
+            margin-top: 22px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 13px 0;
+            border-bottom: 1px solid #f0f3f2;
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #7a8986;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #123e3a;
+            font-weight: 600;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .order-summary {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .order-count {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #e5f4f0;
+            color: #087e78;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .order-summary p {
+            margin: 0;
+            color: #71817e;
+            font-size: 13px;
+        }
+
+        .order-summary h3 {
+            margin: 0 0 5px;
+            font-size: 17px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px 12px;
+            background: #f3f8f6;
+            color: #58716c;
+            font-size: 12px;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #edf2f0;
+            font-size: 13px;
+            color: #405a55;
+        }
+
+        .order-number {
+            color: #087e78;
+            font-weight: 700;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #e5f4f0;
+            color: #087e78;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 15px;
+            color: #81908c;
+        }
+
+        .empty-state h3 {
+            color: #123e3a;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 900px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-content {
+                padding: 18px;
+            }
+
+            .page-header h1 {
+                font-size: 22px;
+            }
+
+            .details-card,
+            .orders-card {
+                padding: 17px;
+            }
+
+            .info-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .info-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/sidebar :: adminSidebar}"></div>
+
+<main class="main-content">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div>
+            <h1>Customer Details</h1>
+            <p>View customer profile and order information.</p>
+        </div>
+
+        <a th:href="@{/admin/customers}" class="back-btn">
+            ← Back to Customers
+        </a>
+    </div>
+
+    <!-- CUSTOMER INFORMATION -->
+    <div class="details-grid">
+
+        <!-- PROFILE CARD -->
+        <section class="details-card">
+
+            <h2 class="card-heading">Customer Profile</h2>
+
+            <div class="customer-avatar"
+                 th:text="${#strings.substring(customer.firstName, 0, 1)}">
+                C
+            </div>
+
+            <div class="customer-name"
+                 th:text="${customer.firstName + ' ' + customer.lastName}">
+                Customer Name
+            </div>
+
+            <div class="customer-email"
+                 th:text="${customer.email}">
+                customer@email.com
+            </div>
+
+            <div class="info-list">
+
+                <div class="info-row">
+                    <span class="info-label">Customer ID</span>
+                    <span class="info-value"
+                          th:text="${customer.userId}">1</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">First Name</span>
+                    <span class="info-value"
+                          th:text="${customer.firstName}">First Name</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Last Name</span>
+                    <span class="info-value"
+                          th:text="${customer.lastName}">Last Name</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Email Address</span>
+                    <span class="info-value"
+                          th:text="${customer.email}">Email</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Phone Number</span>
+                    <span class="info-value"
+                          th:text="${customer.phone != null ? customer.phone : 'Not provided'}">
+                        Phone
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Gender</span>
+                    <span class="info-value"
+                          th:text="${customer.gender != null ? customer.gender : 'Not provided'}">
+                        Gender
+                    </span>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ADDRESS CARD -->
+        <section class="details-card">
+
+            <h2 class="card-heading">Address Information</h2>
+
+            <div class="info-list">
+
+                <div class="info-row">
+                    <span class="info-label">Address</span>
+                    <span class="info-value"
+                          th:text="${customer.addressLine != null ? customer.addressLine : 'Not provided'}">
+                        Address
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">City</span>
+                    <span class="info-value"
+                          th:text="${customer.city != null ? customer.city : 'Not provided'}">
+                        City
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">State</span>
+                    <span class="info-value"
+                          th:text="${customer.state != null ? customer.state : 'Not provided'}">
+                        State
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Postal Code</span>
+                    <span class="info-value"
+                          th:text="${customer.postalCode != null ? customer.postalCode : 'Not provided'}">
+                        Postal Code
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Account Role</span>
+                    <span class="info-value"
+                          th:text="${customer.role}">CUSTOMER</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Email Verification</span>
+                    <span class="info-value"
+                          th:text="${customer.emailVerified ? 'Verified' : 'Not Verified'}">
+                        Not Verified
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Phone Verification</span>
+                    <span class="info-value"
+                          th:text="${customer.phoneVerified ? 'Verified' : 'Not Verified'}">
+                        Not Verified
+                    </span>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ORDER HISTORY -->
+    <section class="orders-card">
+
+        <h2 class="card-heading">Customer Order History</h2>
+
+        <div class="order-summary">
+            <div class="order-count"
+                 th:text="${totalOrders}">0</div>
+
+            <div>
+                <h3>Total Orders</h3>
+                <p>Orders placed by this customer</p>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(customerOrders)}"
+             class="empty-state">
+
+            <h3>No Orders Yet</h3>
+            <p>This customer has not placed any orders.</p>
+
+        </div>
+
+        <div class="table-wrapper"
+             th:unless="${#lists.isEmpty(customerOrders)}">
+
+            <table>
+                <thead>
+                <tr>
+                    <th>ORDER NUMBER</th>
+                    <th>ORDER DATE</th>
+                    <th>AMOUNT</th>
+                    <th>PAYMENT METHOD</th>
+                    <th>PAYMENT STATUS</th>
+                    <th>ORDER STATUS</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="order : ${customerOrders}">
+
+                    <td class="order-number"
+                        th:text="${order.orderNumber}">
+                        ORD-001
+                    </td>
+
+                    <td th:text="${order.createdAt != null ? order.createdAt : 'N/A'}">
+                        Date
+                    </td>
+
+                    <td>
+                        ₹<span th:text="${order.totalAmount}">0.00</span>
+                    </td>
+
+                    <td th:text="${order.paymentMethod != null ? order.paymentMethod : 'N/A'}">
+                        Payment
+                    </td>
+
+                    <td>
+                        <span class="status"
+                              th:text="${order.paymentStatus != null ? order.paymentStatus : 'N/A'}">
+                            PAID
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="status"
+                              th:text="${order.orderStatus != null ? order.orderStatus : 'N/A'}">
+                            CONFIRMED
+                        </span>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

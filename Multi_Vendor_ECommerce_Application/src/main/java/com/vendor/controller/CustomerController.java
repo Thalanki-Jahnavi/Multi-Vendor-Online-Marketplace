@@ -1,7 +1,9 @@
+
 package com.vendor.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ public class CustomerController {
     public CustomerController(
             UserRepository userRepository,
             ProductService productService) {
+
         this.userRepository = userRepository;
         this.productService = productService;
     }
@@ -36,10 +39,13 @@ public class CustomerController {
 
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() ->
-                        new IllegalStateException("Signed-in user was not found"));
+                        new IllegalStateException(
+                                "Signed-in user was not found"));
 
         model.addAttribute("firstName", user.getFirstName());
-        model.addAttribute("products", productService.getApprovedProducts());
+        model.addAttribute(
+                "products",
+                productService.getApprovedProducts());
 
         return "customer/dashboard";
     }
@@ -55,38 +61,70 @@ public class CustomerController {
             @RequestParam(required = false, defaultValue = "newest") String sort,
             Model model) {
 
-        if (authentication != null && authentication.isAuthenticated()
+        if (authentication != null
+                && authentication.isAuthenticated()
                 && !"anonymousUser".equals(authentication.getPrincipal())) {
-            userRepository.findByEmail(authentication.getName()).ifPresent(user -> {
-                model.addAttribute("customerName", user.getFirstName());
-                model.addAttribute("customerFullName",
-                        (user.getFirstName() != null ? user.getFirstName() : "")
-                        + " " + (user.getLastName() != null ? user.getLastName() : ""));
-                model.addAttribute("customerEmail", user.getEmail());
-            });
+
+            userRepository.findByEmail(authentication.getName())
+                    .ifPresent(user -> {
+
+                        model.addAttribute(
+                                "customerName",
+                                user.getFirstName());
+
+                        model.addAttribute(
+                                "customerFullName",
+                                (user.getFirstName() != null
+                                        ? user.getFirstName() : "")
+                                + " "
+                                + (user.getLastName() != null
+                                        ? user.getLastName() : ""));
+
+                        model.addAttribute(
+                                "customerEmail",
+                                user.getEmail());
+                    });
         }
 
-        List<Product> allProducts = productService.getApprovedProducts();
+        // Get all approved products before applying filters
+        List<Product> allProducts =
+                productService.getApprovedProducts();
 
-        List<Product> filteredProducts = productService.filterProducts(
-                allProducts,
-                keyword,
-                category,
-                vendorId,
-                minPrice,
-                maxPrice,
-                sort
-        );
+        // Apply selected filters to product listing
+        List<Product> filteredProducts =
+                productService.filterProducts(
+                        allProducts,
+                        keyword,
+                        category,
+                        vendorId,
+                        minPrice,
+                        maxPrice,
+                        sort);
 
+        // Collect unique categories without case duplicates
         TreeSet<String> categories =
                 new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
         TreeSet<Integer> vendorIds = new TreeSet<>();
 
+        // CASE-INSENSITIVE CATEGORY COUNTS
+        Map<String, Long> categoryCounts =
+                new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
         for (Product product : allProducts) {
+
             if (product.getCategory() != null
                     && !product.getCategory().isBlank()) {
-                categories.add(product.getCategory().trim());
+
+                String categoryName =
+                        product.getCategory().trim();
+
+                categories.add(categoryName);
+
+                categoryCounts.merge(
+                        categoryName,
+                        1L,
+                        Long::sum);
             }
 
             if (product.getVendorId() != null) {
@@ -94,47 +132,61 @@ public class CustomerController {
             }
         }
 
-        Map<String, Long> categoryCounts = allProducts.stream()
-                .filter(p -> p.getCategory() != null && !p.getCategory().isBlank())
-                .collect(Collectors.groupingBy(p -> p.getCategory().trim(), Collectors.counting()));
-
-        List<Integer> vendorIdList = vendorIds.stream()
-                .collect(Collectors.toList());
+        // Get vendor details
+        List<Integer> vendorIdList =
+                vendorIds.stream().collect(Collectors.toList());
 
         List<User> vendors = vendorIdList.isEmpty()
                 ? List.of()
                 : userRepository.findByUserIdIn(vendorIdList);
 
-        Map<Integer, String> vendorNames = vendors.stream()
-                .collect(Collectors.toMap(
+        Map<Integer, String> vendorNames =
+                vendors.stream().collect(Collectors.toMap(
                         User::getUserId,
                         user -> {
-                            String businessName = user.getBusinessName();
+
+                            String businessName =
+                                    user.getBusinessName();
 
                             if (businessName != null
                                     && !businessName.isBlank()) {
                                 return businessName;
                             }
 
-                            String firstName = user.getFirstName();
+                            String firstName =
+                                    user.getFirstName();
 
-                            return firstName != null && !firstName.isBlank()
+                            return firstName != null
+                                    && !firstName.isBlank()
                                     ? firstName
                                     : "Vendor";
                         },
                         (existing, replacement) -> existing
                 ));
 
-        boolean hasActiveFilters = (keyword != null && !keyword.isBlank())
+        boolean hasActiveFilters =
+                (keyword != null && !keyword.isBlank())
                 || (category != null && !category.isBlank())
-                || (vendorId != null)
-                || (minPrice != null)
-                || (maxPrice != null);
+                || vendorId != null
+                || minPrice != null
+                || maxPrice != null;
 
+        // Send data to Thymeleaf
         model.addAttribute("products", filteredProducts);
-        model.addAttribute("totalProductsCount", allProducts.size());
+
+        // Total approved products, independent of selected filters
+        model.addAttribute(
+                "totalProductsCount",
+                allProducts.size());
+
         model.addAttribute("categories", categories);
+        System.out.println("========== CATEGORY COUNT DEBUG ==========");
+        System.out.println("Total approved products: " + allProducts.size());
+        System.out.println("Categories: " + categories);
+        System.out.println("Category counts: " + categoryCounts);
+        System.out.println("==========================================");
         model.addAttribute("categoryCounts", categoryCounts);
+
         model.addAttribute("vendors", vendors);
         model.addAttribute("vendorNames", vendorNames);
 

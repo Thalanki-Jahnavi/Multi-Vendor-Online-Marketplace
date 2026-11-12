@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product | OneCart</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f8f6;
+            color: #123e3a;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 { font-size: 28px; }
+        .subtitle { color: #718b86; margin-top: 8px; }
+
+        .back-link {
+            color: #087e78;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #dcebe6;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 22px;
+        }
+
+        h2 {
+            font-size: 19px;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .full { grid-column: 1 / -1; }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d6e5df;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #087e78;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-row {
+            display: flex;
+            gap: 25px;
+            margin-top: 18px;
+        }
+
+        .checkbox-row label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-row input {
+            width: auto;
+        }
+
+        .image-preview {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            border: 1px dashed #b8d4ca;
+            border-radius: 10px;
+            margin-top: 12px;
+            padding: 8px;
+            display: none;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        button, .cancel {
+            padding: 13px 22px;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+        }
+
+        .submit {
+            background: #087e78;
+            color: white;
+        }
+
+        .cancel {
+            background: #e8f1ee;
+            color: #123e3a;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 15px;
+        }
+
+        .error {
+            background: #ffe9e9;
+            color: #b42318;
+        }
+
+        @media(max-width: 650px) {
+            body { padding: 15px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .full { grid-column: auto; }
+            .header { align-items: flex-start; gap: 15px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div>
+            <h1>Add New Product</h1>
+            <p class="subtitle">
+                Add a product to your OneCart vendor store.
+            </p>
+        </div>
+
+        <a th:href="@{/vendor/products}" class="back-link">
+            ← Back to Products
+        </a>
+    </div>
+
+    <div th:if="${error}" class="alert error" th:text="${error}"></div>
+
+    <form th:action="@{/vendor/products/add}"
+          method="post"
+          enctype="multipart/form-data">
+
+        <div class="card">
+            <h2>Basic Information</h2>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Product Name *</label>
+                    <input type="text" name="productName"
+                           placeholder="Enter product name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select name="category" required>
+                        <option value="">Select category</option>
+                        <option>Electronics</option>
+                        <option>Fashion</option>
+                        <option>Home & Kitchen</option>
+                        <option>Beauty</option>
+                        <option>Sports</option>
+                        <option>Accessories</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Brand</label>
+                    <input type="text" name="brand"
+                           placeholder="Enter brand">
+                </div>
+
+                <div class="form-group">
+                    <label>SKU</label>
+                    <input type="text" name="sku"
+                           placeholder="Product SKU">
+                </div>
+
+                <div class="form-group full">
+                    <label>Description</label>
+                    <textarea name="description"
+                              placeholder="Describe your product"></textarea>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Pricing & Inventory</h2>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Price (₹) *</label>
+                    <input type="number" name="price"
+                           min="0.01" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Discount (%)</label>
+                    <input type="number" name="discountPercentage"
+                           min="0" max="100" step="0.01" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Stock Quantity *</label>
+                    <input type="number" name="stockQuantity"
+                           min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" name="weightKg"
+                           min="0" step="0.01">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Product Specifications</h2>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Color</label>
+                    <input type="text" name="color"
+                           placeholder="Example: Black">
+                </div>
+
+                <div class="form-group">
+                    <label>Size</label>
+                    <input type="text" name="size"
+                           placeholder="Example: Medium">
+                </div>
+
+                <div class="form-group">
+                    <label>Warranty (Months)</label>
+                    <input type="number" name="warrantyMonths"
+                           min="0" value="0">
+                </div>
+
+            </div>
+
+            <div class="checkbox-row">
+                <label>
+                    <input type="checkbox" name="returnable"
+                           value="true" checked>
+                    Returnable
+                </label>
+
+                <label>
+                    <input type="checkbox" name="replaceable"
+                           value="true">
+                    Replaceable
+                </label>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Product Image</h2>
+
+            <div class="form-group">
+                <label>Select Product Image</label>
+
+                <input type="file"
+                       name="productImage"
+                       id="productImage"
+                       accept="image/png,image/jpeg,image/webp">
+
+                <small>Supported formats: JPG, PNG and WEBP.</small>
+
+                <img id="imagePreview"
+                     class="image-preview"
+                     alt="Product image preview">
+            </div>
+        </div>
+
+        <div class="buttons">
+            <a th:href="@{/vendor/products}" class="cancel">Cancel</a>
+            <button type="submit" class="submit">Save Product</button>
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+    const productImage = document.getElementById("productImage");
+    const imagePreview = document.getElementById("imagePreview");
+
+    productImage.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (file) {
+            imagePreview.src = URL.createObjectURL(file);
+            imagePreview.style.display = "block";
+        } else {
+            imagePreview.style.display = "none";
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+package com.vendor.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.vendor.entity.User;
+import com.vendor.repository.UserRepository;
+import com.vendor.service.AdminService;
+
+@Controller
+public class AdminController {
+
+    private final AdminService adminService;
+    private final UserRepository userRepository;
+
+    public AdminController(
+            AdminService adminService,
+            UserRepository userRepository) {
+
+        this.adminService = adminService;
+        this.userRepository = userRepository;
+    }
+
+    // ADMIN DASHBOARD
+    @GetMapping("/admin/dashboard")
+    public String showDashboard(
+            Authentication authentication,
+            Model model) {
+
+        User admin = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException("Admin account not found"));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getRole())) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Admin access required");
+        }
+
+        Map<String, Object> dashboardData =
+                adminService.getDashboardData();
+
+        model.addAllAttributes(dashboardData);
+
+        model.addAttribute("adminName", admin.getFirstName());
+        model.addAttribute("adminEmail", admin.getEmail());
+        model.addAttribute("activePage", "dashboard");
+
+        return "admin/dashboard";
+    }
+
+    // ADMIN CUSTOMER MANAGEMENT
+    @GetMapping("/admin/customers")
+    public String showCustomers(
+            Authentication authentication,
+            Model model) {
+
+        User admin = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException("Admin account not found"));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getRole())) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Admin access required");
+        }
+
+        List<User> customers =
+                userRepository.findByRoleIgnoreCase("CUSTOMER");
+
+        Map<String, Object> dashboardData =
+                adminService.getDashboardData();
+
+        model.addAllAttributes(dashboardData);
+
+        model.addAttribute("customers", customers);
+        model.addAttribute("totalCustomers", customers.size());
+        model.addAttribute("adminName", admin.getFirstName());
+        model.addAttribute("adminEmail", admin.getEmail());
+        model.addAttribute("activePage", "customers");
+
+        return "admin/customers";
+    }
+    
+    @GetMapping("/admin/vendors")
+    public String showVendors(
+            Authentication authentication,
+            Model model) {
+
+        User admin = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException("Admin account not found"));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getRole())) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Admin access required");
+        }
+
+        List<User> vendors =
+                userRepository.findByRoleIgnoreCase("VENDOR");
+
+        Map<String, Object> dashboardData =
+                adminService.getDashboardData();
+
+        model.addAllAttributes(dashboardData);
+
+        model.addAttribute("vendors", vendors);
+        model.addAttribute("totalVendors", vendors.size());
+        model.addAttribute("adminName", admin.getFirstName());
+        model.addAttribute("adminEmail", admin.getEmail());
+        model.addAttribute("activePage", "vendors");
+
+        return "admin/vendors";
+    }
+}

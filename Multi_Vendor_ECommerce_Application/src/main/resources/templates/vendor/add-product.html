@@ -1,0 +1,533 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Product | OneCart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f8f7;
+            color: #123e3a;
+        }
+
+        .header {
+            background: white;
+            padding: 22px 35px;
+            border-bottom: 1px solid #e4eeeb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header h2 {
+            font-size: 22px;
+        }
+
+        .header p {
+            color: #78918c;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .back-link {
+            color: #087e78;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .main {
+            max-width: 900px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 32px;
+            border: 1px solid #e4eeeb;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(18, 62, 58, 0.04);
+        }
+
+        .form-card h1 {
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .intro {
+            color: #78918c;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            min-width: 0;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #123e3a;
+            background: white;
+            outline: none;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #087e78;
+            box-shadow: 0 0 0 3px rgba(8, 126, 120, 0.08);
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            background: #f7fbfa;
+        }
+
+        .field-hint {
+            color: #78918c;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #bd5147;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .note {
+            background: #eff8f5;
+            color: #54736d;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 22px;
+            line-height: 1.6;
+        }
+
+        .image-preview {
+            display: none;
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            border: 1px solid #e0ebe8;
+            border-radius: 10px;
+            padding: 5px;
+            background: #f7fbfa;
+            margin-top: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .submit-btn {
+            background: #087e78;
+            color: white;
+            border: none;
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #065f59;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .cancel-btn {
+            background: #edf3f1;
+            color: #123e3a;
+            text-decoration: none;
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .category-empty {
+            color: #bd5147;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        @media(max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            .form-card {
+                padding: 22px;
+            }
+
+            .header {
+                padding: 18px;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <div>
+            <h2>OneCart Seller Center</h2>
+            <p>Add a new product to your store</p>
+        </div>
+
+        <a th:href="@{/vendor/products}" class="back-link">
+            ← Back to Products
+        </a>
+
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <section class="form-card">
+
+            <h1>Add New Product</h1>
+
+            <p class="intro">
+                Enter your product details and upload a clear product image.
+            </p>
+
+            <!-- ERROR MESSAGE -->
+            <div class="error"
+                 th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+            <!-- APPROVAL NOTE -->
+            <div class="note">
+                Your product will be saved with
+                <strong>Pending</strong> approval status.
+                An administrator must approve it before it appears
+                in the customer marketplace.
+            </div>
+
+            <!-- PRODUCT FORM -->
+            <form th:action="@{/vendor/products/add}"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <div class="form-grid">
+
+                    <!-- PRODUCT NAME -->
+                    <div class="form-group full-width">
+
+                        <label for="productName">
+                            Product Name *
+                        </label>
+
+                        <input type="text"
+                               id="productName"
+                               name="productName"
+                               maxlength="255"
+                               placeholder="Example: Wireless Headphones"
+                               required>
+
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="form-group full-width">
+
+                        <label for="description">
+                            Product Description
+                        </label>
+
+                        <textarea id="description"
+                                  name="description"
+                                  maxlength="255"
+                                  placeholder="Describe your product, features and details..."></textarea>
+
+                        <small class="field-hint">
+                            Maximum 255 characters according to your current products table.
+                        </small>
+
+                    </div>
+
+                    <!-- CATEGORY -->
+                    <div class="form-group">
+
+                        <label for="category">
+                            Category *
+                        </label>
+
+                        <select id="category"
+                                name="category"
+                                required>
+
+                            <option value="" disabled selected>
+                                Select category
+                            </option>
+
+                            <option th:each="category : ${categories}"
+                                    th:value="${category.categoryName}"
+                                    th:text="${category.categoryName}">
+                            </option>
+
+                        </select>
+
+                        <small class="field-hint"
+                               th:if="${categories != null and !#lists.isEmpty(categories)}">
+                            Select a category created by the administrator.
+                        </small>
+
+                        <small class="category-empty"
+                               th:if="${categories == null or #lists.isEmpty(categories)}">
+                            No active categories are available. Please contact the administrator.
+                        </small>
+
+                    </div>
+
+                    <!-- BRAND -->
+                    <div class="form-group">
+
+                        <label for="brand">
+                            Brand
+                        </label>
+
+                        <input type="text"
+                               id="brand"
+                               name="brand"
+                               maxlength="255"
+                               placeholder="Example: Wrogn">
+
+                    </div>
+
+                    <!-- SKU -->
+                    <div class="form-group">
+
+                        <label for="sku">
+                            SKU
+                        </label>
+
+                        <input type="text"
+                               id="sku"
+                               name="sku"
+                               maxlength="255"
+                               placeholder="Example: WRG-SHOE-001">
+
+                    </div>
+
+                    <!-- PRICE -->
+                    <div class="form-group">
+
+                        <label for="price">
+                            Price (₹) *
+                        </label>
+
+                        <input type="number"
+                               id="price"
+                               name="price"
+                               placeholder="Example: 2099"
+                               min="0.01"
+                               step="0.01"
+                               required>
+
+                    </div>
+
+                    <!-- DISCOUNT -->
+                    <div class="form-group">
+
+                        <label for="discountPercentage">
+                            Discount (%)
+                        </label>
+
+                        <input type="number"
+                               id="discountPercentage"
+                               name="discountPercentage"
+                               placeholder="Example: 10"
+                               min="0"
+                               max="100"
+                               step="0.01"
+                               value="0">
+
+                    </div>
+
+                    <!-- STOCK -->
+                    <div class="form-group">
+
+                        <label for="stockQuantity">
+                            Stock Quantity *
+                        </label>
+
+                        <input type="number"
+                               id="stockQuantity"
+                               name="stockQuantity"
+                               placeholder="Example: 50"
+                               min="0"
+                               required>
+
+                    </div>
+
+                    <!-- PRODUCT IMAGE -->
+                    <div class="form-group full-width">
+
+                        <label for="productImage">
+                            Product Image *
+                        </label>
+
+                        <input type="file"
+                               id="productImage"
+                               name="productImage"
+                               accept="image/jpeg,image/png,image/webp"
+                               required>
+
+                        <small class="field-hint">
+                            Upload JPG, PNG or WEBP.
+                            Maximum file size: 5 MB.
+                        </small>
+
+                        <img id="productImagePreview"
+                             class="image-preview"
+                             alt="Selected product image preview">
+
+                    </div>
+
+                </div>
+
+                <!-- BUTTONS -->
+                <div class="buttons">
+
+                    <button type="submit"
+                            class="submit-btn"
+                            th:disabled="${categories == null or #lists.isEmpty(categories)}">
+                        Save Product
+                    </button>
+
+                    <a th:href="@{/vendor/products}"
+                       class="cancel-btn">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <!-- IMAGE PREVIEW -->
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const imageInput =
+                document.getElementById("productImage");
+
+            const preview =
+                document.getElementById("productImagePreview");
+
+            let previewUrl = null;
+
+            imageInput.addEventListener("change", function () {
+
+                const file = this.files[0];
+
+                if (!file) {
+                    preview.style.display = "none";
+                    return;
+                }
+
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+                ];
+
+                if (!allowedTypes.includes(file.type)) {
+                    alert("Please select a JPG, PNG or WEBP image.");
+                    this.value = "";
+                    preview.style.display = "none";
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("Product image must not exceed 5 MB.");
+                    this.value = "";
+                    preview.style.display = "none";
+                    return;
+                }
+
+                if (previewUrl) {
+                    URL.revokeObjectURL(previewUrl);
+                }
+
+                previewUrl = URL.createObjectURL(file);
+
+                preview.src = previewUrl;
+                preview.style.display = "block";
+
+            });
+
+        });
+
+    </script>
+
+</body>
+</html>

@@ -1,142 +1,222 @@
+
 package com.vendor.service;
 
+import java.nio.charset.StandardCharsets;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.vendor.entity.Order;
 import com.vendor.entity.OrderItem;
 
+import jakarta.mail.internet.MimeMessage;
+
 @Service
 public class EmailNotificationService {
 
-    /**
-     * Sends an Order Placed & Payment Confirmation Email to the customer
-     */
+    private final JavaMailSender mailSender;
+
+    @Value("${onecart.mail.from}")
+    private String fromEmail;
+
+    public EmailNotificationService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    private String customerName(Order order) {
+        return order.getCustomerName() != null
+                ? order.getCustomerName() : "Customer";
+    }
+
+    private void sendHtmlEmail(String to, String subject, String html)
+            throws Exception {
+
+        if (to == null || to.isBlank()) {
+            throw new IllegalArgumentException("Customer email is missing");
+        }
+
+        MimeMessage message = mailSender.createMimeMessage();
+
+        MimeMessageHelper helper = new MimeMessageHelper(
+                message, true, StandardCharsets.UTF_8.name());
+
+        helper.setFrom(fromEmail);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(html, true);
+
+        mailSender.send(message);
+        System.out.println("OneCart email sent successfully to: " + to);
+    }
+
+    private String emailLayout(String title, String content) {
+        return """
+            <!DOCTYPE html>
+            <html>
+            <body style="margin:0;padding:25px;background:#f3f8f6;
+                         font-family:Arial,sans-serif;">
+
+              <div style="max-width:600px;margin:auto;background:white;
+                          border-radius:12px;overflow:hidden;">
+
+                <div style="background:#087e78;padding:25px;
+                            text-align:center;color:white;">
+                  <h1 style="margin:0;">OneCart</h1>
+                  <p style="margin:8px 0 0;">Your Shopping Partner</p>
+                </div>
+
+                <div style="padding:30px;color:#333;">
+
+                  <h2 style="color:#123e3a;">%s</h2>
+
+                  %s
+
+                  <p style="margin-top:30px;color:#087e78;">
+                    Thank you for choosing OneCart!
+                  </p>
+
+                  <p style="font-size:13px;color:#777;">
+                    OneCart Customer Support
+                  </p>
+
+                </div>
+
+                <div style="background:#e5f4f0;padding:15px;
+                            text-align:center;font-size:12px;color:#555;">
+                  © OneCart. All rights reserved.
+                </div>
+
+              </div>
+            </body>
+            </html>
+            """.formatted(title, content);
+    }
+
+    // 1. Payment and order confirmation email
     public void sendOrderConfirmationEmail(Order order) {
-        StringBuilder itemsList = new StringBuilder();
+
+        StringBuilder items = new StringBuilder();
+
         if (order.getItems() != null) {
             for (OrderItem item : order.getItems()) {
-                itemsList.append(String.format("   • %s (Qty: %d) - ₹%.2f\n",
-                        item.getProductName(), item.getQuantity(), item.getSubtotal()));
+                items.append("<li>")
+                     .append(item.getProductName())
+                     .append(" - Quantity: ")
+                     .append(item.getQuantity())
+                     .append(" - ₹")
+                     .append(item.getSubtotal())
+                     .append("</li>");
             }
         }
 
-        String subject = "Order Confirmed! Your OneCart Order #" + order.getOrderNumber();
-        String message = String.format("""
-            ================================================================================
-            📧 [ONECART EMAIL NOTIFICATION]
-            To: %s (%s)
-            Subject: %s
-            --------------------------------------------------------------------------------
-            Dear %s,
+        String content = """
+            <p>Hello %s,</p>
 
-            Thank you for shopping with OneCart! Your order has been placed successfully and payment of ₹%.2f was received.
+            <p>Your OneCart order has been successfully created.</p>
 
-            ORDER SUMMARY:
-            Order Number: %s
-            Payment Method: %s (Status: %s)
-            Delivery Address: %s
-            Estimated Delivery: Within 3-5 business days
+            <p><b>Order Number:</b> %s</p>
+            <p><b>Payment Method:</b> %s</p>
+            <p><b>Payment Status:</b> %s</p>
 
-            ITEMS ORDERED:
-            %s
-            Total Amount: ₹%.2f
+            <h3>Order Items</h3>
+            <ul>%s</ul>
 
-            We will notify you once your order is dispatched.
-            OneCart Customer Support | support@onecart.com
-            ================================================================================
-            """,
-                order.getCustomerEmail(),
-                order.getCustomerName() != null ? order.getCustomerName() : "Customer",
-                subject,
-                order.getCustomerName() != null ? order.getCustomerName() : "Valued Customer",
-                order.getTotalAmount() != null ? order.getTotalAmount() : 0.0,
+            <h3>Total: ₹%.2f</h3>
+
+            <p><b>Delivery Address:</b> %s</p>
+
+            <p style="background:#fff4d6;padding:12px;">
+              This is a demo/test payment confirmation.
+              No real money was transferred.
+            </p>
+            """.formatted(
+                customerName(order),
                 order.getOrderNumber(),
                 order.getPaymentMethod(),
                 order.getPaymentStatus(),
-                order.getShippingAddress(),
-                itemsList.toString(),
-                order.getTotalAmount() != null ? order.getTotalAmount() : 0.0
+                items,
+                order.getTotalAmount() != null
+                        ? order.getTotalAmount() : 0.0,
+                order.getShippingAddress()
         );
 
-        System.out.println(message);
+        try {
+            sendHtmlEmail(
+                order.getCustomerEmail(),
+                "OneCart - Order Confirmed: " + order.getOrderNumber(),
+                emailLayout("Payment Successful!", content)
+            );
+        } catch (Exception e) {
+            System.err.println("Order confirmation email failed: "
+                    + e.getMessage());
+        }
     }
 
-    /**
-     * Sends an Order Cancellation and Money Refund Email to the customer
-     */
-    public void sendOrderCancellationAndRefundEmail(Order order, Double refundAmount) {
-        String subject = "Order Cancelled & Refund Initiated - OneCart Order #" + order.getOrderNumber();
-        String message = String.format("""
-            ================================================================================
-            📧 [ONECART EMAIL NOTIFICATION]
-            To: %s (%s)
-            Subject: %s
-            --------------------------------------------------------------------------------
-            Dear %s,
+    // 2. Order cancellation email
+    public void sendOrderCancellationAndRefundEmail(
+            Order order, Double refundAmount) {
 
-            Your OneCart Order #%s has been successfully CANCELLED.
+        String content = """
+            <p>Hello %s,</p>
 
-            REFUND DETAILS:
-            • Refund Amount: ₹%.2f
-            • Refund Status: COMPLETED / REFUNDED TO SOURCE
-            • Payment Mode: %s
-            • Timeline: The amount has been credited back to your original payment method / account.
+            <p>Your order <b>%s</b> has been cancelled successfully.</p>
 
-            If you did not request this cancellation or have any questions, please contact our 24/7 helpdesk.
+            <p><b>Order Amount:</b> ₹%.2f</p>
 
-            Thank you,
-            OneCart Customer Support | refunds@onecart.com
-            ================================================================================
-            """,
-                order.getCustomerEmail(),
-                order.getCustomerName() != null ? order.getCustomerName() : "Customer",
-                subject,
-                order.getCustomerName() != null ? order.getCustomerName() : "Valued Customer",
+            <p><b>Refund Status:</b> Pending verification</p>
+
+            <p>No refund has been confirmed as completed.
+               We will notify you separately if a refund is processed.</p>
+            """.formatted(
+                customerName(order),
                 order.getOrderNumber(),
-                refundAmount != null ? refundAmount : (order.getTotalAmount() != null ? order.getTotalAmount() : 0.0),
-                order.getPaymentMethod() != null ? order.getPaymentMethod() : "Original Payment Method"
+                refundAmount != null ? refundAmount : 0.0
         );
 
-        System.out.println(message);
+        try {
+            sendHtmlEmail(
+                order.getCustomerEmail(),
+                "OneCart - Order Cancelled: " + order.getOrderNumber(),
+                emailLayout("Order Cancelled", content)
+            );
+        } catch (Exception e) {
+            System.err.println("Cancellation email failed: "
+                    + e.getMessage());
+        }
     }
 
-    /**
-     * Sends a Return or Exchange Request Confirmation Email
-     */
-    public void sendReturnOrExchangeEmail(Order order, String requestType, String reason) {
-        String subject = String.format("%s Request Registered - OneCart Order #%s", requestType, order.getOrderNumber());
-        String message = String.format("""
-            ================================================================================
-            📧 [ONECART EMAIL NOTIFICATION]
-            To: %s (%s)
-            Subject: %s
-            --------------------------------------------------------------------------------
-            Dear %s,
+    // 3. Return or exchange request email
+    public void sendReturnOrExchangeEmail(
+            Order order, String requestType, String reason) {
 
-            We have received your %s request for Order #%s.
+        String content = """
+            <p>Hello %s,</p>
 
-            REQUEST DETAILS:
-            • Request Type: %s
-            • Reason: %s
-            • Status: IN REVIEW / COURIER PICKUP SCHEDULED
-            • Pickup Window: Our courier partner will pick up the package within 48 hours.
+            <p>We have received your %s request.</p>
 
-            Once inspected, your replacement or refund will be processed immediately.
+            <p><b>Order Number:</b> %s</p>
+            <p><b>Reason:</b> %s</p>
+            <p><b>Status:</b> Request received and pending review.</p>
 
-            Thank you,
-            OneCart Customer Support | returns@onecart.com
-            ================================================================================
-            """,
-                order.getCustomerEmail(),
-                order.getCustomerName() != null ? order.getCustomerName() : "Customer",
-                subject,
-                order.getCustomerName() != null ? order.getCustomerName() : "Valued Customer",
+            <p>We will notify you when your request is reviewed.</p>
+            """.formatted(
+                customerName(order),
                 requestType,
                 order.getOrderNumber(),
-                requestType,
                 reason != null ? reason : "Not specified"
         );
 
-        System.out.println(message);
+        try {
+            sendHtmlEmail(
+                order.getCustomerEmail(),
+                "OneCart - " + requestType + " Request Received",
+                emailLayout("Request Received", content)
+            );
+        } catch (Exception e) {
+            System.err.println("Return email failed: " + e.getMessage());
+        }
     }
 }

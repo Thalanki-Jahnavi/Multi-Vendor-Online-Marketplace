@@ -30,10 +30,6 @@ public class HomeController {
         return "public/contact";
     }
 
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "public/login";
-    }
 
     @GetMapping("/signup")
     public String showSignupPage() {

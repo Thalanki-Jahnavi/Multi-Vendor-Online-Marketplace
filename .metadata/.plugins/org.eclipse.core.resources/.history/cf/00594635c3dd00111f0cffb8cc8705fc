@@ -1,0 +1,75 @@
+<aside class="sidebar" th:fragment="sidebar">
+
+    <div class="brand">
+        <div class="brand-logo">O</div>
+        <div>
+            <h2>OneCart</h2>
+            <span>ADMIN PANEL</span>
+        </div>
+    </div>
+
+    <div class="sidebar-label">MAIN MENU</div>
+
+    <a class="nav-link"
+       th:href="@{/admin/dashboard}"
+       th:classappend="${activePage == 'dashboard'} ? ' active' : ''">
+        <span class="nav-icon">▦</span> Dashboard
+    </a>
+
+    <div class="sidebar-label">MARKETPLACE MANAGEMENT</div>
+
+    <a class="nav-link"
+       th:href="@{/admin/customers}"
+       th:classappend="${activePage == 'customers'} ? ' active' : ''">
+        <span class="nav-icon">♙</span> Customers
+    </a>
+
+    <a class="nav-link" th:href="@{/admin/vendors}">
+        <span class="nav-icon">♧</span> Vendors
+    </a>
+
+    <a class="nav-link" th:href="@{/admin/products}">
+        <span class="nav-icon">▣</span> Products
+    </a>
+
+    <a class="nav-link" th:href="@{/admin/product-approvals}">
+        <span class="nav-icon">✓</span> Product Approvals
+        <span class="nav-count"
+              th:text="${pendingApprovals != null ? pendingApprovals : 0}">0</span>
+    </a>
+
+    <a class="nav-link" th:href="@{/admin/categories}">
+        <span class="nav-icon">▤</span> Categories
+    </a>
+
+    <a class="nav-link" th:href="@{/admin/orders}">
+        <span class="nav-icon">▧</span> Orders
+    </a>
+
+    <div class="sidebar-label">ANALYTICS</div>
+
+    <a class="nav-link" th:href="@{/admin/reports}">
+        <span class="nav-icon">▥</span> Reports &amp; Analytics
+    </a>
+
+    <div class="sidebar-label">ACCOUNT</div>
+
+    <a class="nav-link" th:href="@{/admin/profile}">
+        <span class="nav-icon">⚙</span> My Profile
+    </a>
+
+    <form th:action="@{/logout}" method="post" class="logout-form">
+        <button type="submit" class="nav-link logout-link">
+            <span class="nav-icon">↪</span> Logout
+        </button>
+    </form>
+
+    <div class="sidebar-footer">
+        <div class="footer-avatar">OC</div>
+        <div>
+            <strong>OneCart Admin</strong>
+            <span>Administrator</span>
+        </div>
+    </div>
+
+</aside>

@@ -1,3 +1,4 @@
+
 package com.vendor.entity;
 
 import jakarta.persistence.*;
@@ -11,13 +12,29 @@ public class Product {
     @Column(name = "product_id")
     private Long productId;
 
+    @Column(name = "vendor_id")
+    private Integer vendorId;
+
     @Column(name = "product_name")
     private String productName;
 
+    private String description;
+    private String category;
+    private String brand;
+    private String sku;
     private Double price;
 
     @Column(name = "discount_percentage")
     private Double discountPercentage;
+
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity;
+
+    @Column(name = "weight_kg")
+    private java.math.BigDecimal weightKg;
+
+    private String color;
+    private String size;
 
     @Column(name = "product_status")
     private String productStatus;
@@ -25,74 +42,96 @@ public class Product {
     @Column(name = "approval_status")
     private String approvalStatus;
 
-    @Column(name = "category")
-    private String category;
+    @Column(name = "is_returnable")
+    private Boolean returnable = true;
 
-    @Column(name = "vendor_id")
-    private Integer vendorId;
+    @Column(name = "is_replaceable")
+    private Boolean replaceable = false;
 
-    public Long getProductId() {
-        return productId;
+    @Column(name = "warranty_months")
+    private Integer warrantyMonths = 0;
+
+    @Column(name = "image_file_name")
+    private String imageFileName;
+
+    public Product() {
     }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
+    // Getters and setters
 
-    public String getProductName() {
-        return productName;
-    }
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
+    public Integer getVendorId() { return vendorId; }
+    public void setVendorId(Integer vendorId) { this.vendorId = vendorId; }
 
-    public Double getPrice() {
-        return price;
-    }
+    public String getProductName() { return productName; }
+    public void setProductName(String productName) { this.productName = productName; }
 
-    public void setPrice(Double price) {
-        this.price = price;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public Double getDiscountPercentage() {
-        return discountPercentage;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
+
+    public String getSku() { return sku; }
+    public void setSku(String sku) { this.sku = sku; }
+
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
+
+    public Double getDiscountPercentage() { return discountPercentage; }
     public void setDiscountPercentage(Double discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
 
-    public String getProductStatus() {
-        return productStatus;
+    public Integer getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(Integer stockQuantity) {
+        this.stockQuantity = stockQuantity;
     }
 
+    public java.math.BigDecimal getWeightKg() { return weightKg; }
+    public void setWeightKg(java.math.BigDecimal weightKg) {
+        this.weightKg = weightKg;
+    }
+
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
+
+    public String getSize() { return size; }
+    public void setSize(String size) { this.size = size; }
+
+    public String getProductStatus() { return productStatus; }
     public void setProductStatus(String productStatus) {
         this.productStatus = productStatus;
     }
 
-    public String getApprovalStatus() {
-        return approvalStatus;
-    }
-
+    public String getApprovalStatus() { return approvalStatus; }
     public void setApprovalStatus(String approvalStatus) {
         this.approvalStatus = approvalStatus;
     }
 
-    public String getCategory() {
-        return category;
+    public Boolean getReturnable() { return returnable; }
+    public void setReturnable(Boolean returnable) {
+        this.returnable = returnable;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public Boolean getReplaceable() { return replaceable; }
+    public void setReplaceable(Boolean replaceable) {
+        this.replaceable = replaceable;
     }
 
-    public Integer getVendorId() {
-        return vendorId;
+    public Integer getWarrantyMonths() { return warrantyMonths; }
+    public void setWarrantyMonths(Integer warrantyMonths) {
+        this.warrantyMonths = warrantyMonths;
     }
 
-    public void setVendorId(Integer vendorId) {
-        this.vendorId = vendorId;
+    public String getImageFileName() { return imageFileName; }
+    public void setImageFileName(String imageFileName) {
+        this.imageFileName = imageFileName;
     }
 
     @Transient
@@ -105,7 +144,7 @@ public class Product {
 
     @Transient
     public Double getSavings() {
-        if (price == null || discountPercentage == null || discountPercentage <= 0) {
+        if (price == null || discountPercentage == null) {
             return 0.0;
         }
         return price * discountPercentage / 100.0;
@@ -114,41 +153,5 @@ public class Product {
     @Transient
     public boolean hasDiscount() {
         return discountPercentage != null && discountPercentage > 0;
-    }
-
-    @Transient
-    public String getImageFileName() {
-        if (productName != null) {
-            String lower = productName.toLowerCase();
-            if (lower.contains("mug") || lower.contains("coffee")) {
-                return "Ceramic Coffee Mug.jpg";
-            } else if (lower.contains("shoe") || lower.contains("running") || lower.contains("sneaker")) {
-                return "Running Shoes.jpg";
-            } else if (lower.contains("mouse")) {
-                return "Wireless Mouse.jpg";
-            } else if (lower.contains("pack") || lower.contains("bag") || lower.contains("backpack")) {
-                return "Travel back pack.jpg";
-            } else if (lower.contains("shirt") || lower.contains("t-shirt") || lower.contains("cloth")) {
-                return "Cotton T-Shirt.jpg";
-            } else if (lower.contains("watch")) {
-                return "Smart Watch.webp";
-            } else if (lower.contains("speaker")) {
-                return "Bluetooth Speaker.png";
-            } else if (lower.contains("headphone") || lower.contains("earphone") || lower.contains("headset") || lower.contains("audio")) {
-                return "Wireless Headphones.png";
-            }
-        }
-        int index = (productId != null ? Math.abs(productId.hashCode()) : 0) % 8;
-        String[] defaults = {
-            "Ceramic Coffee Mug.jpg",
-            "Running Shoes.jpg",
-            "Wireless Mouse.jpg",
-            "Travel back pack.jpg",
-            "Cotton T-Shirt.jpg",
-            "Smart Watch.webp",
-            "Bluetooth Speaker.png",
-            "Wireless Headphones.png"
-        };
-        return defaults[index];
     }
 }
