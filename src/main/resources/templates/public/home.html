@@ -1,0 +1,683 @@
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OneCart | Shop Everything</title>
+
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar-layout.css}">
+    <link rel="stylesheet" th:href="@{/css/guest-home.css}">
+</head>
+
+<body>
+
+<div class="sidebar-layout">
+
+    <!-- ================= GUEST SIDEBAR ================= -->
+
+    <aside class="app-sidebar" sec:authorize="isAnonymous()">
+
+        <a class="sidebar-brand" th:href="@{/}">
+            <span class="sidebar-brand-icon">O</span>
+            <span>One<span class="brand-light">Cart</span></span>
+        </a>
+
+        <p class="sidebar-label">MENU</p>
+
+        <nav class="sidebar-nav">
+
+            <a class="sidebar-link active" th:href="@{/}">
+                <span class="nav-icon">⌂</span>
+                <span>Home</span>
+            </a>
+
+            <a class="sidebar-link" href="#guestProducts">
+                <span class="nav-icon">▦</span>
+                <span>Products</span>
+            </a>
+
+        </nav>
+
+        <!-- CATEGORY SECTION -->
+
+        <p class="sidebar-label sidebar-label-spaced">CATEGORIES</p>
+
+        <nav class="sidebar-nav guest-sidebar-categories">
+
+            <a class="sidebar-link guest-category-link"
+               href="#guestProducts"
+               data-category="Accessories">
+                <span class="nav-icon">✧</span>
+                <span>Accessories</span>
+            </a>
+
+            <a class="sidebar-link guest-category-link"
+               href="#guestProducts"
+               data-category="Electronics">
+                <span class="nav-icon">▣</span>
+                <span>Electronics</span>
+            </a>
+
+            <a class="sidebar-link guest-category-link"
+               href="#guestProducts"
+               data-category="Fashion">
+                <span class="nav-icon">♧</span>
+                <span>Fashion</span>
+            </a>
+
+            <a class="sidebar-link guest-category-link"
+               href="#guestProducts"
+               data-category="Home &amp; Kitchen">
+                <span class="nav-icon">⌂</span>
+                <span>Home &amp; Kitchen</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a class="sidebar-link" th:href="@{/login}">
+                <span class="nav-icon">↪</span>
+                <span>Sign In</span>
+            </a>
+
+            <a class="sidebar-signup" th:href="@{/signup}">
+                Get Started
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= CUSTOMER SIDEBAR ================= -->
+
+    <aside class="app-sidebar" sec:authorize="hasRole('CUSTOMER')">
+
+        <a class="sidebar-brand" th:href="@{/customer/dashboard}">
+            <span class="sidebar-brand-icon">O</span>
+            <span>One<span class="brand-light">Cart</span></span>
+        </a>
+
+        <p class="sidebar-label">SHOPPING</p>
+
+        <nav class="sidebar-nav">
+
+            <a class="sidebar-link active"
+               th:href="@{/customer/dashboard}">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a class="sidebar-link"
+               th:href="@{/customer/products}">
+                <span class="nav-icon">▦</span>
+                <span>Shop Products</span>
+            </a>
+
+            <a class="sidebar-link"
+               th:href="@{/customer/products}">
+                <span class="nav-icon">♡</span>
+                <span>Wishlist</span>
+            </a>
+
+            <a class="sidebar-link"
+               th:href="@{/customer/products}">
+                <span class="nav-icon">🛒</span>
+                <span>Cart</span>
+            </a>
+
+            <a class="sidebar-link"
+               th:href="@{/customer/orders}">
+                <span class="nav-icon">▤</span>
+                <span>My Orders</span>
+            </a>
+
+        </nav>
+
+        <p class="sidebar-label sidebar-label-spaced">ACCOUNT</p>
+
+        <nav class="sidebar-nav">
+
+            <a class="sidebar-link"
+               th:href="@{/customer/account}">
+                <span class="nav-icon">♙</span>
+                <span>My Account</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <form th:action="@{/logout}" method="post">
+
+                <button class="sidebar-logout" type="submit">
+                    <span class="nav-icon">↪</span>
+                    <span>Logout</span>
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN AREA ================= -->
+
+    <div class="main-shell">
+
+        <!-- ========== GUEST TOPBAR ========== -->
+
+        <header class="content-topbar guest-topbar"
+                sec:authorize="isAnonymous()">
+
+            <button class="mobile-menu-toggle"
+                    type="button"
+                    onclick="toggleOneCartSidebar()"
+                    aria-label="Toggle navigation">
+                ☰
+            </button>
+
+            <div class="guest-search-wrap">
+
+                <form class="guest-search-form" id="guestSearchForm">
+
+                    <span class="guest-search-icon">⌕</span>
+
+                    <input type="search"
+                           id="guestSearch"
+                           placeholder="Search products, brands or vendors..."
+                           aria-label="Search products">
+
+                    <button type="submit">Search</button>
+
+                </form>
+
+            </div>
+
+            <div class="guest-header-actions">
+
+                <a class="guest-header-icon"
+                   th:href="@{/login}"
+                   title="Profile"
+                   aria-label="Sign in to view profile">♙</a>
+
+                <a class="guest-header-icon"
+                   th:href="@{/login}"
+                   title="Wishlist"
+                   aria-label="Sign in to view wishlist">♡</a>
+
+                <a class="guest-header-icon"
+                   th:href="@{/login}"
+                   title="Cart"
+                   aria-label="Sign in to view cart">🛒</a>
+
+                <a class="guest-signin-button" th:href="@{/login}">
+                    Sign In
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- ========== CUSTOMER TOPBAR ========== -->
+
+        <header class="content-topbar"
+                sec:authorize="hasRole('CUSTOMER')">
+
+            <button class="mobile-menu-toggle"
+                    type="button"
+                    onclick="toggleOneCartSidebar()"
+                    aria-label="Toggle navigation">
+                ☰
+            </button>
+
+            <div class="topbar-heading">
+
+                <span class="topbar-eyebrow">
+                    ONECART MARKETPLACE
+                </span>
+
+                <h1>Shop Products</h1>
+
+            </div>
+
+            <div class="topbar-actions">
+
+                <a class="topbar-icon-link"
+                   th:href="@{/customer/products}"
+                   title="Wishlist">♡</a>
+
+                <a class="topbar-icon-link"
+                   th:href="@{/customer/products}"
+                   title="Cart">🛒</a>
+
+                <a class="topbar-profile"
+                   th:href="@{/customer/account}">♙</a>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             GUEST PRODUCT PAGE
+        ================================================== -->
+
+        <main class="guest-products-main"
+              id="guestProducts"
+              sec:authorize="isAnonymous()">
+
+            <div class="guest-products-heading">
+
+                <div>
+
+                    <span class="guest-eyebrow">
+                        ONECART MARKETPLACE
+                    </span>
+
+                    <h1>Discover Products</h1>
+
+                    <p>
+                        Explore products from trusted OneCart sellers.
+                    </p>
+
+                </div>
+
+                <span class="guest-product-count"
+                      id="guestProductCount"
+                      th:text="${products != null ? products.size() + ' products' : '0 products'}">
+                    0 products
+                </span>
+
+            </div>
+
+
+            <!-- CATEGORY AND SORTING -->
+
+            <div class="guest-filter-bar">
+
+                <div class="guest-category-area">
+
+                    <span class="filter-label">Categories</span>
+
+                    <div class="guest-category-list"
+                         id="guestCategoryList">
+
+                        <button class="category-filter active"
+                                type="button"
+                                data-category="all">
+                            All
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="guest-sort-area">
+
+                    <label for="guestSort">Sort by</label>
+
+                    <select id="guestSort">
+
+                        <option value="newest">Newest</option>
+
+                        <option value="price-low">
+                            Price: Low to High
+                        </option>
+
+                        <option value="price-high">
+                            Price: High to Low
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT GRID -->
+
+            <div class="guest-product-grid"
+                 id="guestProductGrid"
+                 th:if="${products != null and !products.isEmpty()}">
+
+                <article class="guest-product-card"
+                         th:each="product : ${products}"
+                         th:attr="data-name=${product.productName},
+                                  data-category=${product.category},
+                                  data-price=${product.discountedPrice != null ? product.discountedPrice : product.price},
+                                  data-id=${product.productId},
+                                  data-vendor=${product.vendorId}">
+
+                    <div class="guest-product-image-wrap">
+
+                        <a th:href="@{/login}"
+                           class="guest-image-link">
+
+                            <!-- CORRECTED GUEST PRODUCT IMAGE -->
+
+                            <img class="guest-product-image"
+                                 th:if="${product.imageFileName != null and !#strings.isEmpty(product.imageFileName)}"
+                                 th:src="${product.imageFileName}"
+                                 th:alt="${product.productName}"
+                                 loading="lazy"
+                                 onerror="this.onerror=null;
+                                          this.style.display='none';
+                                          this.nextElementSibling.style.display='grid';">
+
+                            <!-- FALLBACK IMAGE -->
+
+                            <div class="guest-image-placeholder"
+                                 th:style="${product.imageFileName != null and !#strings.isEmpty(product.imageFileName)}
+                                           ? 'display:none'
+                                           : 'display:grid'">
+
+                                <span>🛍️</span>
+
+                            </div>
+
+                        </a>
+
+                        <span class="guest-discount-badge"
+                              th:if="${product.hasDiscount()}"
+                              th:text="${#numbers.formatDecimal(product.discountPercentage, 1, 0) + '% OFF'}">
+                            10% OFF
+                        </span>
+
+                        <a class="guest-wishlist-button"
+                           th:href="@{/login}"
+                           aria-label="Sign in to add to wishlist">
+                            ♡
+                        </a>
+
+                    </div>
+
+
+                    <div class="guest-product-info">
+
+                        <span class="guest-product-category"
+                              th:text="${product.category != null ? product.category : 'GENERAL'}">
+                            CATEGORY
+                        </span>
+
+                        <h3 th:text="${product.productName}">
+                            Product name
+                        </h3>
+
+
+                        <!-- VENDOR NAME -->
+
+                        <p class="guest-vendor-name">
+
+                            <span>Sold by</span>
+
+                            <strong th:each="vendor : ${vendors}"
+                                    th:if="${vendor.userId == product.vendorId}"
+                                    th:text="${vendor.businessName != null and !#strings.isEmpty(vendor.businessName)
+                                               ? vendor.businessName
+                                               : vendor.firstName + ' ' + vendor.lastName}">
+                                Vendor name
+                            </strong>
+
+                            <strong th:if="${vendors == null or vendors.isEmpty()}">
+                                OneCart Seller
+                            </strong>
+
+                        </p>
+
+
+                        <!-- PRICE -->
+
+                        <div class="guest-price-row">
+
+                            <strong class="guest-product-price"
+                                    th:text="${'₹' + #numbers.formatDecimal(product.discountedPrice != null ? product.discountedPrice : product.price, 1, 2)}">
+                                ₹0.00
+                            </strong>
+
+                            <del th:if="${product.hasDiscount()}"
+                                 th:text="${'₹' + #numbers.formatDecimal(product.price, 1, 2)}">
+                                ₹0.00
+                            </del>
+
+                        </div>
+
+
+                        <a class="guest-add-cart"
+                           th:href="@{/login}">
+
+                            <span>Add to Cart</span>
+
+                            <span>→</span>
+
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+
+            <!-- EMPTY DATABASE STATE -->
+
+            <div class="guest-empty-state"
+                 th:if="${products == null or products.isEmpty()}">
+
+                <div>🛍️</div>
+
+                <h2>No products available yet</h2>
+
+                <p>
+                    Approved products from our vendors will appear here.
+                </p>
+
+            </div>
+
+
+            <!-- NO SEARCH RESULTS -->
+
+            <div class="guest-empty-state"
+                 id="guestNoResults"
+                 style="display:none">
+
+                <div>⌕</div>
+
+                <h2>No matching products found</h2>
+
+                <p>
+                    Try another search or choose a different category.
+                </p>
+
+                <button type="button"
+                        class="guest-reset-button"
+                        onclick="resetGuestFilters()">
+                    Clear filters
+                </button>
+
+            </div>
+
+        </main>
+
+
+        <!-- =================================================
+             CUSTOMER PRODUCT AREA
+        ================================================== -->
+
+        <main class="products-main"
+              id="products"
+              sec:authorize="hasRole('CUSTOMER')">
+
+            <div class="products-heading">
+
+                <div>
+
+                    <span class="products-eyebrow">
+                        EXPLORE OUR COLLECTION
+                    </span>
+
+                    <h2>Popular Products</h2>
+
+                    <p>
+                        Discover products from OneCart sellers.
+                    </p>
+
+                </div>
+
+                <span class="products-count"
+                      th:text="${products != null ? products.size() + ' products' : 'Products'}">
+                    Products
+                </span>
+
+            </div>
+
+
+            <div class="product-grid"
+                 th:if="${products != null and !products.isEmpty()}">
+
+                <article class="product-card"
+                         th:each="product : ${products}">
+
+                    <div class="product-image-wrap">
+
+                        <a th:href="@{/customer/products(keyword=${product.productName})}"
+                           class="sidebar-product-image-link">
+
+                            <!-- CUSTOMER IMAGE LOGIC RETAINED -->
+
+                            <img class="product-image"
+                                 th:src="@{'/images/products/' + ${product.imageFileName}}"
+                                 th:alt="${product.productName}"
+                                 loading="lazy"
+                                 onerror="this.onerror=null;this.src='/images/products/Ceramic Coffee Mug.jpg';">
+
+                        </a>
+
+                        <span class="product-badge">
+                            Popular
+                        </span>
+
+                        <a class="wishlist-button"
+                           th:href="@{/customer/products}"
+                           aria-label="Open wishlist">
+                            ♡
+                        </a>
+
+                    </div>
+
+
+                    <div class="product-info">
+
+                        <span class="product-category"
+                              th:text="${product.category != null ? product.category : 'ONECART FIND'}">
+                            ONECART FIND
+                        </span>
+
+                        <a th:href="@{/customer/products(keyword=${product.productName})}">
+
+                            <h3 th:text="${product.productName}">
+                                Product name
+                            </h3>
+
+                        </a>
+
+
+                        <div class="product-price-row">
+
+                            <strong class="product-price"
+                                    th:text="${product.discountedPrice != null ? '₹' + #numbers.formatDecimal(product.discountedPrice, 1, 2) : '₹' + #numbers.formatDecimal(product.price, 1, 2)}">
+                                ₹0.00
+                            </strong>
+
+                            <del th:if="${product.hasDiscount()}"
+                                 style="font-size:13px;color:#68817e;margin-left:6px;">
+
+                                ₹<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">
+                                    0.00
+                                </span>
+
+                            </del>
+
+                        </div>
+
+
+                        <a class="add-to-cart"
+                           th:href="@{/customer/products(keyword=${product.productName})}">
+
+                            View product <span>→</span>
+
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+
+            <div class="empty-state"
+                 th:if="${products == null or products.isEmpty()}">
+
+                <div class="empty-icon">🛍️</div>
+
+                <h3>Products are on their way</h3>
+
+                <p>
+                    Check back soon to discover new finds from our vendors.
+                </p>
+
+            </div>
+
+        </main>
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <footer class="sidebar-page-footer">
+
+            <span>© 2026 OneCart. All rights reserved.</span>
+
+            <span>Made for everyday discoveries ♡</span>
+
+        </footer>
+
+    </div>
+
+</div>
+
+
+<!-- MOBILE SIDEBAR OVERLAY -->
+
+<div class="sidebar-mobile-overlay"
+     id="oneCartSidebarOverlay"
+     onclick="toggleOneCartSidebar()">
+</div>
+
+
+<!-- SIDEBAR JAVASCRIPT -->
+
+<script>
+
+    function toggleOneCartSidebar() {
+        document.body.classList.toggle("sidebar-open");
+    }
+
+</script>
+
+
+<!-- GUEST HOME JAVASCRIPT -->
+
+<script th:src="@{/js/guest-home.js}"></script>
+
+</body>
+</html>

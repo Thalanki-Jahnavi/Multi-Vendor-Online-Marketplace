@@ -1,0 +1,1089 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Orders | OneCart Seller Center</title>
+
+    <link rel="stylesheet" th:href="@{/css/vendor-dashboard.css}">
+
+    <style>
+        .orders-content {
+            padding: 30px;
+        }
+
+        .orders-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .orders-heading h1 {
+            margin: 8px 0;
+            color: #123e3a;
+            font-size: 28px;
+        }
+
+        .orders-heading p {
+            color: #78918c;
+            font-size: 13px;
+        }
+
+        .orders-eyebrow {
+            color: #087e78;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        /* SUMMARY CARDS */
+
+        .orders-summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            padding: 22px;
+            background: white;
+            border: 1px solid #e4eeeb;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(18, 62, 58, .035);
+        }
+
+        .summary-card span {
+            color: #78918c;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .5px;
+        }
+
+        .summary-card h2 {
+            margin: 12px 0 5px;
+            color: #123e3a;
+            font-size: 30px;
+        }
+
+        .summary-card small {
+            color: #78918c;
+            font-size: 11px;
+        }
+
+        .summary-card.processing h2 {
+            color: #b47b00;
+        }
+
+        .summary-card.delivered h2 {
+            color: #168052;
+        }
+
+        .summary-card.cancelled h2 {
+            color: #bd5147;
+        }
+
+        /* ORDER CARD */
+
+        .orders-card {
+            padding: 24px;
+            background: white;
+            border: 1px solid #e4eeeb;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(18, 62, 58, .035);
+        }
+
+        .orders-card-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .orders-card-heading h3 {
+            color: #123e3a;
+            font-size: 17px;
+        }
+
+        .orders-card-heading p {
+            margin-top: 5px;
+            color: #78918c;
+            font-size: 12px;
+        }
+
+        /* SEARCH AND FILTER */
+
+        .orders-toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .orders-search {
+            flex: 1;
+            min-width: 200px;
+            height: 43px;
+            padding: 0 13px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            outline: none;
+            color: #123e3a;
+            background: white;
+            font-size: 12px;
+        }
+
+        .orders-filter {
+            height: 43px;
+            padding: 0 12px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            outline: none;
+            background: white;
+            color: #123e3a;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .orders-search:focus,
+        .orders-filter:focus {
+            border-color: #087e78;
+        }
+
+        /* TABLE */
+
+        .orders-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .orders-table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+        }
+
+        .orders-table thead {
+            background: #f0f7f5;
+        }
+
+        .orders-table th {
+            padding: 15px;
+            text-align: left;
+            color: #54736d;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .orders-table td {
+            padding: 17px 15px;
+            border-bottom: 1px solid #edf2f0;
+            color: #23463f;
+            font-size: 12px;
+            vertical-align: top;
+        }
+
+        .orders-table tbody tr:hover {
+            background: #f8fbfa;
+        }
+
+        .order-number {
+            color: #087e78;
+            font-weight: 800;
+        }
+
+        .order-date {
+            display: block;
+            margin-top: 6px;
+            color: #78918c;
+            font-size: 10px;
+        }
+
+        .customer-name {
+            display: block;
+            color: #123e3a;
+            font-weight: 700;
+        }
+
+        .customer-email {
+            display: block;
+            margin-top: 5px;
+            color: #78918c;
+            font-size: 10px;
+        }
+
+        /* ORDERED ITEMS */
+
+        .ordered-items {
+            min-width: 150px;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .ordered-items li {
+            margin-bottom: 8px;
+            color: #123e3a;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .ordered-items li:last-child {
+            margin-bottom: 0;
+        }
+
+        .ordered-item-quantity {
+            color: #78918c;
+            font-size: 10px;
+        }
+
+        /* AMOUNT */
+
+        .vendor-subtotal {
+            color: #087e78;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        /* STATUS BADGES */
+
+        .order-status-badge,
+        .payment-status-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .confirmed {
+            background: #fff3d9;
+            color: #a66c00;
+        }
+
+        .delivered {
+            background: #e1f5ed;
+            color: #168052;
+        }
+
+        .cancelled {
+            background: #fce9e7;
+            color: #bd5147;
+        }
+
+        .return_requested,
+        .exchange_requested {
+            background: #f0eaff;
+            color: #7250a8;
+        }
+
+        .paid {
+            background: #e1f5ed;
+            color: #168052;
+        }
+
+        .pending {
+            background: #fff3d9;
+            color: #a66c00;
+        }
+
+        .refunded {
+            background: #fce9e7;
+            color: #bd5147;
+        }
+
+        /* DETAILS */
+
+        .order-details summary {
+            color: #087e78;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .order-details-content {
+            min-width: 190px;
+            max-width: 260px;
+            margin-top: 12px;
+            padding: 13px;
+            background: #f3f8f6;
+            border-radius: 9px;
+            white-space: normal;
+        }
+
+        .order-details-content strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #123e3a;
+            font-size: 11px;
+        }
+
+        .order-details-content p {
+            margin: 0 0 10px;
+            color: #66827b;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .order-details-content p:last-child {
+            margin-bottom: 0;
+        }
+
+		/* VENDOR FULFILMENT STATUS */
+
+		.fulfillment-status {
+		    display: inline-block;
+		    padding: 6px 10px;
+		    border-radius: 20px;
+		    background: #e5f4f0;
+		    color: #087e78;
+		    font-size: 10px;
+		    font-weight: 700;
+		    text-transform: uppercase;
+		}
+
+		.fulfillment-update-form {
+		    display: flex;
+		    flex-direction: column;
+		    gap: 7px;
+		    margin-top: 10px;
+		    min-width: 120px;
+		}
+
+		.fulfillment-update-form select {
+		    padding: 7px;
+		    border: 1px solid #dce8e5;
+		    border-radius: 6px;
+		    color: #123e3a;
+		    background: white;
+		    font-size: 11px;
+		}
+
+		.fulfillment-update-form button {
+		    padding: 8px 12px;
+		    border: none;
+		    border-radius: 6px;
+		    background: #087e78;
+		    color: white;
+		    font-size: 11px;
+		    font-weight: 700;
+		    cursor: pointer;
+		}
+
+		.fulfillment-update-form button:hover {
+		    background: #123e3a;
+		}
+		
+        /* EMPTY STATE */
+
+        .orders-empty {
+            padding: 65px 20px;
+            text-align: center;
+        }
+
+        .orders-empty-icon {
+            font-size: 42px;
+        }
+
+        .orders-empty h3 {
+            margin: 15px 0 8px;
+            color: #123e3a;
+            font-size: 19px;
+        }
+
+        .orders-empty p {
+            color: #78918c;
+            font-size: 12px;
+        }
+
+        .no-order-results {
+            display: none;
+            padding: 25px;
+            text-align: center;
+            color: #78918c;
+            font-size: 13px;
+        }
+
+        /* INFORMATION NOTE */
+
+        .orders-info-note {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border: 1px solid #dcece7;
+            border-radius: 9px;
+            background: #f0f7f5;
+            color: #66827b;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .orders-info-note strong {
+            color: #123e3a;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 1050px) {
+            .orders-summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media(max-width: 650px) {
+            .orders-content {
+                padding: 18px 13px;
+            }
+
+            .orders-heading h1 {
+                font-size: 23px;
+            }
+
+            .orders-summary {
+                gap: 10px;
+            }
+
+            .summary-card {
+                padding: 16px;
+            }
+
+            .orders-card {
+                padding: 14px;
+            }
+
+            .orders-toolbar {
+                flex-direction: column;
+            }
+
+            .orders-search,
+            .orders-filter {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">O</div>
+
+            <div>
+                <h2>OneCart</h2>
+                <span>SELLER CENTER</span>
+            </div>
+        </div>
+
+        <!-- STORE INFORMATION -->
+        <div class="store-info">
+
+            <div class="store-avatar">🏪</div>
+
+            <div class="store-text">
+                <strong th:text="${vendor.businessName != null and !vendor.businessName.isEmpty() ? vendor.businessName : 'My Store'}">
+                    My Store
+                </strong>
+
+                <small>Vendor Account</small>
+            </div>
+
+        </div>
+
+        <!-- SIDEBAR NAVIGATION -->
+        <nav class="sidebar-nav">
+
+            <p class="nav-heading">MAIN MENU</p>
+
+            <a th:href="@{/vendor/dashboard}" class="nav-link">
+                <span class="nav-icon">▦</span>
+                Dashboard
+            </a>
+
+            <p class="nav-heading">STORE MANAGEMENT</p>
+
+            <a th:href="@{/vendor/store}" class="nav-link">
+                <span class="nav-icon">🏬</span>
+                My Store
+            </a>
+
+            <a th:href="@{/vendor/products}" class="nav-link">
+                <span class="nav-icon">▣</span>
+                Products
+            </a>
+
+            <a th:href="@{/vendor/inventory}" class="nav-link">
+                <span class="nav-icon">▤</span>
+                Inventory
+            </a>
+
+            <p class="nav-heading">BUSINESS</p>
+
+            <a th:href="@{/vendor/orders}" class="nav-link active">
+                <span class="nav-icon">▧</span>
+                Orders
+            </a>
+
+
+            <p class="nav-heading">ACCOUNT</p>
+
+            <a th:href="@{/vendor/profile}" class="nav-link">
+                <span class="nav-icon">♙</span>
+                My Profile
+            </a>
+
+        </nav>
+
+
+        <!-- SIDEBAR BOTTOM -->
+        <div class="sidebar-bottom">
+
+            <div class="help-card">
+                <div class="help-icon">?</div>
+
+                <strong>Need help?</strong>
+
+                <p>
+                    Manage your store with OneCart Seller Center.
+                </p>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-button">
+                    ↪ Logout
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button class="menu-toggle"
+                        id="menuToggle"
+                        type="button"
+                        aria-label="Toggle menu">
+                    ☰
+                </button>
+
+                <div>
+                    <h2>Orders</h2>
+                    <p>View and manage orders containing your products.</p>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="profile-area">
+
+                    <div class="profile-avatar">
+                        <span th:text="${vendor.firstName != null and !vendor.firstName.isEmpty() ? #strings.substring(vendor.firstName, 0, 1).toUpperCase() : 'V'}">
+                            V
+                        </span>
+                    </div>
+
+                    <div class="profile-details">
+                        <strong th:text="${(vendor.firstName != null ? vendor.firstName : '') + ' ' + (vendor.lastName != null ? vendor.lastName : '')}">
+                            Vendor Name
+                        </strong>
+
+                        <small>Vendor</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+        <section class="page-content orders-content">
+
+            <!-- PAGE HEADING -->
+            <section class="orders-heading">
+
+                <div>
+
+                    <span class="orders-eyebrow">
+                        SELLER CENTER / BUSINESS / ORDERS
+                    </span>
+
+                    <h1>Order Management</h1>
+
+                    <p>
+                        Welcome,
+                        <strong th:text="${vendor.businessName}">
+                            Vendor
+                        </strong>.
+                        Track customer orders containing your products.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- SUMMARY CARDS -->
+            <section class="orders-summary">
+
+                <div class="summary-card">
+                    <span>TOTAL ORDERS</span>
+
+                    <h2 th:text="${totalOrders}">0</h2>
+
+                    <small>Orders containing your products</small>
+                </div>
+
+
+                <div class="summary-card processing">
+                    <span>TO PROCESS</span>
+
+                    <h2 th:text="${processingOrders}">0</h2>
+
+                    <small>Customer orders confirmed</small>
+                </div>
+
+
+                <div class="summary-card delivered">
+                    <span>DELIVERED</span>
+
+                    <h2 th:text="${deliveredOrders}">0</h2>
+
+                    <small>Successfully delivered</small>
+                </div>
+
+
+                <div class="summary-card cancelled">
+                    <span>CANCELLED</span>
+
+                    <h2 th:text="${cancelledOrders}">0</h2>
+
+                    <small>Cancelled customer orders</small>
+                </div>
+
+            </section>
+
+
+            <!-- ORDERS TABLE CARD -->
+            <section class="orders-card">
+
+                <div class="orders-card-heading">
+
+                    <div>
+                        <h3>Customer Orders</h3>
+
+                        <p>
+                            Orders that contain products from your store.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- SEARCH AND FILTER -->
+                <div class="orders-toolbar"
+                     th:if="${!#lists.isEmpty(vendorOrders)}">
+
+                    <input type="search"
+                           id="orderSearch"
+                           class="orders-search"
+                           placeholder="Search order number or customer...">
+
+                    <select id="orderStatusFilter"
+                            class="orders-filter">
+
+                        <option value="">All Order Status</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="return_requested">Return Requested</option>
+                        <option value="exchange_requested">Exchange Requested</option>
+
+                    </select>
+
+                    <select id="paymentFilter"
+                            class="orders-filter">
+
+                        <option value="">All Payment Status</option>
+                        <option value="paid">Paid</option>
+                        <option value="pending">Pending</option>
+                        <option value="refunded">Refunded</option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- EMPTY STATE -->
+                <div class="orders-empty"
+                     th:if="${#lists.isEmpty(vendorOrders)}">
+
+                    <div class="orders-empty-icon">📦</div>
+
+                    <h3>No orders yet</h3>
+
+                    <p>
+                        Customer orders containing your products
+                        will appear here.
+                    </p>
+
+                </div>
+
+
+                <!-- ORDERS TABLE -->
+                <div class="orders-table-wrapper"
+                     th:unless="${#lists.isEmpty(vendorOrders)}">
+
+                    <table class="orders-table" id="ordersTable">
+
+                        <thead>
+                            <tr>
+                                <th>Order Details</th>
+                                <th>Customer</th>
+                                <th>Your Products</th>
+                                <th>Your Subtotal</th>
+                                <th>Payment</th>
+                                <th>Order Status</th>
+                                <th>More Details</th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+
+                            <tr th:each="order : ${vendorOrders}"
+                                th:attr="data-order=${order.orderNumber},
+                                         data-customer=${order.customerName},
+                                         data-status=${order.orderStatus},
+                                         data-payment=${order.paymentStatus}">
+
+                                <!-- ORDER DETAILS -->
+                                <td>
+
+                                    <strong class="order-number"
+                                            th:text="${order.orderNumber}">
+                                        OD-12345
+                                    </strong>
+
+                                    <span class="order-date"
+                                          th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'dd MMM yyyy, hh:mm a') : 'Date not available'}">
+                                        10 Nov 2026
+                                    </span>
+
+                                </td>
+
+
+                                <!-- CUSTOMER -->
+                                <td>
+
+                                    <strong class="customer-name"
+                                            th:text="${order.customerName != null ? order.customerName : 'Customer'}">
+                                        Customer
+                                    </strong>
+
+                                    <span class="customer-email"
+                                          th:text="${order.customerEmail}">
+                                        customer@email.com
+                                    </span>
+
+                                </td>
+
+
+                                <!-- VENDOR PRODUCTS ONLY -->
+                                <td>
+
+                                    <ul class="ordered-items">
+
+                                        <li th:each="item : ${order.items}">
+
+                                            <strong th:text="${item.productName}">
+                                                Product Name
+                                            </strong>
+
+                                            <br>
+
+                                            <span class="ordered-item-quantity">
+                                                Qty:
+                                                <span th:text="${item.quantity}">
+                                                    1
+                                                </span>
+                                                × ₹<span th:text="${item.price}">
+                                                    0
+                                                </span>
+                                            </span>
+
+                                        </li>
+
+                                    </ul>
+
+                                </td>
+
+
+                                <!-- VENDOR SUBTOTAL -->
+                                <td>
+
+                                    <span class="vendor-subtotal">
+                                        ₹<span th:text="${#numbers.formatDecimal(order.vendorSubtotal, 1, 2)}">
+                                            0.00
+                                        </span>
+                                    </span>
+
+                                </td>
+
+
+                                <!-- PAYMENT -->
+                                <td>
+
+                                    <span class="payment-status-badge"
+                                          th:classappend="${order.paymentStatus != null ? #strings.toLowerCase(order.paymentStatus) : 'pending'}"
+                                          th:text="${order.paymentStatus != null ? order.paymentStatus : 'N/A'}">
+                                        PAID
+                                    </span>
+
+                                    <span class="order-date"
+                                          th:text="${order.paymentMethod}">
+                                        UPI
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ORDER STATUS -->
+                                <td>
+
+                                    <span class="order-status-badge"
+                                          th:classappend="${order.orderStatus != null ? #strings.toLowerCase(order.orderStatus) : 'unknown'}"
+                                          th:text="${order.orderStatus != null ? #strings.replace(order.orderStatus, '_', ' ') : 'N/A'}">
+                                        CONFIRMED
+                                    </span>
+
+                                </td>
+
+
+                                <!-- MORE DETAILS -->
+                                <td>
+
+                                    <details class="order-details">
+
+                                        <summary>View details</summary>
+
+                                        <div class="order-details-content">
+
+                                            <strong>Customer Contact</strong>
+
+                                            <p>
+                                                <span th:text="${order.customerPhone != null ? order.customerPhone : 'Not provided'}">
+                                                    Phone
+                                                </span>
+                                            </p>
+
+                                            <strong>Shipping Address</strong>
+
+                                            <p th:text="${order.shippingAddress != null ? order.shippingAddress : 'Address not available'}">
+                                                Shipping Address
+                                            </p>
+
+                                            <strong>Vendor Item Subtotal</strong>
+
+                                            <p>
+                                                ₹<span th:text="${#numbers.formatDecimal(order.vendorSubtotal, 1, 2)}">
+                                                    0.00
+                                                </span>
+                                            </p>
+
+                                            <p>
+                                                <small>
+                                                    This subtotal includes only products
+                                                    belonging to your store.
+                                                </small>
+                                            </p>
+
+                                        </div>
+
+                                    </details>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+
+                    <div class="no-order-results" id="noOrderResults">
+                        No matching orders found.
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- INFORMATION NOTE -->
+            <div class="orders-info-note">
+
+                <strong>Important:</strong>
+
+                The order status shown here belongs to the overall
+                customer order. It is displayed for reference only.
+                Vendor-specific fulfilment status updates are not
+                enabled in this first version.
+
+            </div>
+
+
+            <!-- FOOTER -->
+            <footer class="footer">
+                © 2026 OneCart. Vendor Seller Center.
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- SEARCH AND FILTER -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput =
+        document.getElementById("orderSearch");
+
+    const statusFilter =
+        document.getElementById("orderStatusFilter");
+
+    const paymentFilter =
+        document.getElementById("paymentFilter");
+
+    const table =
+        document.getElementById("ordersTable");
+
+    const noResults =
+        document.getElementById("noOrderResults");
+
+
+    function filterOrders() {
+
+        if (!table) {
+            return;
+        }
+
+        const keyword =
+            searchInput.value.toLowerCase().trim();
+
+        const selectedStatus =
+            statusFilter.value.toLowerCase();
+
+        const selectedPayment =
+            paymentFilter.value.toLowerCase();
+
+        const rows =
+            table.querySelectorAll("tbody tr");
+
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+
+            const orderNumber =
+                (row.dataset.order || "").toLowerCase();
+
+            const customer =
+                (row.dataset.customer || "").toLowerCase();
+
+            const status =
+                (row.dataset.status || "").toLowerCase();
+
+            const payment =
+                (row.dataset.payment || "").toLowerCase();
+
+            const matchesSearch =
+                orderNumber.includes(keyword) ||
+                customer.includes(keyword);
+
+            const matchesStatus =
+                selectedStatus === "" ||
+                status === selectedStatus;
+
+            const matchesPayment =
+                selectedPayment === "" ||
+                payment === selectedPayment;
+
+            const visible =
+                matchesSearch &&
+                matchesStatus &&
+                matchesPayment;
+
+            row.style.display =
+                visible ? "" : "none";
+
+            if (visible) {
+                visibleCount++;
+            }
+
+        });
+
+        if (noResults) {
+            noResults.style.display =
+                visibleCount === 0 ? "block" : "none";
+        }
+
+    }
+
+
+    if (searchInput) {
+        searchInput.addEventListener(
+            "input",
+            filterOrders
+        );
+    }
+
+    if (statusFilter) {
+        statusFilter.addEventListener(
+            "change",
+            filterOrders
+        );
+    }
+
+    if (paymentFilter) {
+        paymentFilter.addEventListener(
+            "change",
+            filterOrders
+        );
+    }
+
+});
+</script>
+
+<script th:src="@{/js/vendor-dashboard.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<!-- ================================================= -->
+<!-- GUEST SIDEBAR -->
+<!-- ================================================= -->
+
+<aside th:fragment="guestSidebar(activePage)" class="app-sidebar">
+
+    <a class="sidebar-brand" th:href="@{/}">
+        <span class="sidebar-brand-icon">O</span>
+        <span>One<span class="brand-light">Cart</span></span>
+    </a>
+
+    <p class="sidebar-label">MENU</p>
+
+    <nav class="sidebar-nav">
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'home'} ? ' active' : ''"
+           th:href="@{/}">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'products'} ? ' active' : ''"
+           th:href="@{/}">
+            <span class="nav-icon">▦</span>
+            <span>Products</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'about'} ? ' active' : ''"
+           th:href="@{/about}">
+            <span class="nav-icon">ⓘ</span>
+            <span>About Us</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'contact'} ? ' active' : ''"
+           th:href="@{/contact}">
+            <span class="nav-icon">✉</span>
+            <span>Contact Us</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <a class="sidebar-link" th:href="@{/login}">
+            <span class="nav-icon">♙</span>
+            <span>Sign In</span>
+        </a>
+
+        <a class="sidebar-signup" th:href="@{/signup}">
+            Create Account
+        </a>
+
+    </div>
+
+</aside>
+
+
+<!-- ================================================= -->
+<!-- CUSTOMER SIDEBAR -->
+<!-- ================================================= -->
+
+<aside th:fragment="customerSidebar(activePage)" class="app-sidebar">
+
+    <a class="sidebar-brand" th:href="@{/customer/dashboard}">
+        <span class="sidebar-brand-icon">O</span>
+        <span>One<span class="brand-light">Cart</span></span>
+    </a>
+
+    <p class="sidebar-label">SHOPPING</p>
+
+    <nav class="sidebar-nav">
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'dashboard'} ? ' active' : ''"
+           th:href="@{/customer/dashboard}">
+            <span class="nav-icon">⌂</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'products'} ? ' active' : ''"
+           th:href="@{/customer/products}">
+            <span class="nav-icon">▦</span>
+            <span>Shop Products</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'orders'} ? ' active' : ''"
+           th:href="@{/customer/orders}">
+            <span class="nav-icon">▤</span>
+            <span>My Orders</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'account'} ? ' active' : ''"
+           th:href="@{/customer/account}">
+            <span class="nav-icon">♙</span>
+            <span>My Account</span>
+        </a>
+
+    </nav>
+
+    <p class="sidebar-label sidebar-label-spaced">QUICK ACCESS</p>
+
+    <nav class="sidebar-nav">
+
+        <a class="sidebar-link"
+           th:href="@{/customer/products}">
+            <span class="nav-icon">♡</span>
+            <span>Wishlist</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:href="@{/customer/products}">
+            <span class="nav-icon">🛒</span>
+            <span>Cart</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <a class="sidebar-link"
+           th:href="@{/customer/account}">
+            <span class="nav-icon">⚙</span>
+            <span>Profile Settings</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post">
+
+            <button class="sidebar-logout" type="submit">
+                <span class="nav-icon">↪</span>
+                <span>Logout</span>
+            </button>
+
+        </form>
+
+    </div>
+
+</aside>
+
+
+<!-- ================================================= -->
+<!-- ADMIN SIDEBAR -->
+<!-- ================================================= -->
+
+<aside th:fragment="adminSidebar" class="app-sidebar">
+
+    <a class="sidebar-brand" th:href="@{/admin/dashboard}">
+        <span class="sidebar-brand-icon">O</span>
+        <span>One<span class="brand-light">Cart</span></span>
+    </a>
+
+    <p class="sidebar-label">MAIN MENU</p>
+
+    <nav class="sidebar-nav">
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'dashboard'} ? ' active' : ''"
+           th:href="@{/admin/dashboard}">
+            <span class="nav-icon">⌂</span>
+            <span>Dashboard</span>
+        </a>
+
+    </nav>
+
+    <p class="sidebar-label sidebar-label-spaced">
+        MARKETPLACE MANAGEMENT
+    </p>
+
+    <nav class="sidebar-nav">
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'customers'} ? ' active' : ''"
+           th:href="@{/admin/customers}">
+            <span class="nav-icon">♙</span>
+            <span>Customers</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'vendors'} ? ' active' : ''"
+           th:href="@{/admin/vendors}">
+            <span class="nav-icon">♧</span>
+            <span>Vendors</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'products'} ? ' active' : ''"
+           th:href="@{/admin/products}">
+            <span class="nav-icon">▦</span>
+            <span>Products</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'approvals'} ? ' active' : ''"
+           th:href="@{/admin/product-approvals}">
+            <span class="nav-icon">✓</span>
+            <span>Product Approvals</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'categories'} ? ' active' : ''"
+           th:href="@{/admin/categories}">
+            <span class="nav-icon">▤</span>
+            <span>Categories</span>
+        </a>
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'orders'} ? ' active' : ''"
+           th:href="@{/admin/orders}">
+            <span class="nav-icon">▣</span>
+            <span>Orders</span>
+        </a>
+
+    </nav>
+
+    <p class="sidebar-label sidebar-label-spaced">
+        ANALYTICS
+    </p>
+
+    <nav class="sidebar-nav">
+
+        <a class="sidebar-link"
+           th:classappend="${activePage == 'reports'} ? ' active' : ''"
+           th:href="@{/admin/reports}">
+            <span class="nav-icon">▥</span>
+            <span>Reports &amp; Analytics</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+       
+        <form th:action="@{/logout}" method="post">
+
+            <button class="sidebar-logout" type="submit">
+                <span class="nav-icon">↪</span>
+                <span>Logout</span>
+            </button>
+
+        </form>
+
+    </div>
+
+</aside>
+
+</body>
+</html>

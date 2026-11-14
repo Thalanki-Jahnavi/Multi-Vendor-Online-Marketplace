@@ -1,0 +1,43 @@
+package com.vendor.controller;
+
+import com.vendor.repository.UserRepository;
+import com.vendor.service.ProductService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class HomeController {
+
+    private final ProductService productService;
+    private final UserRepository userRepository;
+
+    public HomeController(ProductService productService,
+                          UserRepository userRepository) {
+        this.productService = productService;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/")
+    public String showHomePage(Model model) {
+        model.addAttribute("products", productService.getApprovedProducts());
+        model.addAttribute("vendors", userRepository.findByRoleIgnoreCase("vendor"));
+        return "public/home";
+    }
+
+    @GetMapping("/contact")
+    public String showContactPage() {
+        return "public/contact";
+    }
+
+
+    @GetMapping("/signup")
+    public String showSignupPage() {
+        return "public/signup";
+    }
+    
+    @GetMapping("/forgot-password")
+    public String forgotPassword() {
+        return "public/forgot-password";
+    }
+}

@@ -1,0 +1,869 @@
+
+package com.vendor.controller;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.vendor.entity.Order;
+import com.vendor.entity.Product;
+import com.vendor.entity.User;
+import com.vendor.entity.Category;
+
+import com.vendor.repository.OrderRepository;
+import com.vendor.repository.ProductRepository;
+import com.vendor.repository.UserRepository;
+
+import com.vendor.service.AdminService;
+import com.vendor.service.CategoryService;
+
+@Controller
+public class AdminController {
+
+    private final AdminService adminService;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
+    private final CategoryService categoryService;
+
+    // Constructor injection
+    public AdminController(
+            AdminService adminService,
+            UserRepository userRepository,
+            ProductRepository productRepository,
+            OrderRepository orderRepository,
+            CategoryService categoryService) {
+
+        this.adminService = adminService;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
+        this.categoryService = categoryService;
+    }
+
+    // Common admin validation
+    private User getAdmin(Authentication authentication) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+
+            throw new AccessDeniedException("Please login first");
+        }
+
+        User admin = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException("Admin account not found"));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getRole())) {
+            throw new AccessDeniedException("Admin access required");
+        }
+
+        return admin;
+    }
+
+    // Add admin information to model
+    private void addAdminDetails(User admin, Model model) {
+
+        model.addAttribute("adminName", admin.getFirstName());
+        model.addAttribute("adminEmail", admin.getEmail());
+    }
+
+
+    // =========================================
+    // 1. ADMIN DASHBOARD
+    // =========================================
+
+    @GetMapping("/admin/dashboard")
+    public String showDashboard(
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        Map<String, Object> dashboardData =
+                adminService.getDashboardData();
+
+        model.addAllAttributes(dashboardData);
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "dashboard");
+
+        return "admin/dashboard";
+    }
+
+
+    // =========================================
+    // 2. CUSTOMER MANAGEMENT
+    // =========================================
+
+    @GetMapping("/admin/customers")
+    public String showCustomers(
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        List<User> customers =
+                userRepository.findByRoleIgnoreCase("CUSTOMER");
+
+        model.addAttribute("customers", customers);
+        model.addAttribute("totalCustomers", customers.size());
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "customers");
+
+        return "admin/customers";
+    }
+
+
+    // =========================================
+    // 3. VENDOR MANAGEMENT
+    // =========================================
+
+    @GetMapping("/admin/vendors")
+    public String showVendors(
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        List<User> vendors =
+                userRepository.findByRoleIgnoreCase("VENDOR");
+
+        vendors.sort((v1, v2) ->
+                v1.getUserId().compareTo(v2.getUserId()));
+
+        model.addAttribute("vendors", vendors);
+        model.addAttribute("totalVendors", vendors.size());
+
+        System.out.println(
+                "ADMIN VENDOR PAGE - Total vendors fetched: "
+                        + vendors.size());
+
+        for (User vendor : vendors) {
+            System.out.println(
+                    "Vendor ID: " + vendor.getUserId()
+                    + " | Name: " + vendor.getFirstName()
+                    + " | Email: " + vendor.getEmail()
+                    + " | Verification: "
+                    + vendor.getVendorVerificationStatus()
+                    + " | Account: " + vendor.getAccountStatus()
+            );
+        }
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "vendors");
+
+        return "admin/vendors";
+    }
+
+
+    // =========================================
+    // 4. PRODUCT MANAGEMENT
+    // =========================================
+
+    @GetMapping("/admin/products")
+    public String showProducts(
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        // Fetch all products, regardless of approval or active status
+        List<Product> allProducts = productRepository.findAll(
+                Sort.by(Sort.Direction.DESC, "productId"));
+
+        List<Product> filteredProducts = allProducts;
+
+        // Search by product name, category, brand or SKU
+        if (keyword != null && !keyword.isBlank()) {
+
+            String searchText = keyword.trim().toLowerCase();
+
+            filteredProducts = allProducts.stream()
+                    .filter(product ->
+                            (product.getProductName() != null
+                                    && product.getProductName()
+                                            .toLowerCase()
+                                            .contains(searchText))
+
+                            || (product.getCategory() != null
+                                    && product.getCategory()
+                                            .toLowerCase()
+                                            .contains(searchText))
+
+                            || (product.getBrand() != null
+                                    && product.getBrand()
+                                            .toLowerCase()
+                                            .contains(searchText))
+
+                            || (product.getSku() != null
+                                    && product.getSku()
+                                            .toLowerCase()
+                                            .contains(searchText))
+                    )
+                    .collect(Collectors.toList());
+        }
+
+        // Approval statistics
+        long approvedProducts = allProducts.stream()
+                .filter(p -> "APPROVED".equalsIgnoreCase(
+                        p.getApprovalStatus()))
+                .count();
+
+        long pendingProducts = allProducts.stream()
+                .filter(p -> "PENDING".equalsIgnoreCase(
+                        p.getApprovalStatus()))
+                .count();
+
+        long rejectedProducts = allProducts.stream()
+                .filter(p -> "REJECTED".equalsIgnoreCase(
+                        p.getApprovalStatus()))
+                .count();
+
+        // Product status statistics
+        long activeProducts = allProducts.stream()
+                .filter(p -> "ACTIVE".equalsIgnoreCase(
+                        p.getProductStatus()))
+                .count();
+
+        long inactiveProducts = allProducts.stream()
+                .filter(p -> "INACTIVE".equalsIgnoreCase(
+                        p.getProductStatus()))
+                .count();
+
+        // Fetch vendor names for displayed products
+        List<Integer> vendorIds = filteredProducts.stream()
+                .map(Product::getVendorId)
+                .filter(id -> id != null)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Integer, String> vendorNames = userRepository
+                .findByUserIdIn(vendorIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        User::getUserId,
+                        user -> {
+
+                            if (user.getBusinessName() != null
+                                    && !user.getBusinessName().isBlank()) {
+                                return user.getBusinessName();
+                            }
+
+                            String firstName = user.getFirstName() == null
+                                    ? "" : user.getFirstName();
+
+                            String lastName = user.getLastName() == null
+                                    ? "" : user.getLastName();
+
+                            return (firstName + " " + lastName).trim();
+                        }
+                ));
+
+        // Send product information to Thymeleaf
+        model.addAttribute("products", filteredProducts);
+
+        model.addAttribute("totalProducts", allProducts.size());
+
+        model.addAttribute("approvedProducts", approvedProducts);
+        model.addAttribute("pendingProducts", pendingProducts);
+        model.addAttribute("rejectedProducts", rejectedProducts);
+
+        model.addAttribute("activeProducts", activeProducts);
+        model.addAttribute("inactiveProducts", inactiveProducts);
+
+        model.addAttribute("vendorNames", vendorNames);
+        model.addAttribute("keyword", keyword);
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "products");
+
+        return "admin/products";
+    }
+
+
+    // =========================================
+    // 5. ACTIVATE PRODUCT
+    // =========================================
+
+    @PostMapping("/admin/products/{productId}/activate")
+    public String activateProduct(
+            @PathVariable Long productId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Product not found"));
+
+        product.setProductStatus("ACTIVE");
+        productRepository.save(product);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Product activated successfully.");
+
+        return "redirect:/admin/products";
+    }
+
+
+    // =========================================
+    // 6. DEACTIVATE PRODUCT
+    // =========================================
+
+    @PostMapping("/admin/products/{productId}/deactivate")
+    public String deactivateProduct(
+            @PathVariable Long productId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Product not found"));
+
+        product.setProductStatus("INACTIVE");
+        productRepository.save(product);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Product deactivated successfully.");
+
+        return "redirect:/admin/products";
+    }
+
+
+    // =========================================
+    // 7. CUSTOMER DETAILS AND ORDER HISTORY
+    // =========================================
+
+    @GetMapping("/admin/customers/{customerId}")
+    public String showCustomerDetails(
+            @PathVariable("customerId") Integer customerId,
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        User customer = userRepository.findById(customerId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Customer not found"));
+
+        if (!"CUSTOMER".equalsIgnoreCase(customer.getRole())) {
+            throw new IllegalArgumentException("Invalid customer account");
+        }
+
+        List<Order> customerOrders =
+                orderRepository.findByCustomerIdOrderByCreatedAtDesc(
+                        customerId);
+
+        model.addAttribute("customer", customer);
+        model.addAttribute("customerOrders", customerOrders);
+        model.addAttribute("totalOrders", customerOrders.size());
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "customers");
+
+        return "admin/customer-details";
+    }
+
+
+    // =========================================
+    // 8. VENDOR DETAILS
+    // =========================================
+
+    @GetMapping("/admin/vendors/{vendorId}")
+    public String showVendorDetails(
+            @PathVariable("vendorId") Integer vendorId,
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        User vendor = userRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Vendor not found"));
+
+        if (!"VENDOR".equalsIgnoreCase(vendor.getRole())) {
+            throw new IllegalArgumentException("Invalid vendor account");
+        }
+
+        List<Product> vendorProducts =
+                productRepository.findByVendorIdOrderByProductIdDesc(vendorId);
+
+        List<Order> vendorOrders =
+                orderRepository.findVendorOrders(vendorId);
+
+        model.addAttribute("vendor", vendor);
+        model.addAttribute("vendorProducts", vendorProducts);
+        model.addAttribute("totalVendorProducts", vendorProducts.size());
+
+        model.addAttribute("vendorOrders", vendorOrders);
+        model.addAttribute("totalVendorOrders", vendorOrders.size());
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "vendors");
+
+        return "admin/vendor-details";
+    }
+
+
+    // =========================================
+    // 9. VERIFY VENDOR
+    // =========================================
+
+    @PostMapping("/admin/vendors/{vendorId}/verify")
+    public String verifyVendor(
+            @PathVariable("vendorId") Integer vendorId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        User vendor = userRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Vendor not found"));
+
+        if (!"VENDOR".equalsIgnoreCase(vendor.getRole())) {
+            throw new IllegalArgumentException("Invalid vendor account");
+        }
+
+        vendor.setVendorVerificationStatus("VERIFIED");
+        userRepository.save(vendor);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Vendor verified successfully.");
+
+        return "redirect:/admin/vendors";
+    }
+
+
+    // =========================================
+    // 10. REJECT VENDOR
+    // =========================================
+
+    @PostMapping("/admin/vendors/{vendorId}/reject")
+    public String rejectVendor(
+            @PathVariable("vendorId") Integer vendorId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        User vendor = userRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Vendor not found"));
+
+        if (!"VENDOR".equalsIgnoreCase(vendor.getRole())) {
+            throw new IllegalArgumentException("Invalid vendor account");
+        }
+
+        vendor.setVendorVerificationStatus("REJECTED");
+        userRepository.save(vendor);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Vendor verification rejected.");
+
+        return "redirect:/admin/vendors";
+    }
+
+
+    // =========================================
+    // 11. DEACTIVATE VENDOR ACCOUNT
+    // =========================================
+
+    @PostMapping("/admin/vendors/{vendorId}/deactivate")
+    public String deactivateVendor(
+            @PathVariable("vendorId") Integer vendorId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        User vendor = userRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Vendor not found"));
+
+        if (!"VENDOR".equalsIgnoreCase(vendor.getRole())) {
+            throw new IllegalArgumentException("Invalid vendor account");
+        }
+
+        vendor.setAccountStatus("INACTIVE");
+        userRepository.save(vendor);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Vendor account deactivated.");
+
+        return "redirect:/admin/vendors";
+    }
+
+
+    // =========================================
+    // 12. ACTIVATE VENDOR ACCOUNT
+    // =========================================
+
+    @PostMapping("/admin/vendors/{vendorId}/activate")
+    public String activateVendor(
+            @PathVariable("vendorId") Integer vendorId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        User vendor = userRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Vendor not found"));
+
+        if (!"VENDOR".equalsIgnoreCase(vendor.getRole())) {
+            throw new IllegalArgumentException("Invalid vendor account");
+        }
+
+        vendor.setAccountStatus("ACTIVE");
+        userRepository.save(vendor);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Vendor account activated.");
+
+        return "redirect:/admin/vendors";
+    }
+
+
+    // =========================================
+    // 13. CATEGORY MANAGEMENT
+    // =========================================
+
+    @GetMapping("/admin/categories")
+    public String showCategories(
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        List<Category> categories;
+
+        if (keyword != null && !keyword.isBlank()) {
+            categories = categoryService.searchCategories(keyword.trim());
+        } else {
+            categories = categoryService.getAllCategories();
+        }
+
+        model.addAttribute("categories", categories);
+        model.addAttribute("keyword", keyword);
+
+        model.addAttribute("totalCategories",
+                categoryService.getTotalCategories());
+
+        model.addAttribute("activeCategories",
+                categoryService.getActiveCategories());
+
+        model.addAttribute("inactiveCategories",
+                categoryService.getInactiveCategories());
+
+        model.addAttribute("newCategory", new Category());
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "categories");
+
+        return "admin/categories";
+    }
+
+
+    // =========================================
+    // 14. ADD CATEGORY
+    // =========================================
+
+    @PostMapping("/admin/categories/add")
+    public String addCategory(
+            @ModelAttribute("newCategory") Category category,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        if (category.getCategoryName() == null
+                || category.getCategoryName().isBlank()) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Category name is required.");
+
+            return "redirect:/admin/categories";
+        }
+
+        String name = category.getCategoryName().trim();
+
+        boolean duplicate = categoryService.getAllCategories()
+                .stream()
+                .anyMatch(c -> c.getCategoryName()
+                        .equalsIgnoreCase(name));
+
+        if (duplicate) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "This category already exists.");
+
+            return "redirect:/admin/categories";
+        }
+
+        category.setCategoryName(name);
+        category.setActive(true);
+
+        categoryService.saveCategory(category);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Category added successfully.");
+
+        return "redirect:/admin/categories";
+    }
+
+
+    // =========================================
+    // 15. UPDATE CATEGORY
+    // =========================================
+
+    @PostMapping("/admin/categories/{categoryId}/update")
+    public String updateCategory(
+            @PathVariable Long categoryId,
+            @RequestParam String categoryName,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String imageUrl,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        if (categoryName == null || categoryName.isBlank()) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Category name is required.");
+
+            return "redirect:/admin/categories";
+        }
+
+        Category existing =
+                categoryService.getCategoryById(categoryId);
+
+        String name = categoryName.trim();
+
+        boolean duplicate = categoryService.getAllCategories()
+                .stream()
+                .anyMatch(c -> !c.getCategoryId().equals(categoryId)
+                        && c.getCategoryName().equalsIgnoreCase(name));
+
+        if (duplicate) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Another category already uses this name.");
+
+            return "redirect:/admin/categories";
+        }
+
+        existing.setCategoryName(name);
+        existing.setDescription(description);
+        existing.setImageUrl(imageUrl);
+
+        categoryService.saveCategory(existing);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Category updated successfully.");
+
+        return "redirect:/admin/categories";
+    }
+
+
+    // =========================================
+    // 16. ACTIVATE / DEACTIVATE CATEGORY
+    // =========================================
+
+    @PostMapping("/admin/categories/{categoryId}/toggle")
+    public String toggleCategory(
+            @PathVariable Long categoryId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        categoryService.toggleCategoryStatus(categoryId);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Category status updated successfully.");
+
+        return "redirect:/admin/categories";
+    }
+
+
+    // =========================================
+    // 17. DELETE CATEGORY
+    // =========================================
+
+    @PostMapping("/admin/categories/{categoryId}/delete")
+    public String deleteCategory(
+            @PathVariable Long categoryId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        getAdmin(authentication);
+
+        Category category =
+                categoryService.getCategoryById(categoryId);
+
+        boolean hasProducts = productRepository.findAll()
+                .stream()
+                .anyMatch(product ->
+                        product.getCategory() != null
+                        && product.getCategory().equalsIgnoreCase(
+                                category.getCategoryName()));
+
+        if (hasProducts) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "This category contains products. Deactivate it instead.");
+
+            return "redirect:/admin/categories";
+        }
+
+        categoryService.deleteCategory(categoryId);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Category deleted successfully.");
+
+        return "redirect:/admin/categories";
+    }
+
+
+    // =========================================
+    // 18. ADMIN ORDER MANAGEMENT
+    // =========================================
+
+    @GetMapping("/admin/orders")
+    public String showOrders(
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String orderStatus,
+            @RequestParam(required = false) String paymentStatus,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        // Fetch all orders, newest first
+        List<Order> allOrders =
+                orderRepository.findAllByOrderByCreatedAtDesc();
+
+        // Search and filter orders
+        List<Order> filteredOrders = allOrders.stream()
+                .filter(order -> {
+
+                    boolean matchesKeyword = true;
+
+                    if (keyword != null && !keyword.isBlank()) {
+
+                        String search = keyword.trim().toLowerCase();
+
+                        matchesKeyword =
+                                (order.getOrderNumber() != null
+                                        && order.getOrderNumber()
+                                                .toLowerCase().contains(search))
+                                ||
+                                (order.getCustomerName() != null
+                                        && order.getCustomerName()
+                                                .toLowerCase().contains(search))
+                                ||
+                                (order.getCustomerEmail() != null
+                                        && order.getCustomerEmail()
+                                                .toLowerCase().contains(search));
+                    }
+
+                    boolean matchesOrderStatus =
+                            orderStatus == null || orderStatus.isBlank()
+                            || orderStatus.equalsIgnoreCase(
+                                    order.getOrderStatus());
+
+                    boolean matchesPaymentStatus =
+                            paymentStatus == null || paymentStatus.isBlank()
+                            || paymentStatus.equalsIgnoreCase(
+                                    order.getPaymentStatus());
+
+                    return matchesKeyword
+                            && matchesOrderStatus
+                            && matchesPaymentStatus;
+                })
+                .collect(Collectors.toList());
+
+        // Order statistics
+        long totalOrders = allOrders.size();
+
+        long confirmedOrders = allOrders.stream()
+                .filter(o -> "CONFIRMED".equalsIgnoreCase(o.getOrderStatus()))
+                .count();
+
+        long deliveredOrders = allOrders.stream()
+                .filter(o -> "DELIVERED".equalsIgnoreCase(o.getOrderStatus()))
+                .count();
+
+        long cancelledOrders = allOrders.stream()
+                .filter(o -> "CANCELLED".equalsIgnoreCase(o.getOrderStatus()))
+                .count();
+
+        // Payment statistics
+        long paidOrders = allOrders.stream()
+                .filter(o -> "PAID".equalsIgnoreCase(o.getPaymentStatus()))
+                .count();
+
+        long pendingPayments = allOrders.stream()
+                .filter(o -> "PENDING".equalsIgnoreCase(o.getPaymentStatus()))
+                .count();
+
+        long refundedOrders = allOrders.stream()
+                .filter(o -> "REFUNDED".equalsIgnoreCase(o.getPaymentStatus()))
+                .count();
+
+        // Send data to Thymeleaf
+        model.addAttribute("orders", filteredOrders);
+
+        model.addAttribute("totalOrders", totalOrders);
+        model.addAttribute("confirmedOrders", confirmedOrders);
+        model.addAttribute("deliveredOrders", deliveredOrders);
+        model.addAttribute("cancelledOrders", cancelledOrders);
+
+        model.addAttribute("paidOrders", paidOrders);
+        model.addAttribute("pendingPayments", pendingPayments);
+        model.addAttribute("refundedOrders", refundedOrders);
+
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedOrderStatus", orderStatus);
+        model.addAttribute("selectedPaymentStatus", paymentStatus);
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "orders");
+
+        return "admin/orders";
+    }
+
+}
