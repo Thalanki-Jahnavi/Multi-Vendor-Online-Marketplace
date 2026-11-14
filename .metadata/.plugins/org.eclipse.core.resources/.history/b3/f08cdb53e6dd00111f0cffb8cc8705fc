@@ -1,0 +1,61 @@
+
+package com.vendor.service;
+
+import com.vendor.entity.Category;
+import com.vendor.repository.CategoryRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CategoryService {
+
+    private final CategoryRepository categoryRepository;
+
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
+
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
+
+    public List<Category> searchCategories(String keyword) {
+        return categoryRepository
+                .findByCategoryNameContainingIgnoreCase(keyword);
+    }
+
+    public long getTotalCategories() {
+        return categoryRepository.count();
+    }
+
+    public long getActiveCategories() {
+        return categoryRepository.countByActiveTrue();
+    }
+
+    public long getInactiveCategories() {
+        return categoryRepository.countByActiveFalse();
+    }
+
+    public Category getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Category not found: " + id));
+    }
+
+    public Category saveCategory(Category category) {
+        return categoryRepository.save(category);
+    }
+
+    public void deleteCategory(Long id) {
+        categoryRepository.deleteById(id);
+    }
+
+    public void toggleCategoryStatus(Long id) {
+        Category category = getCategoryById(id);
+
+        category.setActive(!Boolean.TRUE.equals(category.getActive()));
+
+        categoryRepository.save(category);
+    }
+}

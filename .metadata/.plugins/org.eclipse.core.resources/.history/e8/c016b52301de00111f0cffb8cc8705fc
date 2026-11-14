@@ -1,0 +1,167 @@
+
+package com.vendor.controller;
+
+import com.vendor.entity.User;
+import com.vendor.repository.UserRepository;
+
+import java.util.Optional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+public class AdminProfileController {
+
+    private final UserRepository userRepository;
+
+    public AdminProfileController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    // ==========================================
+    // DISPLAY ADMIN PROFILE
+    // ==========================================
+
+    @GetMapping("/admin/profile")
+    public String showProfile(
+            Authentication authentication,
+            Model model) {
+
+        if (authentication == null ||
+                !authentication.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        Optional<User> optionalAdmin =
+                userRepository.findByEmail(authentication.getName());
+
+        if (optionalAdmin.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        User admin = optionalAdmin.get();
+
+        if (admin.getRole() == null ||
+                !admin.getRole().equalsIgnoreCase("ADMIN")) {
+            return "redirect:/";
+        }
+
+        model.addAttribute("admin", admin);
+        model.addAttribute("activePage", "profile");
+
+        return "admin/profile";
+    }
+
+    // ==========================================
+    // UPDATE ADMIN PROFILE
+    // ==========================================
+
+    @PostMapping("/admin/profile/update")
+    public String updateProfile(
+            Authentication authentication,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("email") String email,
+            @RequestParam(value = "phone", required = false)
+                    String phone,
+            RedirectAttributes redirectAttributes) {
+
+        if (authentication == null ||
+                !authentication.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        Optional<User> optionalAdmin =
+                userRepository.findByEmail(authentication.getName());
+
+        if (optionalAdmin.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        User admin = optionalAdmin.get();
+
+        if (admin.getRole() == null ||
+                !admin.getRole().equalsIgnoreCase("ADMIN")) {
+            return "redirect:/";
+        }
+
+        // Remove unnecessary spaces
+        firstName = firstName.trim();
+        lastName = lastName.trim();
+        email = email.trim();
+
+        if (phone == null) {
+            phone = "";
+        } else {
+            phone = phone.trim();
+        }
+
+        // Validate required fields
+        if (firstName.isEmpty() ||
+                lastName.isEmpty() ||
+                email.isEmpty()) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "First name, last name and email are required.");
+
+            return "redirect:/admin/profile";
+        }
+
+        // Check whether email is already used by another account
+        Optional<User> existingUser =
+                userRepository.findByEmail(email);
+
+        if (existingUser.isPresent() &&
+                !existingUser.get().getUserId()
+                        .equals(admin.getUserId())) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "This email address is already registered.");
+
+            return "redirect:/admin/profile";
+        }
+
+        // Update admin details
+        admin.setFirstName(firstName);
+        admin.setLastName(lastName);
+        admin.setEmail(email);
+        admin.setPhone(phone);
+
+        userRepository.save(admin);
+
+        // Update authentication when email changes
+        if (!authentication.getName().equals(email)) {
+
+            UsernamePasswordAuthenticationToken newAuthentication =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            authentication.getCredentials(),
+                            authentication.getAuthorities()
+                    );
+
+            newAuthentication.setDetails(
+                    authentication.getDetails());
+
+            SecurityContextHolder.getContext()
+                    .setAuthentication(newAuthentication);
+        }
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Your profile has been updated successfully!");
+
+        return "redirect:/admin/profile";
+    }
+}

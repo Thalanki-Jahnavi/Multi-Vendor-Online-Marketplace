@@ -1,0 +1,95 @@
+package com.vendor.config;
+
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import com.vendor.entity.Product;
+import com.vendor.repository.ProductRepository;
+
+@Component
+public class ProductDataSeeder implements CommandLineRunner {
+
+    private final ProductRepository productRepository;
+
+    public ProductDataSeeder(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @Override
+    public void run(String... args) {
+        try {
+            seedProducts();
+        } catch (Exception e) {
+            System.err.println("ProductDataSeeder encountered an error: " + e.getMessage());
+        }
+    }
+
+    public synchronized void seedProducts() {
+        List<Product> existing = productRepository.findAll();
+        System.out.println(">>> [ProductDataSeeder] Current product count in DB: " + existing.size());
+
+        // Dynamically find a valid vendor ID from existing products or default to 1
+        Integer vendorId = existing.stream()
+                .map(Product::getVendorId)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(1);
+
+        System.out.println(">>> [ProductDataSeeder] Using vendor ID: " + vendorId);
+
+        // --- Completely New Diverse Products ---
+        // 1. Electronics
+        createIfMissing(existing, "Mechanical RGB Gaming Keyboard", "Electronics", 3499.00, 15.0, vendorId);
+        createIfMissing(existing, "4K Ultra HD Pro Webcam", "Electronics", 4299.00, 10.0, vendorId);
+        createIfMissing(existing, "Fast Qi Wireless Charging Pad", "Electronics", 1499.00, 20.0, vendorId);
+        createIfMissing(existing, "Portable 1TB External SSD", "Electronics", 6999.00, 12.0, vendorId);
+
+        // 2. Fashion
+        createIfMissing(existing, "Classic Vintage Denim Jacket", "Fashion", 2499.00, 25.0, vendorId);
+        createIfMissing(existing, "Polarized Aviator Sunglasses", "Fashion", 1299.00, 30.0, vendorId);
+        createIfMissing(existing, "Handcrafted Genuine Leather Wallet", "Fashion", 899.00, 15.0, vendorId);
+        createIfMissing(existing, "Casual Canvas Slip-On Loafers", "Fashion", 1799.00, 20.0, vendorId);
+
+        // 3. Home & Kitchen
+        createIfMissing(existing, "Stainless Steel Insulated Water Bottle (1L)", "Home & Kitchen", 799.00, 10.0, vendorId);
+        createIfMissing(existing, "Electric Rapid-Boil Glass Kettle (1.8L)", "Home & Kitchen", 1899.00, 18.0, vendorId);
+        createIfMissing(existing, "Ultrasonic Aroma Diffuser & Humidifier", "Home & Kitchen", 1399.00, 22.0, vendorId);
+        createIfMissing(existing, "Non-Stick Granitestone Frying Pan (28cm)", "Home & Kitchen", 1599.00, 15.0, vendorId);
+
+        // 4. Fitness & Accessories
+        createIfMissing(existing, "High-Density Non-Slip Yoga Mat (6mm)", "Fitness", 1199.00, 25.0, vendorId);
+        createIfMissing(existing, "Adjustable Ergonomic Aluminium Laptop Stand", "Accessories", 1499.00, 15.0, vendorId);
+        createIfMissing(existing, "Memory Foam Orthopedic Seat Cushion", "Accessories", 1299.00, 20.0, vendorId);
+        createIfMissing(existing, "Dimmable LED Desk Lamp with USB Port", "Accessories", 1699.00, 10.0, vendorId);
+
+        System.out.println(">>> [ProductDataSeeder] Seeding finished. Total products in DB: " + productRepository.count());
+    }
+
+    private void createIfMissing(List<Product> existing, String name, String category,
+                                 Double price, Double discount, Integer vendorId) {
+        boolean alreadyExists = existing.stream()
+                .anyMatch(p -> p.getProductName() != null 
+                        && p.getProductName().equalsIgnoreCase(name));
+
+        if (!alreadyExists) {
+            try {
+                Product product = new Product();
+                product.setProductName(name);
+                product.setCategory(category);
+                product.setPrice(price);
+                product.setDiscountPercentage(discount);
+                product.setVendorId(vendorId);
+                product.setProductStatus("ACTIVE");
+                product.setApprovalStatus("APPROVED");
+
+                productRepository.save(product);
+                System.out.println(">>> [ProductDataSeeder] Successfully inserted: " + name);
+            } catch (Exception e) {
+                System.err.println(">>> [ProductDataSeeder] Failed to insert '" + name + "': " + e.getMessage());
+            }
+        }
+    }
+}

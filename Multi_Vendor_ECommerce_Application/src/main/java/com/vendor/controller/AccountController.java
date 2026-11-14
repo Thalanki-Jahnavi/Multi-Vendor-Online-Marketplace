@@ -1,0 +1,73 @@
+package com.vendor.controller;
+
+import java.util.Optional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.vendor.entity.User;
+import com.vendor.repository.UserRepository;
+import com.vendor.service.OrderService;
+
+@Controller
+public class AccountController {
+
+    private final UserRepository userRepository;
+    private final OrderService orderService;
+
+    public AccountController(UserRepository userRepository, OrderService orderService) {
+        this.userRepository = userRepository;
+        this.orderService = orderService;
+    }
+
+    @GetMapping("/customer/account")
+    public String showAccountPage(
+            Authentication authentication,
+            @RequestParam(required = false) String updated,
+            Model model) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        Optional<User> userOpt = userRepository.findByEmail(authentication.getName());
+        if (userOpt.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        User user = userOpt.get();
+        int ordersCount = orderService.getOrdersByCustomer(user.getUserId()).size();
+
+        model.addAttribute("user", user);
+        model.addAttribute("customerName", user.getFirstName());
+        model.addAttribute("customerFullName",
+                (user.getFirstName() != null ? user.getFirstName() : "")
+                + " " + (user.getLastName() != null ? user.getLastName() : ""));
+        model.addAttribute("customerEmail", user.getEmail());
+        model.addAttribute("ordersCount", ordersCount);
+        model.addAttribute("updated", updated != null);
+
+        return "customer/account";
+    }
+
+    @PostMapping("/customer/account/update")
+    public String updateProfile(
+            Authentication authentication,
+            @RequestParam String firstName,
+            @RequestParam String lastName) {
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            userRepository.findByEmail(authentication.getName()).ifPresent(user -> {
+                user.setFirstName(firstName);
+                user.setLastName(lastName);
+                userRepository.save(user);
+            });
+        }
+
+        return "redirect:/customer/account?updated=true";
+    }
+}

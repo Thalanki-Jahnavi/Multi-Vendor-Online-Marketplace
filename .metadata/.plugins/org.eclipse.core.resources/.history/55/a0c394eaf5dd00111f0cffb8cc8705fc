@@ -1,0 +1,583 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reports & Analytics | OneCart Admin</title>
+
+    <!-- Existing Admin Sidebar CSS -->
+	<link rel="stylesheet" th:href="@{/css/sidebar-layout.css}">
+	
+
+    <!-- Reports Page CSS -->
+	<link rel="stylesheet" th:href="@{/css/admin-reports.css}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="brand-text">
+                <h2>OneCart</h2>
+                <span>Admin Panel</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <p class="menu-heading">MAIN MENU</p>
+
+            <a th:href="@{/admin/dashboard}" class="menu-link">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a th:href="@{/admin/customers}" class="menu-link">
+                <i class="fas fa-users"></i>
+                <span>Customers</span>
+            </a>
+
+            <a th:href="@{/admin/vendors}" class="menu-link">
+                <i class="fas fa-store"></i>
+                <span>Vendors</span>
+            </a>
+
+            <a th:href="@{/admin/products}" class="menu-link">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+
+            <a th:href="@{/admin/product-approvals}" class="menu-link">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Product Approvals</span>
+            </a>
+
+            <a th:href="@{/admin/categories}" class="menu-link">
+                <i class="fas fa-list"></i>
+                <span>Categories</span>
+            </a>
+
+            <a th:href="@{/admin/orders}" class="menu-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+            </a>
+
+            <a th:href="@{/admin/reports}"
+               class="menu-link active">
+                <i class="fas fa-chart-line"></i>
+                <span>Reports & Analytics</span>
+            </a>
+
+            <p class="menu-heading">ACCOUNT</p>
+
+            <a th:href="@{/admin/profile}" class="menu-link">
+                <i class="fas fa-user-circle"></i>
+                <span>My Profile</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a th:href="@{/logout}" class="menu-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOP HEADER -->
+        <header class="reports-header">
+
+            <div>
+                <h1>Reports & Analytics</h1>
+                <p>Track your marketplace performance and business growth.</p>
+            </div>
+
+            <div class="admin-info">
+                <div class="admin-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+
+                <div>
+                    <strong th:text="${adminName}">Admin</strong>
+                    <span>Administrator</span>
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+        <section class="reports-container">
+
+            <!-- DATE FILTER -->
+            <div class="reports-toolbar">
+
+                <div>
+                    <h2>Business Overview</h2>
+                    <p>View your business performance for a selected period.</p>
+                </div>
+
+                <form th:action="@{/admin/reports}"
+                      method="get"
+                      class="date-filter">
+
+                    <label for="days">Date Range</label>
+
+                    <select name="days" id="days"
+                            onchange="this.form.submit()">
+
+                        <option value="7"
+                                th:selected="${days == 7}">
+                            Last 7 Days
+                        </option>
+
+                        <option value="30"
+                                th:selected="${days == 30}">
+                            Last 30 Days
+                        </option>
+
+                        <option value="90"
+                                th:selected="${days == 90}">
+                            Last 90 Days
+                        </option>
+
+                    </select>
+
+                </form>
+
+            </div>
+
+
+            <!-- SUMMARY CARDS -->
+            <div class="stats-grid">
+
+                <div class="stat-card sales-card">
+                    <div class="stat-top">
+                        <div class="stat-icon">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                        </div>
+                        <span class="stat-label">Total Sales</span>
+                    </div>
+
+                    <h2>
+                        ₹<span th:text="${#numbers.formatDecimal(totalSales, 1, 2)}">0.00</span>
+                    </h2>
+
+                    <p>Paid orders excluding cancelled orders</p>
+                </div>
+
+
+                <div class="stat-card orders-card">
+                    <div class="stat-top">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <span class="stat-label">Total Orders</span>
+                    </div>
+
+                    <h2 th:text="${totalOrders}">0</h2>
+
+                    <p>Orders in selected period</p>
+                </div>
+
+
+                <div class="stat-card customers-card">
+                    <div class="stat-top">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <span class="stat-label">Total Customers</span>
+                    </div>
+
+                    <h2 th:text="${totalCustomers}">0</h2>
+
+                    <p>Registered customers</p>
+                </div>
+
+
+                <div class="stat-card vendors-card">
+                    <div class="stat-top">
+                        <div class="stat-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <span class="stat-label">Total Vendors</span>
+                    </div>
+
+                    <h2 th:text="${totalVendors}">0</h2>
+
+                    <p>Registered vendors</p>
+                </div>
+
+            </div>
+
+
+            <!-- SALES AND ORDER CHARTS -->
+            <div class="charts-grid">
+
+                <div class="report-card sales-chart-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h3>Sales Overview</h3>
+                            <p>Revenue generated over time</p>
+                        </div>
+
+                        <span class="chart-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </span>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+
+                </div>
+
+
+                <div class="report-card order-chart-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h3>Order Status</h3>
+                            <p>Order distribution</p>
+                        </div>
+
+                        <span class="chart-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </span>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="orderChart"></canvas>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCTS AND CATEGORY -->
+            <div class="bottom-grid">
+
+                <!-- TOP PRODUCTS -->
+                <div class="report-card products-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h3>Top Selling Products</h3>
+                            <p>Best performing products by revenue</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="reports-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity Sold</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr th:each="product : ${topProducts}">
+
+                                    <td>
+                                        <strong th:text="${product.productName}">
+                                            Product Name
+                                        </strong>
+                                    </td>
+
+                                    <td th:text="${product.quantity}">
+                                        0
+                                    </td>
+
+                                    <td class="revenue-cell">
+                                        ₹<span th:text="${#numbers.formatDecimal(product.revenue, 1, 2)}">
+                                            0.00
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+                                <tr th:if="${#lists.isEmpty(topProducts)}">
+                                    <td colspan="3" class="empty-message">
+                                        No product sales available for this period.
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CATEGORY REVENUE -->
+                <div class="report-card category-card">
+
+                    <div class="card-heading">
+                        <div>
+                            <h3>Revenue by Category</h3>
+                            <p>Category-wise sales performance</p>
+                        </div>
+                    </div>
+
+                    <div class="category-chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PAYMENT SUMMARY -->
+            <div class="report-card payment-card">
+
+                <div class="card-heading">
+                    <div>
+                        <h3>Payment Summary</h3>
+                        <p>Payment status for the selected period</p>
+                    </div>
+                </div>
+
+                <div class="payment-grid">
+
+                    <div class="payment-item paid">
+                        <div class="payment-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+
+                        <div>
+                            <span>Paid Payments</span>
+                            <h2 th:text="${paidCount}">0</h2>
+                        </div>
+                    </div>
+
+
+                    <div class="payment-item pending">
+                        <div class="payment-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+
+                        <div>
+                            <span>Pending Payments</span>
+                            <h2 th:text="${pendingPayments}">0</h2>
+                        </div>
+                    </div>
+
+
+                    <div class="payment-item refunded">
+                        <div class="payment-icon">
+                            <i class="fas fa-rotate-left"></i>
+                        </div>
+
+                        <div>
+                            <span>Refunded Payments</span>
+                            <h2 th:text="${refundedPayments}">0</h2>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ORDER SUMMARY -->
+            <div class="order-summary-grid">
+
+                <div class="summary-box">
+                    <span>Confirmed Orders</span>
+                    <h2 th:text="${confirmedOrders}">0</h2>
+                </div>
+
+                <div class="summary-box">
+                    <span>Delivered Orders</span>
+                    <h2 th:text="${deliveredOrders}">0</h2>
+                </div>
+
+                <div class="summary-box">
+                    <span>Cancelled Orders</span>
+                    <h2 th:text="${cancelledOrders}">0</h2>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- CHART DATA AND CONFIGURATION -->
+<script th:inline="javascript">
+
+    const salesLabels = /*[[${salesLabels}]]*/ [];
+    const salesValues = /*[[${salesValues}]]*/ [];
+
+    const orderLabels = /*[[${orderStatusLabels}]]*/ [];
+    const orderValues = /*[[${orderStatusValues}]]*/ [];
+
+    const categoryLabels = /*[[${categoryLabels}]]*/ [];
+    const categoryValues = /*[[${categoryValues}]]*/ [];
+
+
+    // SALES LINE CHART
+    new Chart(document.getElementById('salesChart'), {
+
+        type: 'line',
+
+        data: {
+            labels: salesLabels,
+
+            datasets: [{
+                label: 'Sales Revenue (₹)',
+                data: salesValues,
+
+                borderColor: '#087e78',
+                backgroundColor: 'rgba(8, 126, 120, 0.12)',
+
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+
+                pointRadius: 3,
+                pointHoverRadius: 6
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+
+    // ORDER DOUGHNUT CHART
+    new Chart(document.getElementById('orderChart'), {
+
+        type: 'doughnut',
+
+        data: {
+            labels: orderLabels,
+
+            datasets: [{
+                data: orderValues,
+
+                backgroundColor: [
+                    '#087e78',
+                    '#37a58c',
+                    '#e76f51',
+                    '#e9c46a',
+                    '#6386a5'
+                ],
+
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+
+            cutout: '65%'
+        }
+    });
+
+
+    // CATEGORY REVENUE CHART
+    new Chart(document.getElementById('categoryChart'), {
+
+        type: 'doughnut',
+
+        data: {
+            labels: categoryLabels,
+
+            datasets: [{
+                data: categoryValues,
+
+                backgroundColor: [
+                    '#087e78',
+                    '#37a58c',
+                    '#8bc9b4',
+                    '#e9c46a',
+                    '#6386a5',
+                    '#e76f51',
+                    '#a78bca'
+                ],
+
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+
+            cutout: '60%'
+        }
+    });
+
+</script>
+
+</body>
+</html>

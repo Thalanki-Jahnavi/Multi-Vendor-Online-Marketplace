@@ -1,0 +1,249 @@
+
+/* ==========================================
+   ONECART COMMON ADMIN SIDEBAR
+   ========================================== */
+
+:root {
+    --sidebar-bg: #123e3a;
+    --sidebar-active: #087e78;
+    --sidebar-text: #e5f4f0;
+    --sidebar-muted: #8bb7b0;
+    --sidebar-hover: rgba(255, 255, 255, 0.07);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    min-height: 100vh;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    padding: 24px 15px 18px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1000;
+    scrollbar-width: thin;
+    scrollbar-color: #47716b var(--sidebar-bg);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #47716b;
+    border-radius: 10px;
+}
+
+/* BRAND */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    margin-bottom: 35px;
+}
+
+.brand-logo {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 12px;
+    background: #e5f4f0;
+    color: #087e78;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.brand h2 {
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 750;
+    margin: 0 0 3px;
+}
+
+.brand span {
+    color: #a7ccc5;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+}
+
+/* SECTION LABELS */
+
+.sidebar-label {
+    color: var(--sidebar-muted);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    padding: 0 12px;
+    margin: 13px 0 11px;
+}
+
+/* NAVIGATION LINKS */
+
+.nav-link {
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 13px;
+    margin-bottom: 4px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: #e5f4f0;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+    background: var(--sidebar-hover);
+    color: #ffffff;
+}
+
+.nav-link.active {
+    background: var(--sidebar-active);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* NAVIGATION ICONS */
+
+.nav-icon {
+    width: 17px;
+    min-width: 17px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    color: #a9d4cc;
+}
+
+.nav-link.active .nav-icon {
+    color: #ffffff;
+}
+
+/* APPROVAL COUNT */
+
+.nav-count {
+    margin-left: auto;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 6px;
+    border-radius: 20px;
+    background: #e5f4f0;
+    color: #087e78;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+/* LOGOUT */
+
+.logout-form {
+    width: 100%;
+    margin: 0;
+}
+
+.logout-link {
+    font-family: inherit;
+}
+
+/* SIDEBAR FOOTER */
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 17px 10px 5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.13);
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.footer-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background: #e5f4f0;
+    color: #087e78;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.sidebar-footer strong {
+    display: block;
+    color: #ffffff;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.sidebar-footer span {
+    display: block;
+    color: #a7ccc5;
+    font-size: 10px;
+}
+
+/* MAIN CONTENT POSITION */
+
+.admin-layout {
+    min-height: 100vh;
+}
+
+.main-content {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    min-height: 100vh;
+    padding: 30px 35px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 992px) {
+    .sidebar {
+        width: 220px;
+    }
+
+    .main-content {
+        margin-left: 220px;
+        width: calc(100% - 220px);
+        padding: 24px 20px;
+    }
+}
+
+@media (max-width: 650px) {
+    .sidebar {
+        width: 190px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .main-content {
+        margin-left: 190px;
+        width: calc(100% - 190px);
+        padding: 18px 12px;
+    }
+}

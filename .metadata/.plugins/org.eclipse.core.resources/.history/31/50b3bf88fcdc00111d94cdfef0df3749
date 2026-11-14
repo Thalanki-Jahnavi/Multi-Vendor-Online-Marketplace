@@ -1,0 +1,59 @@
+
+package com.vendor.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.vendor.entity.Product;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    // Find all publicly available products
+    List<Product>
+    findByProductStatusIgnoreCaseAndApprovalStatusIgnoreCaseOrderByProductIdDesc(
+            String productStatus,
+            String approvalStatus
+    );
+
+    // Find all products belonging to a particular vendor
+    List<Product> findByVendorIdOrderByProductIdDesc(
+            Integer vendorId
+    );
+
+    // Count all products belonging to a vendor
+    long countByVendorId(Integer vendorId);
+
+    // Count products by vendor and product status
+    long countByVendorIdAndProductStatusIgnoreCase(
+            Integer vendorId,
+            String productStatus
+    );
+
+    // Count products with stock less than or equal to a given quantity
+    long countByVendorIdAndStockQuantityLessThanEqual(
+            Integer vendorId,
+            Integer stockQuantity
+    );
+
+    // Find products belonging to a vendor by status
+    List<Product> findByVendorIdAndProductStatusIgnoreCaseOrderByProductIdDesc(
+            Integer vendorId,
+            String productStatus
+    );
+
+    // Find products belonging to a vendor by approval status
+    List<Product> findByVendorIdAndApprovalStatusIgnoreCaseOrderByProductIdDesc(
+            Integer vendorId,
+            String approvalStatus
+    );
+
+    // Search products by name for a particular vendor
+    List<Product> findByVendorIdAndProductNameContainingIgnoreCaseOrderByProductIdDesc(
+            Integer vendorId,
+            String productName
+    );
+
+}

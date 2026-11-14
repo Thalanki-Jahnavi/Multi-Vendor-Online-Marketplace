@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About OneCart</title>
+
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/about.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar-layout.css}">
+</head>
+
+<body>
+
+<div class="sidebar-layout">
+
+    <aside class="app-sidebar">
+        <a class="sidebar-brand" th:href="@{/}">
+            <span class="sidebar-brand-icon">O</span>
+            <span>One<span class="brand-light">Cart</span></span>
+        </a>
+
+        <p class="sidebar-label">MENU</p>
+
+        <nav class="sidebar-nav">
+            <a class="sidebar-link" th:href="@{/}">
+                <span class="nav-icon">⌂</span>
+                <span>Home</span>
+            </a>
+
+            <a class="sidebar-link" th:href="@{/} + '#products'">
+                <span class="nav-icon">▦</span>
+                <span>Products</span>
+            </a>
+
+            <a class="sidebar-link active" th:href="@{/about}">
+                <span class="nav-icon">ⓘ</span>
+                <span>About Us</span>
+            </a>
+
+            <a class="sidebar-link" th:href="@{/contact}">
+                <span class="nav-icon">✉</span>
+                <span>Contact Us</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a class="sidebar-link" th:href="@{/login}">
+                <span class="nav-icon">♙</span>
+                <span>Sign In</span>
+            </a>
+
+            <a class="sidebar-signup" th:href="@{/login}">Get Started</a>
+        </div>
+    </aside>
+
+    <div class="main-shell">
+
+        <header class="content-topbar">
+            <button class="mobile-menu-toggle"
+                    type="button"
+                    onclick="toggleOneCartSidebar()"
+                    aria-label="Toggle navigation">☰</button>
+
+            <div class="topbar-heading">
+                <span class="topbar-eyebrow">GET TO KNOW US</span>
+                <h1>About OneCart</h1>
+            </div>
+
+            <div class="topbar-actions">
+                <a class="topbar-button" th:href="@{/login}">Sign In</a>
+            </div>
+        </header>
+
+        <main class="side-page-main">
+
+            <section class="about-hero">
+                <div class="about-hero-content">
+                    <span class="eyebrow">ABOUT ONECART</span>
+                    <h1>More than a marketplace.<br><span>A place to discover.</span></h1>
+                    <p>
+                        OneCart brings customers and independent vendors together,
+                        making it easier to discover products and shop in one place.
+                    </p>
+                    <a class="button button-primary" th:href="@{/}">
+                        Explore products <span>→</span>
+                    </a>
+                </div>
+
+                <div class="about-hero-art" aria-hidden="true">
+                    <div class="about-art-circle"></div>
+                    <div class="about-art-card">
+                        <span class="about-art-icon">🛍️</span>
+                        <strong>Discover something new</strong>
+                        <small>Find your next favorite</small>
+                    </div>
+                    <span class="about-art-sparkle sparkle-one">✦</span>
+                    <span class="about-art-sparkle sparkle-two">✧</span>
+                </div>
+            </section>
+
+            <section class="about-intro">
+                <div class="about-intro-heading">
+                    <span class="eyebrow">OUR STORY</span>
+                    <h2>Shopping should feel<br>simple and inspiring.</h2>
+                </div>
+
+                <div class="about-intro-copy">
+                    <p>
+                        We created OneCart with a simple idea: bring a variety of products
+                        and sellers together in one convenient online marketplace.
+                    </p>
+                    <p>
+                        Whether you're looking for everyday essentials or something
+                        special, OneCart helps you explore products from different vendors
+                        without making shopping complicated.
+                    </p>
+                </div>
+            </section>
+
+            <section class="about-values">
+                <div class="about-section-heading">
+                    <span class="eyebrow">WHAT MATTERS TO US</span>
+                    <h2>Built around better shopping</h2>
+                    <p>We focus on making the marketplace easy to explore and use.</p>
+                </div>
+
+                <div class="about-value-grid">
+                    <article class="about-value-card">
+                        <span class="about-value-icon">⌕</span>
+                        <h3>Easy discovery</h3>
+                        <p>Browse products and find new favorites in one convenient place.</p>
+                    </article>
+
+                    <article class="about-value-card">
+                        <span class="about-value-icon">♧</span>
+                        <h3>Vendor community</h3>
+                        <p>We bring independent sellers and shoppers together through one marketplace.</p>
+                    </article>
+
+                    <article class="about-value-card">
+                        <span class="about-value-icon">♡</span>
+                        <h3>Simple experience</h3>
+                        <p>We aim to keep the shopping journey clear, friendly, and straightforward.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="about-cta">
+                <div>
+                    <span class="eyebrow">YOUR NEXT FIND IS WAITING</span>
+                    <h2>Ready to discover OneCart?</h2>
+                    <p>Explore products from vendors in one place.</p>
+                </div>
+
+                <a class="button button-primary" th:href="@{/}">
+                    Start exploring <span>→</span>
+                </a>
+            </section>
+
+        </main>
+
+        <footer class="sidebar-page-footer">
+            <span>© 2026 OneCart. All rights reserved.</span>
+            <span>Made for everyday discoveries ♡</span>
+        </footer>
+
+    </div>
+</div>
+
+<div class="sidebar-mobile-overlay"
+     id="oneCartSidebarOverlay"
+     onclick="toggleOneCartSidebar()"></div>
+
+<script>
+    function toggleOneCartSidebar() {
+        document.body.classList.toggle("sidebar-open");
+    }
+</script>
+
+</body>
+</html>

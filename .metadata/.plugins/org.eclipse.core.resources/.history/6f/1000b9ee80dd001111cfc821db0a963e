@@ -1,0 +1,177 @@
+
+package com.vendor.service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.springframework.stereotype.Service;
+
+import com.vendor.entity.Product;
+import com.vendor.repository.ProductRepository;
+
+@Service
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    // Get products that customers are allowed to browse
+    public List<Product> getApprovedProducts() {
+
+        return productRepository
+                .findByProductStatusIgnoreCaseAndApprovalStatusIgnoreCaseAndStockQuantityGreaterThanOrderByProductIdDesc(
+                        "ACTIVE",
+                        "APPROVED",
+                        0
+                );
+    }
+
+    // Filter and sort marketplace products
+    public List<Product> filterProducts(
+            List<Product> products,
+            String keyword,
+            String category,
+            Integer vendorId,
+            Double minPrice,
+            Double maxPrice,
+            String sort) {
+
+        Stream<Product> result = products.stream();
+
+        // Search by product name
+        if (keyword != null && !keyword.isBlank()) {
+
+            String searchText = keyword.trim().toLowerCase();
+
+            result = result.filter(product ->
+                    product.getProductName() != null
+                            && product.getProductName()
+                                    .toLowerCase()
+                                    .contains(searchText)
+            );
+        }
+
+        // Filter by category
+        if (category != null && !category.isBlank()) {
+
+            String selectedCategory = category.trim();
+
+            result = result.filter(product ->
+                    product.getCategory() != null
+                            && product.getCategory()
+                                    .equalsIgnoreCase(selectedCategory)
+            );
+        }
+
+        // Filter by vendor
+        if (vendorId != null) {
+
+            result = result.filter(product ->
+                    Objects.equals(product.getVendorId(), vendorId)
+            );
+        }
+
+        // Filter by minimum effective price
+        if (minPrice != null) {
+
+            result = result.filter(product -> {
+
+                Double effectivePrice =
+                        product.getDiscountedPrice() != null
+                                ? product.getDiscountedPrice()
+                                : product.getPrice();
+
+                return effectivePrice != null
+                        && effectivePrice >= minPrice;
+            });
+        }
+
+        // Filter by maximum effective price
+        if (maxPrice != null) {
+
+            result = result.filter(product -> {
+
+                Double effectivePrice =
+                        product.getDiscountedPrice() != null
+                                ? product.getDiscountedPrice()
+                                : product.getPrice();
+
+                return effectivePrice != null
+                        && effectivePrice <= maxPrice;
+            });
+        }
+
+        Comparator<Product> comparator;
+
+        switch (sort == null ? "newest" : sort.toLowerCase()) {
+
+            case "price-low":
+
+                comparator = Comparator.comparing(
+                        product -> product.getDiscountedPrice() != null
+                                ? product.getDiscountedPrice()
+                                : product.getPrice(),
+                        Comparator.nullsLast(Double::compareTo)
+                );
+
+                break;
+
+            case "price-high":
+
+                comparator = Comparator
+                        .<Product, Double>comparing(
+                                product -> product.getDiscountedPrice() != null
+                                        ? product.getDiscountedPrice()
+                                        : product.getPrice(),
+                                Comparator.nullsLast(Double::compareTo)
+                        )
+                        .reversed();
+
+                break;
+
+            case "name":
+
+                comparator = Comparator.comparing(
+                        Product::getProductName,
+                        Comparator.nullsLast(
+                                String.CASE_INSENSITIVE_ORDER
+                        )
+                );
+
+                break;
+
+            case "discount":
+
+                comparator = Comparator
+                        .<Product, Double>comparing(
+                                product -> product.getDiscountPercentage() != null
+                                        ? product.getDiscountPercentage()
+                                        : 0.0,
+                                Comparator.nullsLast(Double::compareTo)
+                        )
+                        .reversed();
+
+                break;
+
+            case "newest":
+            default:
+
+                comparator = Comparator.comparing(
+                        Product::getProductId,
+                        Comparator.nullsLast(Long::compareTo)
+                ).reversed();
+
+                break;
+        }
+
+        return result
+                .sorted(comparator)
+                .collect(Collectors.toList());
+    }
+}

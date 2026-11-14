@@ -1,0 +1,125 @@
+
+package com.vendor.controller;
+
+import java.util.Optional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.vendor.entity.User;
+import com.vendor.repository.UserRepository;
+
+@Controller
+public class VendorStoreController {
+
+    private final UserRepository userRepository;
+
+    public VendorStoreController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    // Display My Store page
+    @GetMapping("/vendor/store")
+    public String showStorePage(
+            Authentication authentication,
+            Model model) {
+
+        Optional<User> vendorOptional =
+                getLoggedInVendor(authentication);
+
+        if (vendorOptional.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        User vendor = vendorOptional.get();
+
+        model.addAttribute("vendor", vendor);
+        model.addAttribute("vendorName", vendor.getBusinessName());
+
+        return "vendor/store";
+    }
+
+    // Update store name
+    @PostMapping("/vendor/store/update")
+    public String updateStoreName(
+            Authentication authentication,
+            @RequestParam(required = false) String businessName,
+            RedirectAttributes redirectAttributes) {
+
+        Optional<User> vendorOptional =
+                getLoggedInVendor(authentication);
+
+        if (vendorOptional.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        String cleanedName =
+                businessName == null ? "" : businessName.trim();
+
+        if (cleanedName.isEmpty()) {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "Store name is required."
+            );
+
+            return "redirect:/vendor/store";
+        }
+
+        if (cleanedName.length() > 255) {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "Store name must be 255 characters or fewer."
+            );
+
+            return "redirect:/vendor/store";
+        }
+
+        User vendor = vendorOptional.get();
+
+        vendor.setBusinessName(cleanedName);
+
+        userRepository.save(vendor);
+
+        redirectAttributes.addFlashAttribute(
+                "success",
+                "Your store name has been updated successfully."
+        );
+
+        return "redirect:/vendor/store";
+    }
+
+    // Get currently logged-in vendor
+    private Optional<User> getLoggedInVendor(
+            Authentication authentication) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+
+            return Optional.empty();
+        }
+
+        Optional<User> userOptional =
+                userRepository.findByEmail(authentication.getName());
+
+        if (userOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = userOptional.get();
+
+        if (user.getRole() == null
+                || !"vendor".equalsIgnoreCase(user.getRole())) {
+
+            return Optional.empty();
+        }
+
+        return Optional.of(user);
+    }
+}
+s

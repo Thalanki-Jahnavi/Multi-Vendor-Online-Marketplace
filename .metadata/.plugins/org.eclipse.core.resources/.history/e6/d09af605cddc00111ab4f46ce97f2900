@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Products | OneCart</title>
+</head>
+<body>
+
+    <h1>My Products</h1>
+
+    <p>
+        Welcome,
+        <span th:text="${vendor.businessName}">Vendor</span>
+    </p>
+
+    <h3>
+        Total Products:
+        <span th:text="${totalProducts}">0</span>
+    </h3>
+
+    <div th:if="${#lists.isEmpty(products)}">
+        <p>You haven't added any products yet.</p>
+    </div>
+
+    <table border="1" cellpadding="10">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Approval</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.productId}"></td>
+                <td th:text="${product.productName}"></td>
+                <td th:text="${product.category}"></td>
+                <td th:text="${product.price}"></td>
+                <td th:text="${product.stockQuantity}"></td>
+                <td th:text="${product.productStatus}"></td>
+                <td th:text="${product.approvalStatus}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

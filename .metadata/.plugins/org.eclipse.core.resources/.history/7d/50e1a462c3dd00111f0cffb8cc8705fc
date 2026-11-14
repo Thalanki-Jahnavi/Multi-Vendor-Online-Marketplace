@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers | OneCart Admin</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f8f7;
+            color: #123e3a;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 35px auto;
+            padding: 25px;
+        }
+
+        .breadcrumb {
+            color: #78908d;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #78908d;
+            margin-bottom: 25px;
+        }
+
+        .summary {
+            background: white;
+            border: 1px solid #e3eeeb;
+            border-radius: 14px;
+            padding: 22px;
+            width: 250px;
+            margin-bottom: 25px;
+        }
+
+        .summary span {
+            color: #78908d;
+            font-size: 13px;
+        }
+
+        .summary h2 {
+            margin: 10px 0 0;
+            font-size: 30px;
+            color: #087e78;
+        }
+
+        .panel {
+            background: white;
+            padding: 24px;
+            border-radius: 14px;
+            border: 1px solid #e3eeeb;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .search {
+            padding: 12px 15px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            width: 280px;
+            max-width: 100%;
+            outline: none;
+        }
+
+        .search:focus {
+            border-color: #087e78;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            background: #f3f8f6;
+            color: #66817d;
+            text-align: left;
+            font-size: 12px;
+            padding: 16px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 17px 16px;
+            border-bottom: 1px solid #edf1f0;
+            font-size: 14px;
+        }
+
+        .customer-name {
+            font-weight: bold;
+        }
+
+        .status {
+            display: inline-block;
+            background: #e5f4ed;
+            color: #168454;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px;
+            color: #78908d;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 22px;
+            color: #087e78;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media(max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            .summary {
+                width: 100%;
+            }
+
+            .search {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="breadcrumb">
+        OneCart / Admin / Customers
+    </div>
+
+    <h1>Customer Management</h1>
+    <p class="subtitle">
+        View and manage customers registered on OneCart.
+    </p>
+
+    <div class="summary">
+        <span>TOTAL CUSTOMERS</span>
+        <h2 th:text="${totalCustomers}">0</h2>
+    </div>
+
+    <div class="panel">
+
+        <div class="panel-header">
+            <h3>Registered Customers</h3>
+
+            <input type="text"
+                   id="customerSearch"
+                   class="search"
+                   placeholder="Search by name or email...">
+        </div>
+
+        <div class="table-wrapper">
+
+            <table id="customersTable">
+
+                <thead>
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>Customer Name</th>
+                        <th>Email Address</th>
+                        <th>Phone</th>
+                        <th>City</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="customer : ${customers}">
+
+                        <td th:text="${customer.userId}">1</td>
+
+                        <td class="customer-name"
+                            th:text="${customer.firstName + ' ' + customer.lastName}">
+                            Customer Name
+                        </td>
+
+                        <td th:text="${customer.email}">
+                            customer@example.com
+                        </td>
+
+                        <td th:text="${customer.phone != null ? customer.phone : 'N/A'}">
+                            N/A
+                        </td>
+
+                        <td th:text="${customer.city != null ? customer.city : 'N/A'}">
+                            N/A
+                        </td>
+
+                        <td>
+                            <span class="status">Registered</span>
+                        </td>
+
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(customers)}">
+                        <td colspan="6" class="empty">
+                            No customers registered yet.
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <a th:href="@{/admin/dashboard}" class="back-link">
+        ← Back to Dashboard
+    </a>
+
+</div>
+
+<script>
+    document.getElementById("customerSearch")
+        .addEventListener("input", function () {
+
+            const searchValue = this.value.toLowerCase();
+
+            document.querySelectorAll("#customersTable tbody tr")
+                .forEach(function (row) {
+
+                    const rowText = row.innerText.toLowerCase();
+
+                    row.style.display =
+                        rowText.includes(searchValue) ? "" : "none";
+                });
+        });
+</script>
+
+</body>
+</html>

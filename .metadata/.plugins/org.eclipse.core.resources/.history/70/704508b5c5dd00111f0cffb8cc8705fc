@@ -1,0 +1,115 @@
+
+package com.vendor.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.vendor.entity.User;
+import com.vendor.repository.UserRepository;
+import com.vendor.service.AdminService;
+
+@Controller
+public class AdminController {
+
+    private final AdminService adminService;
+    private final UserRepository userRepository;
+
+    public AdminController(
+            AdminService adminService,
+            UserRepository userRepository) {
+
+        this.adminService = adminService;
+        this.userRepository = userRepository;
+    }
+
+    // Admin Dashboard
+    @GetMapping("/admin/dashboard")
+    public String showDashboard(
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        Map<String, Object> dashboardData =
+                adminService.getDashboardData();
+
+        model.addAllAttributes(dashboardData);
+
+        model.addAttribute("adminName", admin.getFirstName());
+        model.addAttribute("adminEmail", admin.getEmail());
+        model.addAttribute("activePage", "dashboard");
+
+        return "admin/dashboard";
+    }
+
+    // Admin - Customer Management
+    @GetMapping("/admin/customers")
+    public String showCustomers(
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        List<User> customers =
+                userRepository.findByRoleIgnoreCase("CUSTOMER");
+
+        model.addAttribute("customers", customers);
+        model.addAttribute("totalCustomers", customers.size());
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "customers");
+
+        return "admin/customers";
+    }
+
+    // Admin - Vendor Management
+    @GetMapping("/admin/vendors")
+    public String showVendors(
+            Authentication authentication,
+            Model model) {
+
+        User admin = getAdmin(authentication);
+
+        List<User> vendors =
+                userRepository.findByRoleIgnoreCase("VENDOR");
+
+        model.addAttribute("vendors", vendors);
+        model.addAttribute("totalVendors", vendors.size());
+
+        addAdminDetails(admin, model);
+        model.addAttribute("activePage", "vendors");
+
+        return "admin/vendors";
+    }
+
+    // Check logged-in admin
+    private User getAdmin(Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Please login first");
+        }
+
+        User admin = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException("Admin account not found"));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getRole())) {
+            throw new AccessDeniedException("Admin access required");
+        }
+
+        return admin;
+    }
+
+    // Common admin details
+    private void addAdminDetails(User admin, Model model) {
+
+        model.addAttribute("adminName", admin.getFirstName());
+        model.addAttribute("adminEmail", admin.getEmail());
+    }
+}

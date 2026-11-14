@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Products | OneCart</title>
+    <link rel="stylesheet" th:href="@{/css/products.css}">
+</head>
+<body>
+
+<div class="shop-page">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="shop-sidebar">
+        <a class="brand" th:href="@{/customer/dashboard}">
+            <span class="brand-icon">O</span>
+            <span>OneCart</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post" class="sidebar-logout">
+            <button type="submit">↪ <span>Logout</span></button>
+        </form>
+
+        <form th:action="@{/customer/products}" method="get"
+              id="productFilterForm" class="sidebar-filters">
+
+            <input type="hidden" name="keyword" th:value="${keyword}">
+            <input type="hidden" name="sort" th:value="${selectedSort}">
+
+            <section class="filter-section">
+                <h3>Categories</h3>
+
+                <label class="filter-option">
+                    <input type="radio" name="category" value=""
+                           onchange="this.form.submit()"
+                           th:checked="${selectedCategory == null or selectedCategory == ''}">
+                    <span class="filter-icon">▦</span>
+                    <span>All Products</span>
+                    <small th:text="${totalProductsCount}">0</small>
+                </label>
+
+                <label class="filter-option" th:each="categoryName : ${categories}">
+                    <input type="radio" name="category"
+                           th:value="${categoryName}"
+                           onchange="this.form.submit()"
+                           th:checked="${categoryName == selectedCategory}">
+                    <span class="filter-icon">◇</span>
+                    <span th:text="${categoryName}">Category</span>
+                    <small th:text="${categoryCounts != null and categoryCounts[categoryName] != null ? categoryCounts[categoryName] : 0}">0</small>
+                </label>
+            </section>
+
+            <div class="sidebar-divider"></div>
+
+            <section class="filter-section">
+                <h3>Price Range</h3>
+
+                <div class="price-presets">
+                    <button type="button" onclick="applyPricePreset(0, 500)">Under ₹500</button>
+                    <button type="button" onclick="applyPricePreset(500, 1000)">₹500 – ₹1,000</button>
+                    <button type="button" onclick="applyPricePreset(1000, 5000)">₹1,000 – ₹5,000</button>
+                    <button type="button" onclick="applyPricePreset(5000, null)">Above ₹5,000</button>
+                </div>
+
+                <div class="price-inputs">
+                    <label>
+                        <span>Minimum</span>
+                        <input type="number" name="minPrice" min="0"
+                               placeholder="₹ 0" th:value="${minPrice}">
+                    </label>
+                    <label>
+                        <span>Maximum</span>
+                        <input type="number" name="maxPrice" min="0"
+                               placeholder="₹ 50000" th:value="${maxPrice}">
+                    </label>
+                </div>
+
+                <button class="apply-filter-btn" type="submit">Apply Price</button>
+            </section>
+
+            <div class="sidebar-divider"></div>
+
+            <section class="filter-section">
+                <h3>Vendors</h3>
+
+                <input class="vendor-search" type="search"
+                       placeholder="Search vendors..."
+                       oninput="filterVendorOptions(this.value)">
+
+                <div class="vendor-options-list">
+                    <label class="filter-option">
+                        <input type="radio" name="vendorId" value=""
+                               onchange="this.form.submit()"
+                               th:checked="${selectedVendorId == null}">
+                        <span>All Vendors</span>
+                    </label>
+
+                    <label class="filter-option" th:each="vendor : ${vendors}">
+                        <input type="radio" name="vendorId"
+                               th:value="${vendor.userId}"
+                               onchange="this.form.submit()"
+                               th:checked="${vendor.userId == selectedVendorId}">
+                        <span th:text="${vendor.businessName != null and !vendor.businessName.isBlank() ? vendor.businessName : vendor.firstName}">
+                            Vendor
+                        </span>
+                    </label>
+                </div>
+            </section>
+
+            <a class="reset-filters" th:href="@{/customer/products}">Reset all filters</a>
+        </form>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="shop-main">
+
+        <!-- TOP BAR -->
+        <header class="shop-topbar">
+            <form class="top-search" th:action="@{/customer/products}" method="get">
+                <input type="hidden" name="category" th:value="${selectedCategory}">
+                <input type="hidden" name="vendorId" th:value="${selectedVendorId}">
+                <input type="hidden" name="minPrice" th:value="${minPrice}">
+                <input type="hidden" name="maxPrice" th:value="${maxPrice}">
+                <input type="hidden" name="sort" th:value="${selectedSort}">
+
+                <span class="search-icon">⌕</span>
+                <input id="productSearchInput" type="search" name="keyword"
+                       th:value="${keyword}"
+                       placeholder="Search products...">
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="top-actions">
+                <button type="button" class="top-icon-btn"
+                        id="wishlistFilterToggle"
+                        onclick="toggleWishlistFilter()" title="Wishlist">
+                    ♡ <span class="wishlist-badge-count">0</span>
+                </button>
+
+                <button type="button" class="top-icon-btn"
+                        onclick="toggleCartDrawer(true)" title="Cart">
+                    🛒 <span class="cart-badge-count">0</span>
+                </button>
+
+                <a class="top-icon-btn profile-icon"
+                   th:href="@{/customer/account}" title="My Account">♙</a>
+            </div>
+        </header>
+
+        <!-- PRODUCTS HEADING AND SORT -->
+        <section class="products-section">
+            <div class="products-heading">
+                <div>
+                    <h1>All Products
+                        <span th:text="'(' + ${totalProductsCount} + ')'">(0)</span>
+                    </h1>
+                    <p th:text="${selectedCategory != null and !selectedCategory.isBlank() ? selectedCategory : 'Explore products from OneCart sellers'}">
+                        Explore products from OneCart sellers
+                    </p>
+                </div>
+
+                <form class="sort-form" th:action="@{/customer/products}" method="get">
+                    <input type="hidden" name="keyword" th:value="${keyword}">
+                    <input type="hidden" name="category" th:value="${selectedCategory}">
+                    <input type="hidden" name="vendorId" th:value="${selectedVendorId}">
+                    <input type="hidden" name="minPrice" th:value="${minPrice}">
+                    <input type="hidden" name="maxPrice" th:value="${maxPrice}">
+
+                    <label for="sortSelect">Sort by:</label>
+                    <select id="sortSelect" name="sort" onchange="this.form.submit()">
+                        <option value="newest" th:selected="${selectedSort == 'newest' or selectedSort == null}">Newest</option>
+                        <option value="price-low" th:selected="${selectedSort == 'price-low'}">Price: Low to High</option>
+                        <option value="price-high" th:selected="${selectedSort == 'price-high'}">Price: High to Low</option>
+                        <option value="discount" th:selected="${selectedSort == 'discount'}">Highest Discount</option>
+                        <option value="name" th:selected="${selectedSort == 'name'}">Name: A to Z</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="results-line">
+                <span th:text="${products != null ? products.size() + ' products found' : '0 products found'}">
+                    Products found
+                </span>
+                <a th:href="@{/customer/products}" th:if="${hasActiveFilters}">Clear filters</a>
+            </div>
+
+            <!-- PRODUCT GRID -->
+            <section class="product-grid" id="productsContainer"
+                     th:if="${products != null and !products.isEmpty()}">
+
+                <article class="product-card"
+                         th:id="'product-' + ${product.productId}"
+                         th:each="product : ${products}">
+
+                    <div class="card-image-wrapper">
+                        <span class="discount-badge"
+                              th:if="${product.hasDiscount()}"
+                              th:text="${#numbers.formatDecimal(product.discountPercentage, 0, 0) + '% OFF'}">
+                            20% OFF
+                        </span>
+
+                        <button type="button"
+                                class="icon-action-btn btn-wishlist-toggle wishlist-btn"
+                                th:data-id="${product.productId}"
+                                onclick="handleWishlistClick(this)"
+                                title="Add to wishlist">♡</button>
+
+                        <img class="product-img"
+                             th:src="@{'/images/products/' + ${product.imageFileName}}"
+                             th:alt="${product.productName}"
+                             loading="lazy"
+                             onerror="this.onerror=null;this.src='/images/products/Ceramic Coffee Mug.jpg';">
+                    </div>
+
+                    <div class="card-body">
+                        <span class="category-tag"
+                              th:text="${product.category != null ? product.category : 'General'}">
+                            Category
+                        </span>
+
+                        <h3 class="card-title"
+                            th:text="${product.productName}"
+                            th:title="${product.productName}">
+                            Product name
+                        </h3>
+
+                        <p class="card-vendor"
+                           th:text="${vendorNames != null and product.vendorId != null and vendorNames[product.vendorId] != null ? vendorNames[product.vendorId] : 'OneCart Vendor'}">
+                            OneCart Vendor
+                        </p>
+
+                        <div class="card-rating-row">
+                            <span class="star-rating">★★★★☆</span>
+                            <span class="rating-count">Customer favourite</span>
+                        </div>
+
+                        <div class="card-price-row">
+                            <strong class="final-price"
+                                    th:text="${product.discountedPrice != null ? '₹' + #numbers.formatDecimal(product.discountedPrice, 1, 2) : '₹' + #numbers.formatDecimal(product.price, 1, 2)}">
+                                ₹0.00
+                            </strong>
+
+                            <del class="original-price"
+                                 th:if="${product.hasDiscount()}"
+                                 th:text="${'₹' + #numbers.formatDecimal(product.price, 1, 2)}">
+                                ₹0.00
+                            </del>
+                        </div>
+
+                        <div class="card-actions-row">
+                            <div class="card-qty-box">
+                                <button type="button" class="card-qty-btn"
+                                        onclick="adjustCardQty(this, -1)">−</button>
+                                <span class="card-qty-val">1</span>
+                                <button type="button" class="card-qty-btn"
+                                        onclick="adjustCardQty(this, 1)">+</button>
+                            </div>
+
+                            <button type="button" class="btn-add-cart"
+                                    onclick="handleAddToCartClick(this)">
+                                🛒 Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <!-- EMPTY STATE -->
+            <section class="empty-state"
+                     th:if="${products == null or products.isEmpty()}">
+                <div>⌕</div>
+                <h2>No products found</h2>
+                <p>Try changing your search or filters.</p>
+                <a th:href="@{/customer/products}">View all products</a>
+            </section>
+        </section>
+    </main>
+</div>
+
+<!-- KEEP YOUR EXISTING QUICK VIEW MODAL, CART DRAWER AND TOAST HTML HERE.
+     Copy these unchanged from your old products.html:
+     1. Quick View Modal
+     2. Slide-Over Cart Drawer
+     3. Toast container, if present
+-->
+
+<script th:src="@{/js/products.js}"></script>
+</body>
+</html>

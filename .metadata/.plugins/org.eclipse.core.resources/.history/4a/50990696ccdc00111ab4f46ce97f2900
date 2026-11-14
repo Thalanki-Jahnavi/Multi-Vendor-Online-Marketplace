@@ -1,0 +1,67 @@
+
+package com.vendor.controller;
+
+import java.util.Optional;
+import java.util.List;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.vendor.entity.Product;
+import com.vendor.entity.User;
+import com.vendor.repository.ProductRepository;
+import com.vendor.repository.UserRepository;
+
+@Controller
+public class VendorProductController {
+
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+
+    public VendorProductController(
+            ProductRepository productRepository,
+            UserRepository userRepository) {
+
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/vendor/products")
+    public String showProducts(
+            Authentication authentication,
+            Model model) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+
+            return "redirect:/login";
+        }
+
+        Optional<User> userOptional =
+                userRepository.findByEmail(authentication.getName());
+
+        if (userOptional.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        User vendor = userOptional.get();
+
+        if (!"vendor".equalsIgnoreCase(vendor.getRole())) {
+            return "redirect:/login?error";
+        }
+
+        Integer vendorId = vendor.getUserId();
+
+        List<Product> products =
+                productRepository.findByVendorIdOrderByProductIdDesc(vendorId);
+
+        model.addAttribute("vendor", vendor);
+        model.addAttribute("products", products);
+        model.addAttribute("totalProducts", products.size());
+
+        return "vendor/products";
+    }
+}

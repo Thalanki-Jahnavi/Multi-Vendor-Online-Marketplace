@@ -1,0 +1,141 @@
+
+package com.vendor.controller;
+
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.vendor.entity.Product;
+import com.vendor.entity.User;
+import com.vendor.repository.UserRepository;
+import com.vendor.service.ProductService;
+
+@Controller
+public class HomeController {
+
+    private final ProductService productService;
+    private final UserRepository userRepository;
+
+    public HomeController(
+            ProductService productService,
+            UserRepository userRepository) {
+
+        this.productService = productService;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/")
+    public String showHomePage(
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false, defaultValue = "newest") String sort,
+            Model model) {
+
+        List<Product> allProducts =
+                productService.getApprovedProducts();
+
+        List<Product> filteredProducts =
+                productService.filterProducts(
+                        allProducts,
+                        keyword,
+                        category,
+                        null,
+                        null,
+                        null,
+                        sort
+                );
+
+        TreeSet<String> categories =
+                new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+
+        for (Product product : allProducts) {
+            if (product.getCategory() != null
+                    && !product.getCategory().isBlank()) {
+                categories.add(product.getCategory().trim());
+            }
+        }
+
+        List<Integer> vendorIds = allProducts.stream()
+                .map(Product::getVendorId)
+                .filter(id -> id != null)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<User> vendors = vendorIds.isEmpty()
+                ? List.of()
+                : userRepository.findByUserIdIn(vendorIds);
+
+        Map<Integer, String> vendorNames = vendors.stream()
+                .collect(Collectors.toMap(
+                        User::getUserId,
+                        user -> {
+                            if (user.getBusinessName() != null
+                                    && !user.getBusinessName().isBlank()) {
+                                return user.getBusinessName();
+                            }
+
+                            return user.getFirstName() != null
+                                    ? user.getFirstName()
+                                    : "OneCart Vendor";
+                        },
+                        (existing, replacement) -> existing
+                ));
+
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getName())) {
+
+            userRepository.findByEmail(authentication.getName())
+                    .ifPresent(user -> {
+                        model.addAttribute(
+                                "customerName",
+                                user.getFirstName()
+                        );
+
+                        model.addAttribute(
+                                "customerEmail",
+                                user.getEmail()
+                        );
+                    });
+        }
+
+        model.addAttribute("products", filteredProducts);
+        model.addAttribute("totalProductsCount", filteredProducts.size());
+        model.addAttribute("categories", categories);
+        model.addAttribute("vendorNames", vendorNames);
+
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("selectedSort", sort);
+
+        return "public/home";
+    }
+
+    @GetMapping("/contact")
+    public String showContactPage() {
+        return "public/contact";
+    }
+
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "public/login";
+    }
+
+    @GetMapping("/signup")
+    public String showSignupPage() {
+        return "public/signup";
+    }
+
+    @GetMapping("/forgot-password")
+    public String forgotPassword() {
+        return "public/forgot-password";
+    }
+}

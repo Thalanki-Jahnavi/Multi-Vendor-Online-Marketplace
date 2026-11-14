@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneCart | Shop Everything</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+
+<body>
+<header class="site-header">
+    <div class="top-strip">
+        <p>Discover great products from trusted sellers</p>
+        <p>OneCart — one place for everything</p>
+    </div>
+
+    <div class="header-main">
+        <a class="brand" th:href="@{/login}">
+            <span class="brand-icon">O</span>
+            <span>One<span>Cart</span></span>
+        </a>
+
+        <!-- Search -->
+        <form class="search-form" th:action="@{/login}" method="get" sec:authorize="isAnonymous()">
+            <input type="search" name="keyword" placeholder="Search products (Login required)..." aria-label="Search products">
+            <button type="submit" aria-label="Search">⌕</button>
+        </form>
+
+        <form class="search-form" th:action="@{/login}" method="get" sec:authorize="isAuthenticated()">
+            <input type="search" name="keyword" placeholder="Search products..." aria-label="Search products">
+            <button type="submit" aria-label="Search">⌕</button>
+        </form>
+
+        <!-- Header Actions -->
+        <div class="header-actions">
+
+            <!-- Guest Options -->
+            <div class="guest-actions"
+                 sec:authorize="isAnonymous()"
+                 style="display:flex; flex-direction:row; align-items:center; justify-content:flex-end; gap:22px; flex-wrap:nowrap; white-space:nowrap;">
+
+                <a class="header-action" th:href="@{/login}">
+                    <span class="action-icon">♙</span>
+                    <span>Sign In</span>
+                </a>
+
+                <a class="header-action" th:href="@{/login}">
+                    <span class="action-icon">♡</span>
+                    <span>Wishlist</span>
+                </a>
+
+                <a class="header-action" th:href="@{/login}">
+                    <span class="action-icon">🛒</span>
+                    <span>Cart</span>
+                </a>
+            </div>
+
+            <!-- Customer Options -->
+            <div class="guest-actions" sec:authorize="hasRole('CUSTOMER')">
+                <a class="header-action" th:href="@{/login}">
+                    <span class="action-icon">♙</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a class="header-action" th:href="@{/login}">
+                    <span class="action-icon">♡</span>
+                    <span>Wishlist</span>
+                </a>
+
+                <a class="header-action" th:href="@{/login}">
+                    <span class="action-icon">🛒</span>
+                    <span>Cart</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <a class="active" th:href="@{/login}">Home</a>
+
+        <a th:href="@{/login}" sec:authorize="isAnonymous()">Categories</a>
+        <a th:href="@{/login}" sec:authorize="isAuthenticated()">Categories</a>
+
+        <a th:href="@{/login}" sec:authorize="isAnonymous()">Products</a>
+        <a th:href="@{/login}" sec:authorize="isAuthenticated()">Products</a>
+
+        <a th:href="@{/login}" sec:authorize="isAnonymous()">Vendors</a>
+        <a th:href="@{/login}" sec:authorize="isAuthenticated()">Vendors</a>
+
+        <a th:href="@{/login}">About</a>
+        <a th:href="@{/login}">Contact</a>
+    </nav>
+</header>
+
+<main>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="eyebrow">WELCOME TO ONECART</span>
+            <h1>Everything you love.<br><span>All in one cart.</span></h1>
+            <p>Explore products from independent sellers and find something you'll love.</p>
+
+            <div class="hero-actions">
+                <a class="button button-primary" th:href="@{/login}" sec:authorize="isAnonymous()">
+                    Explore products <span>→</span>
+                </a>
+
+                <a class="button button-primary" th:href="@{/login}" sec:authorize="isAuthenticated()">
+                    Explore products <span>→</span>
+                </a>
+
+                <a class="button button-light" th:href="@{/login}" sec:authorize="isAnonymous()">
+                    Explore vendors
+                </a>
+
+                <a class="button button-light" th:href="@{/login}" sec:authorize="isAuthenticated()">
+                    Explore vendors
+                </a>
+            </div>
+
+            <div class="hero-trust">
+                <span>✓ Trusted sellers</span>
+                <span>✓ Easy shopping</span>
+                <span>✓ Great finds</span>
+            </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+            <div class="hero-circle"></div>
+
+            <div class="hero-card hero-card-back">
+                <span class="hero-card-icon">✦</span>
+                <span>Everyday essentials</span>
+            </div>
+
+            <div class="hero-card hero-card-front">
+                <div class="hero-bag">🛍️</div>
+                <strong>Find your next favorite</strong>
+                <span>Shop OneCart</span>
+            </div>
+
+            <div class="floating-tag tag-top">Fresh finds</div>
+            <div class="floating-tag tag-bottom">Made for you ♡</div>
+        </div>
+    </section>
+
+    <!-- Benefits -->
+    <section class="benefits">
+        <div class="benefit">
+            <span class="benefit-icon">✦</span>
+            <div>
+                <strong>Curated finds</strong>
+                <small>Discover something new</small>
+            </div>
+        </div>
+
+        <div class="benefit">
+            <span class="benefit-icon">♧</span>
+            <div>
+                <strong>Independent vendors</strong>
+                <small>Shop from trusted sellers</small>
+            </div>
+        </div>
+
+        <div class="benefit">
+            <span class="benefit-icon">♡</span>
+            <div>
+                <strong>Simple shopping</strong>
+                <small>Your favorites in one place</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="section categories-section" id="categories">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">EXPLORE</span>
+                <h2>Shop by category</h2>
+                <p>Find the things you need, and the things you didn't know you needed.</p>
+            </div>
+
+            <a class="text-link" th:href="@{/login}" sec:authorize="isAnonymous()">Browse products <span>→</span></a>
+            <a class="text-link" th:href="@{/login}" sec:authorize="isAuthenticated()">Browse products <span>→</span></a>
+        </div>
+
+        <div class="category-grid">
+            <a class="category-card category-fashion" th:href="@{/login}" sec:authorize="isAnonymous()">
+                <span class="category-emoji">👕</span>
+                <span class="category-name">Fashion</span>
+                <span class="category-note">Login to explore</span>
+            </a>
+
+            <a class="category-card category-fashion" th:href="@{/login}" sec:authorize="isAuthenticated()">
+                <span class="category-emoji">👕</span>
+                <span class="category-name">Fashion</span>
+                <span class="category-note">Everyday style</span>
+            </a>
+
+            <a class="category-card category-electronics" th:href="@{/login}" sec:authorize="isAnonymous()">
+                <span class="category-emoji">🎧</span>
+                <span class="category-name">Electronics</span>
+                <span class="category-note">Login to explore</span>
+            </a>
+
+            <a class="category-card category-electronics" th:href="@{/login}" sec:authorize="isAuthenticated()">
+                <span class="category-emoji">🎧</span>
+                <span class="category-name">Electronics</span>
+                <span class="category-note">Tech favorites</span>
+            </a>
+
+            <a class="category-card category-home" th:href="@{/login}" sec:authorize="isAnonymous()">
+                <span class="category-emoji">🏡</span>
+                <span class="category-name">Home &amp; Living</span>
+                <span class="category-note">Login to explore</span>
+            </a>
+
+            <a class="category-card category-home" th:href="@{/login}" sec:authorize="isAuthenticated()">
+                <span class="category-emoji">🏡</span>
+                <span class="category-name">Home &amp; Living</span>
+                <span class="category-note">Make it yours</span>
+            </a>
+
+            <a class="category-card category-beauty" th:href="@{/login}" sec:authorize="isAnonymous()">
+                <span class="category-emoji">💄</span>
+                <span class="category-name">Beauty</span>
+                <span class="category-note">Login to explore</span>
+            </a>
+
+            <a class="category-card category-beauty" th:href="@{/login}" sec:authorize="isAuthenticated()">
+                <span class="category-emoji">💄</span>
+                <span class="category-name">Beauty</span>
+                <span class="category-note">Little luxuries</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Popular Products Section -->
+    <section class="section products-section" id="products">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">HANDPICKED FOR YOU</span>
+                <h2>Popular products</h2>
+                <p>Take a look at some of the products available on OneCart.</p>
+            </div>
+
+            <a class="text-link" th:href="@{/login}" sec:authorize="isAnonymous()">Explore all products <span>→</span></a>
+            <a class="text-link" th:href="@{/login}" sec:authorize="isAuthenticated()">Explore all products <span>→</span></a>
+        </div>
+
+        <div class="product-grid" th:if="${products != null and !products.isEmpty()}">
+            <article class="product-card" th:each="product : ${products}">
+                <div class="product-image-wrap">
+                    <a th:href="@{/login}" sec:authorize="isAnonymous()" style="display:block;width:100%;height:100%;">
+                        <img class="product-image"
+                             th:src="@{'/images/products/' + ${product.imageFileName}}"
+                             th:alt="${product.productName}"
+                             loading="lazy"
+                             onerror="this.onerror=null;this.src='/images/products/Ceramic Coffee Mug.jpg';">
+                    </a>
+
+                    <a th:href="@{/login}" sec:authorize="isAuthenticated()" style="display:block;width:100%;height:100%;">
+                        <img class="product-image"
+                             th:src="@{'/images/products/' + ${product.imageFileName}}"
+                             th:alt="${product.productName}"
+                             loading="lazy"
+                             onerror="this.onerror=null;this.src='/images/products/Ceramic Coffee Mug.jpg';">
+                    </a>
+
+                    <span class="product-badge">Popular</span>
+
+                    <a class="wishlist-button"
+                       th:href="@{/login}"
+                       aria-label="Sign in to add this product to wishlist">♡</a>
+                </div>
+
+                <div class="product-info">
+                    <span class="product-category" th:text="${product.category != null ? product.category : 'ONECART FIND'}">ONECART FIND</span>
+
+                    <a th:href="@{/login}" sec:authorize="isAnonymous()">
+                        <h3 th:text="${product.productName}">Product name</h3>
+                    </a>
+
+                    <a th:href="@{/login}" sec:authorize="isAuthenticated()">
+                        <h3 th:text="${product.productName}">Product name</h3>
+                    </a>
+
+                    <div class="product-price-row">
+                        <strong class="product-price"
+                                th:text="${product.discountedPrice != null ? '₹' + #numbers.formatDecimal(product.discountedPrice, 1, 2) : '₹' + #numbers.formatDecimal(product.price, 1, 2)}">
+                            ₹0.00
+                        </strong>
+
+                        <del th:if="${product.hasDiscount()}" style="font-size:13px;color:#68817e;margin-left:6px;">
+                            ₹<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+                        </del>
+                    </div>
+
+                    <a class="add-to-cart" th:href="@{/login}" sec:authorize="isAnonymous()">
+                        Sign in to buy <span>→</span>
+                    </a>
+
+                    <a class="add-to-cart" th:href="@{/login}" sec:authorize="hasRole('CUSTOMER')">
+                        Explore product <span>→</span>
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <div class="empty-state" th:if="${products == null or products.isEmpty()}">
+            <div class="empty-icon">🛍️</div>
+            <h3>Products are on their way</h3>
+            <p>Check back soon to discover new finds from our vendors.</p>
+        </div>
+    </section>
+
+    <!-- Vendor Section -->
+    <section class="vendor-section" id="vendors">
+        <div class="section vendor-content">
+            <div class="vendor-copy">
+                <span class="eyebrow">SELL WITH ONECART</span>
+                <h2>Have something<br>great to share?</h2>
+                <p>Bring your products to OneCart and connect with shoppers looking for their next favorite find.</p>
+                <a class="button button-primary" th:href="@{/login}">
+                    Become a vendor <span>→</span>
+                </a>
+            </div>
+
+            <div class="vendor-panel">
+                <div class="vendor-panel-heading">
+                    <div>
+                        <span class="eyebrow">OUR COMMUNITY</span>
+                        <h3>Meet our vendors</h3>
+                    </div>
+                    <span class="vendor-star">✦</span>
+                </div>
+
+                <div class="vendor-list" th:if="${vendors != null and !vendors.isEmpty()}">
+                    <a th:href="@{/login}" class="vendor-row" th:each="vendor : ${vendors}" style="text-decoration:none;color:inherit;">
+                        <span class="vendor-avatar"
+                              th:text="${vendor.businessName != null and !vendor.businessName.isEmpty() ? #strings.substring(vendor.businessName, 0, 1).toUpperCase() : 'V'}">V</span>
+
+                        <div>
+                            <strong th:text="${vendor.businessName != null ? vendor.businessName : 'OneCart Vendor'}">Vendor name</strong>
+                            <small>Sign in to view catalog</small>
+                        </div>
+
+                        <span class="vendor-arrow">→</span>
+                    </a>
+                </div>
+
+                <p class="vendor-empty" th:if="${vendors == null or vendors.isEmpty()}">
+                    New vendors are joining OneCart soon.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Strip -->
+    <section class="about-strip" id="about">
+        <div class="section about-inner">
+            <div>
+                <span class="eyebrow">ABOUT ONECART</span>
+                <h2>A little more choice.<br>A lot more discovery.</h2>
+            </div>
+            <p>OneCart brings customers and independent vendors together in one simple marketplace. Browse, discover, and shop your way.</p>
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="site-footer" id="contact">
+    <div class="footer-main">
+        <div class="footer-brand">
+            <a class="brand brand-footer" th:href="@{/login}">
+                <span class="brand-icon">O</span>
+                <span>One<span>Cart</span></span>
+            </a>
+            <p>Discover more. Shop simply.</p>
+        </div>
+
+        <div class="footer-links">
+            <strong>Explore</strong>
+            <a th:href="@{/login}">Categories</a>
+            <a th:href="@{/login}">Products</a>
+            <a th:href="@{/login}">Vendors</a>
+        </div>
+
+        <div class="footer-links">
+            <strong>Help</strong>
+            <a th:href="@{/login}">My account</a>
+            <a th:href="@{/login}">Contact us</a>
+            <a th:href="@{/login}">About OneCart</a>
+        </div>
+
+        <div class="footer-contact">
+            <strong>Stay connected</strong>
+            <p>Have a question? We'd love to hear from you.</p>
+            <a th:href="@{/login}">Get in touch <span>→</span></a>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <span>© <span id="current-year"></span> OneCart. All rights reserved.</span>
+        <span>Made for everyday discoveries <span class="footer-heart">♡</span></span>
+    </div>
+</footer>
+
+<script>
+    (() => {
+        const year = document.getElementById("current-year");
+        if (year) {
+            year.textContent = new Date().getFullYear();
+        }
+    })();
+</script>
+
+</body>
+</html>

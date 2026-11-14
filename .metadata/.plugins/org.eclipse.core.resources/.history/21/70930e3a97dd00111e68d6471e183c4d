@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Dashboard | OneCart</title>
+
+    <link rel="stylesheet" th:href="@{/css/sidebar-layout.css}">
+    <link rel="stylesheet" th:href="@{/css/customer-dashboard.css}">
+</head>
+
+<body>
+
+<div class="sidebar-layout">
+
+    <!-- CUSTOMER SIDEBAR -->
+    <aside class="app-sidebar">
+
+        <a class="sidebar-brand" th:href="@{/customer/dashboard}">
+            <span class="sidebar-brand-icon">O</span>
+            <span>One<span class="brand-light">Cart</span></span>
+        </a>
+
+        <p class="sidebar-label">SHOPPING</p>
+
+        <nav class="sidebar-nav">
+
+            <a class="sidebar-link active"
+               th:href="@{/customer/dashboard}">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a class="sidebar-link"
+               th:href="@{/customer/products}">
+                <span class="nav-icon">▦</span>
+                <span>Shop Products</span>
+            </a>
+
+            <a class="sidebar-link"
+               th:href="@{/customer/products}">
+                <span class="nav-icon">♡</span>
+                <span>Wishlist</span>
+            </a>
+
+            <a class="sidebar-link"
+               th:href="@{/customer/products}">
+                <span class="nav-icon">🛒</span>
+                <span>My Cart</span>
+            </a>
+
+            <a class="sidebar-link"
+               th:href="@{/customer/orders}">
+                <span class="nav-icon">▤</span>
+                <span>My Orders</span>
+            </a>
+
+        </nav>
+
+        <p class="sidebar-label sidebar-label-spaced">ACCOUNT</p>
+
+        <nav class="sidebar-nav">
+            <a class="sidebar-link"
+               th:href="@{/customer/account}">
+                <span class="nav-icon">♙</span>
+                <span>My Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <form th:action="@{/logout}" method="post">
+                <button class="sidebar-logout" type="submit">
+                    <span class="nav-icon">↪</span>
+                    <span>Logout</span>
+                </button>
+            </form>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <div class="main-shell">
+
+        <!-- TOPBAR -->
+        <header class="content-topbar">
+
+            <button class="mobile-menu-toggle"
+                    type="button"
+                    onclick="toggleOneCartSidebar()"
+                    aria-label="Toggle navigation">
+                ☰
+            </button>
+
+            <form class="dashboard-search"
+                  th:action="@{/customer/products}"
+                  method="get">
+
+                <span class="search-icon">⌕</span>
+
+                <input type="text"
+                       name="keyword"
+                       placeholder="Search products, brands and more"
+                       aria-label="Search products">
+
+                <button type="submit" aria-label="Search">
+                    Search
+                </button>
+
+            </form>
+
+            <div class="topbar-actions">
+
+                <a class="topbar-icon-link"
+                   th:href="@{/customer/products}"
+                   title="Wishlist">
+                    ♡
+                </a>
+
+                <a class="topbar-icon-link"
+                   th:href="@{/customer/products}"
+                   title="My Cart">
+                    🛒
+                </a>
+
+                <a class="topbar-profile"
+                   th:href="@{/customer/account}"
+                   title="My Profile">
+                    ♙
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- PRODUCTS ONLY -->
+        <main class="products-main dashboard-products-main">
+
+            <div class="products-heading">
+
+                <div>
+                    <span class="products-eyebrow">
+                        MADE FOR YOUR EVERYDAY
+                    </span>
+
+                    <h2>Discover Products</h2>
+
+                    <p>
+                        Find your next favourite from OneCart vendors.
+                    </p>
+                </div>
+
+                <a class="view-all-products"
+                   th:href="@{/customer/products}">
+                    View all products <span>→</span>
+                </a>
+
+            </div>
+
+
+            <!-- PRODUCT GRID -->
+            <div class="product-grid"
+                 th:if="${products != null and !products.isEmpty()}">
+
+                <article class="product-card"
+                         th:each="product : ${products}">
+
+                    <div class="product-image-wrap">
+
+                        <a class="dashboard-product-image-link"
+                           th:href="@{/customer/products(keyword=${product.productName})}">
+
+                            <img class="product-image"
+                                 th:src="@{'/images/products/' + ${product.imageFileName}}"
+                                 th:alt="${product.productName}"
+                                 loading="lazy"
+                                 onerror="this.onerror=null;this.src='/images/products/Ceramic Coffee Mug.jpg';">
+
+                        </a>
+
+                        <span class="product-badge">Popular</span>
+
+                        <a class="wishlist-button"
+                           th:href="@{/customer/products}"
+                           title="Wishlist">
+                            ♡
+                        </a>
+
+                    </div>
+
+
+                    <div class="product-info">
+
+                        <span class="product-category"
+                              th:text="${product.category != null ? product.category : 'ONECART FIND'}">
+                            ONECART FIND
+                        </span>
+
+                        <a class="dashboard-product-name"
+                           th:href="@{/customer/products(keyword=${product.productName})}">
+
+                            <h3 th:text="${product.productName}">
+                                Product name
+                            </h3>
+
+                        </a>
+
+
+                        <div class="product-price-row">
+
+                            <strong class="product-price"
+                                    th:text="${product.discountedPrice != null
+                                    ? '₹' + #numbers.formatDecimal(product.discountedPrice, 1, 2)
+                                    : '₹' + #numbers.formatDecimal(product.price, 1, 2)}">
+                                ₹0.00
+                            </strong>
+
+                            <del th:if="${product.hasDiscount()}">
+                                ₹<span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">
+                                    0.00
+                                </span>
+                            </del>
+
+                        </div>
+
+
+                        <a class="add-to-cart"
+                           th:href="@{/customer/products(keyword=${product.productName})}">
+                            View product <span>→</span>
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+
+            <!-- EMPTY PRODUCTS -->
+            <div class="empty-state"
+                 th:if="${products == null or products.isEmpty()}">
+
+                <div class="empty-icon">🛍️</div>
+
+                <h3>No products available yet</h3>
+
+                <p>
+                    Approved products from vendors will appear here.
+                    Please check back soon.
+                </p>
+
+                <a th:href="@{/customer/products}">
+                    Explore products
+                </a>
+
+            </div>
+
+        </main>
+
+
+        <!-- FOOTER -->
+        <footer class="sidebar-page-footer">
+            <span>© 2026 OneCart. All rights reserved.</span>
+            <span>Made for everyday discoveries ♡</span>
+        </footer>
+
+    </div>
+
+</div>
+
+
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div class="sidebar-mobile-overlay"
+     id="oneCartSidebarOverlay"
+     onclick="toggleOneCartSidebar()">
+</div>
+
+
+<script>
+    function toggleOneCartSidebar() {
+        document.body.classList.toggle("sidebar-open");
+    }
+</script>
+
+</body>
+</html>

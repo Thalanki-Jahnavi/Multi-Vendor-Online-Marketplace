@@ -1,0 +1,155 @@
+
+package com.vendor.controller;
+
+import java.util.Optional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.vendor.entity.Product;
+import com.vendor.entity.User;
+import com.vendor.repository.ProductRepository;
+import com.vendor.repository.UserRepository;
+
+@Controller
+public class AddProductController {
+
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+
+    public AddProductController(
+            ProductRepository productRepository,
+            UserRepository userRepository) {
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
+    }
+
+    // Display Add Product form
+    @GetMapping("/vendor/products/add")
+    public String showAddProductForm(
+            Authentication authentication,
+            Model model) {
+
+        User vendor = getLoggedInVendor(authentication);
+
+        if (vendor == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("vendor", vendor);
+        return "vendor/add-product";
+    }
+
+    // Save product
+    @PostMapping("/vendor/products/add")
+    public String addProduct(
+            Authentication authentication,
+            @RequestParam String productName,
+            @RequestParam String category,
+            @RequestParam Double price,
+            @RequestParam(required = false) Double discountPercentage,
+            @RequestParam Integer stockQuantity,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        User vendor = getLoggedInVendor(authentication);
+
+        if (vendor == null) {
+            return "redirect:/login";
+        }
+
+        // Validate product name
+        if (productName == null || productName.isBlank()) {
+            model.addAttribute("error", "Product name is required.");
+            model.addAttribute("vendor", vendor);
+            return "vendor/add-product";
+        }
+
+        // Validate category
+        if (category == null || category.isBlank()) {
+            model.addAttribute("error", "Please select a category.");
+            model.addAttribute("vendor", vendor);
+            return "vendor/add-product";
+        }
+
+        // Validate price and stock
+        if (price == null || price <= 0) {
+            model.addAttribute("error", "Enter a valid product price.");
+            model.addAttribute("vendor", vendor);
+            return "vendor/add-product";
+        }
+
+        if (stockQuantity == null || stockQuantity < 0) {
+            model.addAttribute("error", "Stock quantity cannot be negative.");
+            model.addAttribute("vendor", vendor);
+            return "vendor/add-product";
+        }
+
+        if (discountPercentage == null) {
+            discountPercentage = 0.0;
+        }
+
+        if (discountPercentage < 0 || discountPercentage > 100) {
+            model.addAttribute("error", "Discount must be between 0 and 100.");
+            model.addAttribute("vendor", vendor);
+            return "vendor/add-product";
+        }
+
+        // Create product
+        Product product = new Product();
+
+        product.setProductName(productName.trim());
+        product.setCategory(category.trim());
+        product.setPrice(price);
+        product.setDiscountPercentage(discountPercentage);
+        product.setStockQuantity(stockQuantity);
+
+        // Default product status
+        product.setProductStatus("ACTIVE");
+
+        // Product requires admin approval
+        product.setApprovalStatus("PENDING");
+
+        // Connect product to the logged-in vendor
+        product.setVendorId(vendor.getUserId());
+
+        productRepository.save(product);
+
+        redirectAttributes.addFlashAttribute(
+                "success",
+                "Product added successfully. It is waiting for admin approval."
+        );
+
+        return "redirect:/vendor/products";
+    }
+
+    // Get the currently logged-in vendor
+    private User getLoggedInVendor(Authentication authentication) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            return null;
+        }
+
+        Optional<User> userOptional =
+                userRepository.findByEmail(authentication.getName());
+
+        if (userOptional.isEmpty()) {
+            return null;
+        }
+
+        User user = userOptional.get();
+
+        if (!"vendor".equalsIgnoreCase(user.getRole())) {
+            return null;
+        }
+
+        return user;
+    }
+}

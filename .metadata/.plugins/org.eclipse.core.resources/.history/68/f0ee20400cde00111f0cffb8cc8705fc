@@ -1,0 +1,200 @@
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("guestSearch");
+    const searchForm = document.getElementById("guestSearchForm");
+    const sortSelect = document.getElementById("guestSort");
+    const categoryList = document.getElementById("guestCategoryList");
+    const productGrid = document.getElementById("guestProductGrid");
+    const countElement = document.getElementById("guestProductCount");
+    const noResults = document.getElementById("guestNoResults");
+
+    if (!productGrid) {
+        return;
+    }
+
+    const cards = Array.from(
+        productGrid.querySelectorAll(".guest-product-card")
+    );
+
+    let selectedCategory = "all";
+
+    function normalize(value) {
+        return (value || "").trim().toLowerCase();
+    }
+
+    function buildCategories() {
+
+        const categories = new Set();
+
+        cards.forEach(card => {
+            const category = card.dataset.category;
+
+            if (category && category.trim()) {
+                categories.add(category.trim());
+            }
+        });
+
+        Array.from(categories)
+            .sort((a, b) => a.localeCompare(b))
+            .forEach(category => {
+
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.className = "category-filter";
+                button.dataset.category = category;
+                button.textContent = category;
+
+                categoryList.appendChild(button);
+            });
+    }
+
+    function sortProducts() {
+
+        const sortValue = sortSelect.value;
+
+        const sortedCards = [...cards];
+
+        sortedCards.sort((a, b) => {
+
+            const priceA = Number(a.dataset.price) || 0;
+            const priceB = Number(b.dataset.price) || 0;
+
+            const idA = Number(a.dataset.id) || 0;
+            const idB = Number(b.dataset.id) || 0;
+
+            if (sortValue === "price-low") {
+                return priceA - priceB;
+            }
+
+            if (sortValue === "price-high") {
+                return priceB - priceA;
+            }
+
+            return idB - idA;
+        });
+
+        sortedCards.forEach(card => {
+            productGrid.appendChild(card);
+        });
+    }
+
+    function applyFilters() {
+
+        const keyword = normalize(searchInput.value);
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+
+            const name = normalize(card.dataset.name);
+            const category = normalize(card.dataset.category);
+            const vendor = normalize(
+                card.querySelector(".guest-vendor-name")?.textContent
+            );
+
+            const searchMatch =
+                !keyword ||
+                name.includes(keyword) ||
+                category.includes(keyword) ||
+                vendor.includes(keyword);
+
+            const categoryMatch =
+                selectedCategory === "all" ||
+                category === normalize(selectedCategory);
+
+            const visible = searchMatch && categoryMatch;
+
+            card.style.display = visible ? "" : "none";
+
+            if (visible) {
+                visibleCount++;
+            }
+        });
+
+        countElement.textContent =
+            visibleCount + (visibleCount === 1 ? " product" : " products");
+
+        noResults.style.display =
+            visibleCount === 0 ? "block" : "none";
+    }
+
+    categoryList.addEventListener("click", function (event) {
+
+        const button = event.target.closest(".category-filter");
+
+        if (!button) {
+            return;
+        }
+
+        categoryList
+            .querySelectorAll(".category-filter")
+            .forEach(item => item.classList.remove("active"));
+
+        button.classList.add("active");
+
+        selectedCategory = button.dataset.category;
+
+        applyFilters();
+    });
+
+    searchInput.addEventListener("input", applyFilters);
+
+    searchForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        applyFilters();
+    });
+
+    sortSelect.addEventListener("change", function () {
+        sortProducts();
+        applyFilters();
+    });
+
+    window.resetGuestFilters = function () {
+
+        searchInput.value = "";
+        selectedCategory = "all";
+        sortSelect.value = "newest";
+
+        categoryList
+            .querySelectorAll(".category-filter")
+            .forEach(item => {
+                item.classList.toggle(
+                    "active",
+                    item.dataset.category === "all"
+                );
+            });
+
+        sortProducts();
+        applyFilters();
+    };
+
+    buildCategories();
+    sortProducts();
+    applyFilters();
+
+});
+// Sidebar category filtering
+document.querySelectorAll(".guest-category-link").forEach(link => {
+
+    link.addEventListener("click", function () {
+
+        const category = this.dataset.category;
+
+        const categoryButton = Array.from(
+            categoryList.querySelectorAll(".category-filter")
+        ).find(button =>
+            normalize(button.dataset.category) === normalize(category)
+        );
+
+        if (categoryButton) {
+            categoryButton.click();
+        }
+
+        document.querySelectorAll(".guest-category-link")
+            .forEach(item => item.classList.remove("active"));
+
+        this.classList.add("active");
+    });
+
+});

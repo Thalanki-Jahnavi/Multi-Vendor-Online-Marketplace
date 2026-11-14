@@ -1,0 +1,241 @@
+.about-hero {
+    min-height: 390px;
+    padding: 65px 9%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 35px;
+    overflow: hidden;
+    background: linear-gradient(115deg, #f3faf7 0%, #e5f4f0 65%, #d9eee6 100%);
+}
+
+.about-hero-content {
+    max-width: 590px;
+}
+
+.about-hero h1 {
+    margin: 0;
+    color: #123e3a;
+    font-family: "Manrope", sans-serif;
+    font-size: clamp(34px, 4.5vw, 54px);
+    font-weight: 800;
+    letter-spacing: -1.8px;
+    line-height: 1.13;
+}
+
+.about-hero h1 span {
+    color: #087e78;
+}
+
+.about-hero-content p {
+    max-width: 490px;
+    margin: 20px 0 25px;
+    color: #637973;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.about-hero-art {
+    position: relative;
+    width: 330px;
+    height: 260px;
+    flex-shrink: 0;
+}
+
+.about-art-circle {
+    position: absolute;
+    inset: 5px 20px 5px 15px;
+    border: 1px solid rgba(8, 126, 120, 0.18);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.about-art-card {
+    position: absolute;
+    top: 55px;
+    left: 40px;
+    width: 235px;
+    min-height: 150px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 1px solid white;
+    border-radius: 17px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 16px 40px rgba(18, 62, 58, 0.1);
+    text-align: center;
+    transform: rotate(-5deg);
+}
+
+.about-art-icon {
+    font-size: 44px;
+}
+
+.about-art-card strong {
+    color: #123e3a;
+    font-family: "Manrope", sans-serif;
+    font-size: 13px;
+}
+
+.about-art-card small {
+    color: #087e78;
+    font-size: 11px;
+}
+
+.about-art-sparkle {
+    position: absolute;
+    color: #087e78;
+    font-size: 30px;
+}
+
+.sparkle-one {
+    top: 20px;
+    right: 20px;
+}
+
+.sparkle-two {
+    bottom: 20px;
+    left: 5px;
+}
+
+.about-intro {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 75px 6.5%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+}
+
+.about-intro h2,
+.about-section-heading h2,
+.about-cta h2 {
+    margin: 0;
+    color: #123e3a;
+    font-family: "Manrope", sans-serif;
+    font-size: clamp(27px, 3.3vw, 39px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
+
+.about-intro-copy p {
+    margin: 0 0 15px;
+    color: #71827e;
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+.about-values {
+    padding: 70px 6.5%;
+    background: #f3faf7;
+}
+
+.about-section-heading {
+    max-width: 700px;
+    margin: 0 auto 32px;
+    text-align: center;
+}
+
+.about-section-heading .eyebrow {
+    margin-bottom: 10px;
+}
+
+.about-section-heading p {
+    margin: 12px 0 0;
+    color: #71827e;
+    font-size: 13px;
+}
+
+.about-value-grid {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.about-value-card {
+    padding: 28px 25px;
+    border: 1px solid #e1eee8;
+    border-radius: 12px;
+    background: white;
+}
+
+.about-value-icon {
+    width: 45px;
+    height: 45px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: #087e78;
+    background: #e5f4f0;
+    font-size: 23px;
+}
+
+.about-value-card h3 {
+    margin: 19px 0 8px;
+    color: #123e3a;
+    font-family: "Manrope", sans-serif;
+    font-size: 16px;
+}
+
+.about-value-card p {
+    margin: 0;
+    color: #71827e;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.about-cta {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 65px 6.5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+}
+
+.about-cta h2 {
+    font-size: clamp(26px, 3vw, 34px);
+}
+
+.about-cta p {
+    margin: 10px 0 0;
+    color: #71827e;
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+    .about-hero {
+        padding: 50px 6%;
+    }
+
+    .about-hero-art {
+        display: none;
+    }
+
+    .about-intro {
+        padding: 52px 6%;
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    .about-values {
+        padding: 52px 6%;
+    }
+
+    .about-value-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .about-cta {
+        padding: 52px 6%;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

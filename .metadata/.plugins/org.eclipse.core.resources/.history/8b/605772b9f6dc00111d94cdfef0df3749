@@ -1,0 +1,341 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Store | OneCart Seller Center</title>
+    <link rel="stylesheet" th:href="@{/css/vendor-dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/vendor-store.css}">
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-icon">O</div>
+            <div>
+                <h2>OneCart</h2>
+                <span>SELLER CENTER</span>
+            </div>
+        </div>
+
+        <div class="store-info">
+            <div class="store-avatar">🏪</div>
+            <div class="store-text">
+                <strong th:text="${vendor.businessName != null and !vendor.businessName.isEmpty() ? vendor.businessName : 'My Store'}">My Store</strong>
+                <small>Vendor Account</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <p class="nav-heading">MAIN MENU</p>
+
+            <a th:href="@{/vendor/dashboard}" class="nav-link">
+                <span class="nav-icon">▦</span>
+                Dashboard
+            </a>
+
+            <p class="nav-heading">STORE MANAGEMENT</p>
+
+            <a th:href="@{/vendor/store}" class="nav-link active">
+                <span class="nav-icon">🏬</span>
+                My Store
+            </a>
+
+            <a th:href="@{/vendor/products}" class="nav-link">
+                <span class="nav-icon">▣</span>
+                Products
+            </a>
+
+            <a th:href="@{/vendor/products/add}" class="nav-link">
+                <span class="nav-icon">＋</span>
+                Add Product
+            </a>
+
+            <a href="#" class="nav-link disabled-link" title="Inventory section">
+                <span class="nav-icon">▤</span>
+                Inventory
+                <span class="coming-soon">Soon</span>
+            </a>
+
+            <p class="nav-heading">BUSINESS</p>
+
+            <a href="#" class="nav-link disabled-link">
+                <span class="nav-icon">▧</span>
+                Orders
+                <span class="coming-soon">Soon</span>
+            </a>
+
+            <a href="#" class="nav-link disabled-link">
+                <span class="nav-icon">↗</span>
+                Sales &amp; Reports
+                <span class="coming-soon">Soon</span>
+            </a>
+
+            <p class="nav-heading">ACCOUNT</p>
+
+            <a th:href="@{/vendor/profile}" class="nav-link">
+                <span class="nav-icon">♙</span>
+                My Profile
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="help-card">
+                <div class="help-icon">?</div>
+                <strong>Need help?</strong>
+                <p>Manage your store with OneCart Seller Center.</p>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-button">
+                    <span>↪</span> Logout
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle"
+                        id="menuToggle"
+                        type="button"
+                        aria-label="Toggle menu">☰</button>
+
+                <div>
+                    <h2>My Store</h2>
+                    <p>Manage the store identity customers see on OneCart.</p>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="profile-area">
+                    <div class="profile-avatar">
+                        <span th:text="${vendor.firstName != null and !vendor.firstName.isEmpty() ? #strings.substring(vendor.firstName, 0, 1).toUpperCase() : 'V'}">V</span>
+                    </div>
+
+                    <div class="profile-details">
+                        <strong th:text="${(vendor.firstName != null ? vendor.firstName : '') + ' ' + (vendor.lastName != null ? vendor.lastName : '')}">
+                            Vendor Name
+                        </strong>
+                        <small>Vendor</small>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="page-content store-page-content">
+
+            <!-- PAGE INTRO -->
+            <div class="store-page-intro">
+                <div>
+                    <span class="store-eyebrow">SELLER CENTER / STORE MANAGEMENT</span>
+                    <h1>Your store, <span>your identity.</span></h1>
+                    <p>
+                        Keep your business name clear and recognizable.
+                        This is the store identity associated with your vendor account.
+                    </p>
+                </div>
+
+                <div class="store-account-pill">
+                    <span></span> Vendor account
+                </div>
+            </div>
+
+            <!-- ALERTS -->
+            <div class="store-alert store-alert-success"
+                 th:if="${success}"
+                 th:text="${success}"
+                 role="status">
+            </div>
+
+            <div class="store-alert store-alert-error"
+                 th:if="${error}"
+                 th:text="${error}"
+                 role="alert">
+            </div>
+
+            <div class="store-layout-grid">
+
+                <!-- STORE PREVIEW -->
+                <section class="store-preview-card">
+
+                    <div class="store-card-heading">
+                        <div>
+                            <span class="store-section-kicker">CUSTOMER VIEW</span>
+                            <h2>Store preview</h2>
+                        </div>
+
+                        <span class="preview-label">Preview</span>
+                    </div>
+
+                    <div class="store-cover-art">
+                        <span class="cover-orbit orbit-one"></span>
+                        <span class="cover-orbit orbit-two"></span>
+                        <span class="cover-spark spark-one">✦</span>
+                        <span class="cover-spark spark-two">✧</span>
+
+                        <div class="cover-copy">
+                            <span>ONECART SELLER</span>
+                            <strong>Discover something<br>worth sharing.</strong>
+                        </div>
+                    </div>
+
+                    <div class="store-preview-identity">
+
+                        <div class="store-logo-preview"
+                             id="storeLogoPreview"
+                             th:text="${vendor.businessName != null and !vendor.businessName.isEmpty() ? #strings.substring(vendor.businessName, 0, 1).toUpperCase() : 'S'}">
+                            S
+                        </div>
+
+                        <div class="store-preview-name-wrap">
+                            <span class="store-preview-label">STORE NAME</span>
+
+                            <h3 id="storeNamePreview"
+                                th:text="${vendor.businessName != null and !vendor.businessName.isEmpty() ? vendor.businessName : 'Your store name'}">
+                                Your store name
+                            </h3>
+
+                            <p>OneCart vendor</p>
+                        </div>
+
+                        <span class="store-preview-check">✓</span>
+                    </div>
+
+                    <div class="preview-footnote">
+                        <span class="preview-footnote-icon">i</span>
+                        Your business name is used to identify your store to customers.
+                    </div>
+                </section>
+
+                <!-- STORE DETAILS -->
+                <section class="store-details-card">
+
+                    <div class="store-card-heading">
+                        <div>
+                            <span class="store-section-kicker">STORE IDENTITY</span>
+                            <h2>Store information</h2>
+                        </div>
+
+                        <span class="edit-icon">✎</span>
+                    </div>
+
+                    <form th:action="@{/vendor/store/update}"
+                          method="post"
+                          class="store-form">
+
+                        <div class="store-field">
+                            <label for="businessName">
+                                Business / Store name <span>*</span>
+                            </label>
+
+                            <input type="text"
+                                   id="businessName"
+                                   name="businessName"
+                                   th:value="${vendor.businessName}"
+                                   placeholder="Enter your store name"
+                                   maxlength="255"
+                                   required
+                                   autocomplete="organization">
+
+                            <small>
+                                This is the name customers will recognize on OneCart.
+                            </small>
+                        </div>
+
+                        <div class="store-field">
+                            <label for="ownerName">Store owner</label>
+
+                            <input type="text"
+                                   id="ownerName"
+                                   th:value="${(vendor.firstName != null ? vendor.firstName : '') + ' ' + (vendor.lastName != null ? vendor.lastName : '')}"
+                                   readonly>
+
+                            <small>Update your personal name from My Profile.</small>
+                        </div>
+
+                        <div class="store-field">
+                            <label for="storeEmail">Registered email</label>
+
+                            <input type="email"
+                                   id="storeEmail"
+                                   th:value="${vendor.email}"
+                                   readonly>
+
+                            <small>Your registered login email is shown here for reference.</small>
+                        </div>
+
+                        <div class="store-form-actions">
+                            <a class="store-cancel-button"
+                               th:href="@{/vendor/dashboard}">
+                                Back to dashboard
+                            </a>
+
+                            <button type="submit" class="store-save-button">
+                                Save store name <span>→</span>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <!-- STORE GUIDANCE -->
+            <section class="store-guidance-card">
+
+                <div class="guidance-icon">✦</div>
+
+                <div class="guidance-copy">
+                    <span class="store-section-kicker">STORE MANAGEMENT</span>
+                    <h2>Build a recognizable storefront</h2>
+
+                    <p>
+                        Your store name is the first part of your business identity
+                        customers see. Keep it short, accurate, and consistent with your brand.
+                    </p>
+                </div>
+
+                <div class="guidance-side-note">
+                    <strong>Next enhancements</strong>
+                    <span>Logo and banner uploads</span>
+                    <span>Store description and policies</span>
+                </div>
+            </section>
+
+            <footer class="footer">
+                © 2026 OneCart. Vendor Seller Center.
+            </footer>
+
+        </section>
+    </main>
+</div>
+
+<!-- LIVE STORE NAME PREVIEW -->
+<script>
+    (() => {
+        const nameInput = document.getElementById('businessName');
+        const previewName = document.getElementById('storeNamePreview');
+        const previewLogo = document.getElementById('storeLogoPreview');
+
+        if (nameInput && previewName && previewLogo) {
+            nameInput.addEventListener('input', () => {
+                const value = nameInput.value.trim();
+
+                previewName.textContent = value || 'Your store name';
+                previewLogo.textContent = value
+                    ? value.charAt(0).toUpperCase()
+                    : 'S';
+            });
+        }
+    })();
+</script>
+
+<script th:src="@{/js/vendor-dashboard.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,331 @@
+
+package com.vendor.controller;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.vendor.entity.Order;
+import com.vendor.entity.OrderItem;
+import com.vendor.entity.Product;
+import com.vendor.entity.User;
+import com.vendor.repository.OrderRepository;
+import com.vendor.repository.ProductRepository;
+import com.vendor.repository.UserRepository;
+
+@Controller
+public class AdminReportsController {
+
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+
+    public AdminReportsController(
+            OrderRepository orderRepository,
+            ProductRepository productRepository,
+            UserRepository userRepository) {
+
+        this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/admin/reports")
+    public String reports(
+            @RequestParam(defaultValue = "30") int days,
+            Authentication authentication,
+            Model model) {
+
+        // Admin authentication
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Please login as admin.");
+        }
+
+        User admin = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new AccessDeniedException("Admin account not found."));
+
+        if (admin.getRole() == null ||
+                !admin.getRole().equalsIgnoreCase("ADMIN")) {
+            throw new AccessDeniedException("Admin access required.");
+        }
+
+        // Date range
+        if (days != 7 && days != 30 && days != 90) {
+            days = 30;
+        }
+
+        LocalDate startDate = LocalDate.now().minusDays(days - 1);
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+
+        List<Order> allOrders =
+                orderRepository.findAllByOrderByCreatedAtDesc();
+
+        List<Order> orders = allOrders.stream()
+                .filter(order -> order.getCreatedAt() != null)
+                .filter(order ->
+                        !order.getCreatedAt().isBefore(startDateTime))
+                .collect(Collectors.toList());
+
+        // Paid orders excluding cancelled orders
+        List<Order> paidOrders = orders.stream()
+                .filter(order -> "PAID".equalsIgnoreCase(
+                        order.getPaymentStatus()))
+                .filter(order -> !"CANCELLED".equalsIgnoreCase(
+                        order.getOrderStatus()))
+                .collect(Collectors.toList());
+
+        // Sales
+        double totalSales = paidOrders.stream()
+                .mapToDouble(order ->
+                        order.getTotalAmount() == null
+                                ? 0.0 : order.getTotalAmount())
+                .sum();
+
+        long totalOrders = orders.size();
+
+        long confirmedOrders = countByStatus(orders, "CONFIRMED");
+        long deliveredOrders = countByStatus(orders, "DELIVERED");
+        long cancelledOrders = countByStatus(orders, "CANCELLED");
+
+        // Customers and vendors
+        List<User> allUsers = userRepository.findAll();
+
+        long totalCustomers = allUsers.stream()
+                .filter(user -> user.getRole() != null)
+                .filter(user ->
+                        user.getRole().equalsIgnoreCase("CUSTOMER"))
+                .count();
+
+        long totalVendors = allUsers.stream()
+                .filter(user -> user.getRole() != null)
+                .filter(user ->
+                        user.getRole().equalsIgnoreCase("VENDOR"))
+                .count();
+
+        // Payment statistics
+        long paidCount = orders.stream()
+                .filter(order -> "PAID".equalsIgnoreCase(
+                        order.getPaymentStatus()))
+                .count();
+
+        long pendingPayments = orders.stream()
+                .filter(order -> "PENDING".equalsIgnoreCase(
+                        order.getPaymentStatus()))
+                .count();
+
+        long refundedPayments = orders.stream()
+                .filter(order -> "REFUNDED".equalsIgnoreCase(
+                        order.getPaymentStatus()))
+                .count();
+
+        // Sales chart
+        Map<String, Double> salesMap = new LinkedHashMap<>();
+
+        for (int i = 0; i < days; i++) {
+            LocalDate date = startDate.plusDays(i);
+            salesMap.put(date.toString(), 0.0);
+        }
+
+        for (Order order : paidOrders) {
+            String date = order.getCreatedAt()
+                    .toLocalDate().toString();
+
+            if (salesMap.containsKey(date)) {
+                double amount = order.getTotalAmount() == null
+                        ? 0.0 : order.getTotalAmount();
+
+                salesMap.put(date,
+                        salesMap.get(date) + amount);
+            }
+        }
+
+        List<String> salesLabels =
+                new ArrayList<>(salesMap.keySet());
+
+        List<Double> salesValues =
+                new ArrayList<>(salesMap.values());
+
+        // Order status chart
+        List<String> orderStatusLabels = List.of(
+                "Confirmed",
+                "Delivered",
+                "Cancelled",
+                "Return Requested",
+                "Exchange Requested"
+        );
+
+        List<Long> orderStatusValues = List.of(
+                countByStatus(orders, "CONFIRMED"),
+                countByStatus(orders, "DELIVERED"),
+                countByStatus(orders, "CANCELLED"),
+                countByStatus(orders, "RETURN_REQUESTED"),
+                countByStatus(orders, "EXCHANGE_REQUESTED")
+        );
+
+        // Product lookup
+        Map<Long, Product> productMap = productRepository.findAll()
+                .stream()
+                .collect(Collectors.toMap(
+                        Product::getProductId,
+                        product -> product,
+                        (first, second) -> first
+                ));
+
+        // Top-selling products
+        Map<Long, Map<String, Object>> productSales =
+                new LinkedHashMap<>();
+
+        for (Order order : paidOrders) {
+
+            if (order.getItems() == null) {
+                continue;
+            }
+
+            for (OrderItem item : order.getItems()) {
+
+                Long productId = item.getProductId();
+
+                if (productId == null) {
+                    continue;
+                }
+
+                Map<String, Object> data =
+                        productSales.computeIfAbsent(
+                                productId, id -> {
+
+                                    Map<String, Object> map =
+                                            new LinkedHashMap<>();
+
+                                    map.put("productName",
+                                            item.getProductName());
+
+                                    map.put("quantity", 0);
+                                    map.put("revenue", 0.0);
+
+                                    return map;
+                                });
+
+                int quantity = item.getQuantity() == null
+                        ? 0 : item.getQuantity();
+
+                double revenue = item.getSubtotal() == null
+                        ? 0.0 : item.getSubtotal();
+
+                data.put("quantity",
+                        (Integer) data.get("quantity") + quantity);
+
+                data.put("revenue",
+                        (Double) data.get("revenue") + revenue);
+            }
+        }
+
+        List<Map<String, Object>> topProducts =
+                productSales.values().stream()
+                        .sorted((a, b) ->
+                                Double.compare(
+                                        (Double) b.get("revenue"),
+                                        (Double) a.get("revenue")))
+                        .limit(5)
+                        .collect(Collectors.toList());
+
+        // Category revenue
+        Map<String, Double> categorySales =
+                new LinkedHashMap<>();
+
+        for (Order order : paidOrders) {
+
+            if (order.getItems() == null) {
+                continue;
+            }
+
+            for (OrderItem item : order.getItems()) {
+
+                Product product =
+                        productMap.get(item.getProductId());
+
+                String category = "Other";
+
+                if (product != null &&
+                        product.getCategory() != null &&
+                        !product.getCategory().isBlank()) {
+
+                    category = product.getCategory();
+                }
+
+                double revenue = item.getSubtotal() == null
+                        ? 0.0 : item.getSubtotal();
+
+                categorySales.merge(
+                        category, revenue, Double::sum);
+            }
+        }
+
+        List<String> categoryLabels =
+                new ArrayList<>(categorySales.keySet());
+
+        List<Double> categoryValues =
+                new ArrayList<>(categorySales.values());
+
+        // Admin details
+        String adminName = admin.getFirstName() == null
+                ? "Admin" : admin.getFirstName();
+
+        if (admin.getLastName() != null) {
+            adminName += " " + admin.getLastName();
+        }
+
+        model.addAttribute("adminName", adminName);
+        model.addAttribute("adminEmail", admin.getEmail());
+        model.addAttribute("activePage", "reports");
+
+        // Dashboard statistics
+        model.addAttribute("days", days);
+        model.addAttribute("totalSales", totalSales);
+        model.addAttribute("totalOrders", totalOrders);
+        model.addAttribute("totalCustomers", totalCustomers);
+        model.addAttribute("totalVendors", totalVendors);
+
+        model.addAttribute("confirmedOrders", confirmedOrders);
+        model.addAttribute("deliveredOrders", deliveredOrders);
+        model.addAttribute("cancelledOrders", cancelledOrders);
+
+        model.addAttribute("paidCount", paidCount);
+        model.addAttribute("pendingPayments", pendingPayments);
+        model.addAttribute("refundedPayments", refundedPayments);
+
+        // Chart data
+        model.addAttribute("salesLabels", salesLabels);
+        model.addAttribute("salesValues", salesValues);
+
+        model.addAttribute("orderStatusLabels", orderStatusLabels);
+        model.addAttribute("orderStatusValues", orderStatusValues);
+
+        model.addAttribute("topProducts", topProducts);
+
+        model.addAttribute("categoryLabels", categoryLabels);
+        model.addAttribute("categoryValues", categoryValues);
+
+        return "admin/reports";
+    }
+
+    private long countByStatus(
+            List<Order> orders, String status) {
+
+        return orders.stream()
+                .filter(order -> status.equalsIgnoreCase(
+                        order.getOrderStatus()))
+                .count();
+    }
+}

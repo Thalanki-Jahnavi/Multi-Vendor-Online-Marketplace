@@ -1,0 +1,5 @@
+package com.vendor.config;
+
+public class StoreUploadWebConfig {
+
+}

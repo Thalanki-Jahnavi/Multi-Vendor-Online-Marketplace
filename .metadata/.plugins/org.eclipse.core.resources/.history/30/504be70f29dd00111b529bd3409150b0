@@ -1,0 +1,192 @@
+
+package com.vendor.controller;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.vendor.dto.VendorOrderView;
+import com.vendor.entity.Order;
+import com.vendor.entity.OrderItem;
+import com.vendor.entity.Product;
+import com.vendor.entity.User;
+import com.vendor.repository.OrderRepository;
+import com.vendor.repository.ProductRepository;
+import com.vendor.repository.UserRepository;
+
+@Controller
+public class VendorOrdersController {
+
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+
+    public VendorOrdersController(
+            OrderRepository orderRepository,
+            ProductRepository productRepository,
+            UserRepository userRepository) {
+
+        this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
+    }
+
+    // Display orders containing this vendor's products
+    @GetMapping("/vendor/orders")
+    public String showVendorOrders(
+            Authentication authentication,
+            Model model) {
+
+        Optional<User> vendorOptional =
+                getLoggedInVendor(authentication);
+
+        if (vendorOptional.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        User vendor = vendorOptional.get();
+
+        // Get this vendor's products
+        List<Product> vendorProducts =
+                productRepository.findByVendorIdOrderByProductIdDesc(
+                        vendor.getUserId()
+                );
+
+        // Store product IDs belonging to this vendor
+        Set<Long> vendorProductIds = new HashSet<>();
+
+        for (Product product : vendorProducts) {
+            vendorProductIds.add(product.getProductId());
+        }
+
+        // Get all orders, newest first
+        List<Order> allOrders =
+                orderRepository.findAllByOrderByCreatedAtDesc();
+
+        List<VendorOrderView> vendorOrders =
+                new ArrayList<>();
+
+        // Keep only order items belonging to this vendor
+        for (Order order : allOrders) {
+
+            List<OrderItem> vendorItems =
+                    new ArrayList<>();
+
+            double vendorSubtotal = 0.0;
+
+            if (order.getItems() != null) {
+
+                for (OrderItem item : order.getItems()) {
+
+                    if (item.getProductId() != null
+                            && vendorProductIds.contains(
+                                    item.getProductId())) {
+
+                        vendorItems.add(item);
+
+                        if (item.getSubtotal() != null) {
+                            vendorSubtotal += item.getSubtotal();
+
+                        } else if (item.getPrice() != null
+                                && item.getQuantity() != null) {
+
+                            vendorSubtotal +=
+                                    item.getPrice() * item.getQuantity();
+                        }
+                    }
+                }
+            }
+
+            // Ignore orders that do not contain this vendor's products
+            if (vendorItems.isEmpty()) {
+                continue;
+            }
+
+            VendorOrderView orderView =
+                    new VendorOrderView(
+                            order.getOrderId(),
+                            order.getOrderNumber(),
+                            order.getCustomerName(),
+                            order.getCustomerEmail(),
+                            order.getCustomerPhone(),
+                            order.getShippingAddress(),
+                            order.getCreatedAt(),
+                            order.getOrderStatus(),
+                            order.getPaymentStatus(),
+                            order.getPaymentMethod(),
+                            vendorSubtotal,
+                            vendorItems
+                    );
+
+            vendorOrders.add(orderView);
+        }
+
+        // Summary counts
+        long processingOrders = vendorOrders.stream()
+                .filter(order ->
+                        "CONFIRMED".equalsIgnoreCase(
+                                order.getOrderStatus()))
+                .count();
+
+        long deliveredOrders = vendorOrders.stream()
+                .filter(order ->
+                        "DELIVERED".equalsIgnoreCase(
+                                order.getOrderStatus()))
+                .count();
+
+        long cancelledOrders = vendorOrders.stream()
+                .filter(order ->
+                        "CANCELLED".equalsIgnoreCase(
+                                order.getOrderStatus()))
+                .count();
+
+        // Send data to Thymeleaf
+        model.addAttribute("vendor", vendor);
+        model.addAttribute("vendorName", vendor.getBusinessName());
+
+        model.addAttribute("vendorOrders", vendorOrders);
+
+        model.addAttribute("totalOrders", vendorOrders.size());
+        model.addAttribute("processingOrders", processingOrders);
+        model.addAttribute("deliveredOrders", deliveredOrders);
+        model.addAttribute("cancelledOrders", cancelledOrders);
+
+        return "vendor/orders";
+    }
+
+    // Get currently logged-in vendor
+    private Optional<User> getLoggedInVendor(
+            Authentication authentication) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+
+            return Optional.empty();
+        }
+
+        Optional<User> userOptional =
+                userRepository.findByEmail(authentication.getName());
+
+        if (userOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = userOptional.get();
+
+        if (user.getRole() == null
+                || !"vendor".equalsIgnoreCase(user.getRole())) {
+
+            return Optional.empty();
+        }
+
+        return Optional.of(user);
+    }
+}

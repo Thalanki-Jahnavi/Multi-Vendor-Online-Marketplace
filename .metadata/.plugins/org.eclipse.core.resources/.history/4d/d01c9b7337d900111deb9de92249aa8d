@@ -1,0 +1,154 @@
+package com.vendor.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "products")
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "product_id")
+    private Long productId;
+
+    @Column(name = "product_name")
+    private String productName;
+
+    private Double price;
+
+    @Column(name = "discount_percentage")
+    private Double discountPercentage;
+
+    @Column(name = "product_status")
+    private String productStatus;
+
+    @Column(name = "approval_status")
+    private String approvalStatus;
+
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "vendor_id")
+    private Integer vendorId;
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Double getDiscountPercentage() {
+        return discountPercentage;
+    }
+
+    public void setDiscountPercentage(Double discountPercentage) {
+        this.discountPercentage = discountPercentage;
+    }
+
+    public String getProductStatus() {
+        return productStatus;
+    }
+
+    public void setProductStatus(String productStatus) {
+        this.productStatus = productStatus;
+    }
+
+    public String getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Integer getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(Integer vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    @Transient
+    public Double getDiscountedPrice() {
+        if (price == null || discountPercentage == null) {
+            return price;
+        }
+        return price - (price * discountPercentage / 100.0);
+    }
+
+    @Transient
+    public Double getSavings() {
+        if (price == null || discountPercentage == null || discountPercentage <= 0) {
+            return 0.0;
+        }
+        return price * discountPercentage / 100.0;
+    }
+
+    @Transient
+    public boolean hasDiscount() {
+        return discountPercentage != null && discountPercentage > 0;
+    }
+
+    @Transient
+    public String getImageFileName() {
+        if (productName != null) {
+            String lower = productName.toLowerCase();
+            if (lower.contains("mug") || lower.contains("coffee")) {
+                return "Ceramic Coffee Mug.jpg";
+            } else if (lower.contains("running") || lower.contains("sneaker") || lower.contains("shoe")) {
+                return "Running Shoes.jpg";
+            } else if (lower.contains("mouse")) {
+                return "Wireless Mouse.jpg";
+            } else if (lower.contains("pack") || lower.contains("backpack")) {
+                return "Travel back pack.jpg";
+            } else if (lower.contains("shirt") || lower.contains("t-shirt")) {
+                return "Cotton T-Shirt.jpg";
+            } else if (lower.contains("watch")) {
+                return "Smart Watch.webp";
+            } else if (lower.contains("speaker")) {
+                return "Bluetooth Speaker.png";
+            } else if (lower.contains("headphone") || lower.contains("earphone") || lower.contains("headset")) {
+                return "Wireless Headphones.png";
+            }
+        }
+        int index = (productId != null ? Math.abs(productId.hashCode()) : 0) % 8;
+        String[] defaults = {
+            "Ceramic Coffee Mug.jpg",
+            "Running Shoes.jpg",
+            "Wireless Mouse.jpg",
+            "Travel back pack.jpg",
+            "Cotton T-Shirt.jpg",
+            "Smart Watch.webp",
+            "Bluetooth Speaker.png",
+            "Wireless Headphones.png"
+        };
+        return defaults[index];
+    }
+}

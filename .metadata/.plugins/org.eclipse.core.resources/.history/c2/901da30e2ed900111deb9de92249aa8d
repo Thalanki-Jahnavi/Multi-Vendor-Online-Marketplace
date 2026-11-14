@@ -1,0 +1,136 @@
+package com.vendor.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.vendor.entity.Order;
+import com.vendor.entity.OrderItem;
+import com.vendor.repository.OrderRepository;
+
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final EmailNotificationService emailNotificationService;
+
+    public OrderService(OrderRepository orderRepository,
+                        EmailNotificationService emailNotificationService) {
+        this.orderRepository = orderRepository;
+        this.emailNotificationService = emailNotificationService;
+    }
+
+    public List<Order> getOrdersByCustomer(Integer customerId) {
+        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
+    }
+
+    public Optional<Order> getOrderById(Long orderId) {
+        return orderRepository.findById(orderId);
+    }
+
+    public Optional<Order> getOrderByNumber(String orderNumber) {
+        return orderRepository.findByOrderNumber(orderNumber);
+    }
+
+    @Transactional
+    public Order createOrder(Integer customerId,
+                             String customerName,
+                             String customerEmail,
+                             String customerPhone,
+                             String shippingAddress,
+                             String paymentMethod,
+                             Double totalAmount,
+                             List<OrderItem> items) {
+
+        Order order = new Order();
+        String generatedOrderNumber = "OD-" + (System.currentTimeMillis() % 100000000);
+        order.setOrderNumber(generatedOrderNumber);
+        order.setCustomerId(customerId);
+        order.setCustomerName(customerName);
+        order.setCustomerEmail(customerEmail);
+        order.setCustomerPhone(customerPhone);
+        order.setShippingAddress(shippingAddress);
+        order.setPaymentMethod(paymentMethod != null ? paymentMethod.toUpperCase() : "CARD");
+        order.setPaymentStatus("PAID");
+        order.setOrderStatus("CONFIRMED");
+        order.setTotalAmount(totalAmount);
+        order.setCreatedAt(LocalDateTime.now());
+
+        if (items != null) {
+            for (OrderItem item : items) {
+                order.addItem(item);
+            }
+        }
+
+        Order savedOrder = orderRepository.save(order);
+
+        // Send order confirmation email
+        try {
+            emailNotificationService.sendOrderConfirmationEmail(savedOrder);
+        } catch (Exception e) {
+            System.err.println("Could not dispatch confirmation email: " + e.getMessage());
+        }
+
+        return savedOrder;
+    }
+
+    @Transactional
+    public boolean cancelOrder(Long orderId, Integer customerId) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isEmpty()) {
+            return false;
+        }
+
+        Order order = optionalOrder.get();
+        if (!order.getCustomerId().equals(customerId)) {
+            return false;
+        }
+
+        if ("CANCELLED".equalsIgnoreCase(order.getOrderStatus())) {
+            return false; // Already cancelled
+        }
+
+        order.setOrderStatus("CANCELLED");
+        order.setPaymentStatus("REFUNDED");
+        orderRepository.save(order);
+
+        // Send cancellation & refund email notification
+        try {
+            emailNotificationService.sendOrderCancellationAndRefundEmail(order, order.getTotalAmount());
+        } catch (Exception e) {
+            System.err.println("Could not dispatch cancellation email: " + e.getMessage());
+        }
+
+        return true;
+    }
+
+    @Transactional
+    public boolean requestReturnOrExchange(Long orderId, Integer customerId, String requestType, String reason) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isEmpty()) {
+            return false;
+        }
+
+        Order order = optionalOrder.get();
+        if (!order.getCustomerId().equals(customerId)) {
+            return false;
+        }
+
+        String newStatus = "EXCHANGE".equalsIgnoreCase(requestType) ? "EXCHANGE_REQUESTED" : "RETURN_REQUESTED";
+        order.setOrderStatus(newStatus);
+        order.setReturnReason(reason);
+        orderRepository.save(order);
+
+        // Send return/exchange confirmation email
+        try {
+            emailNotificationService.sendReturnOrExchangeEmail(order, requestType, reason);
+        } catch (Exception e) {
+            System.err.println("Could not dispatch return/exchange email: " + e.getMessage());
+        }
+
+        return true;
+    }
+}

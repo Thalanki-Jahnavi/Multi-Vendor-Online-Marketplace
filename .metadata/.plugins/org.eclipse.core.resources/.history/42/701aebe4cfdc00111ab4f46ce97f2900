@@ -1,0 +1,456 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Products | OneCart</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f8f7;
+            color: #123e3a;
+        }
+
+        .page-header {
+            background: white;
+            padding: 22px 32px;
+            border-bottom: 1px solid #e4eeeb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h2 {
+            font-size: 22px;
+        }
+
+        .page-header p {
+            color: #78918c;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .main-content {
+            padding: 35px;
+        }
+
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .heading h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .heading p {
+            color: #78918c;
+            font-size: 14px;
+        }
+
+        .add-btn {
+            display: inline-block;
+            background: #087e78;
+            color: white;
+            padding: 12px 22px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .add-btn:hover {
+            background: #065f59;
+            color: white;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            border: 1px solid #e4eeeb;
+            max-width: 300px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card span {
+            display: block;
+            color: #78918c;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .summary-card h2 {
+            font-size: 32px;
+            margin-top: 12px;
+            color: #087e78;
+        }
+
+        .products-container {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #e4eeeb;
+            padding: 25px;
+            overflow: hidden;
+            min-height: 300px;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .toolbar input,
+        .toolbar select {
+            padding: 11px 14px;
+            border: 1px solid #dce8e5;
+            border-radius: 8px;
+            outline: none;
+            color: #123e3a;
+            background: white;
+            font-size: 13px;
+        }
+
+        .toolbar input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .toolbar input:focus,
+        .toolbar select:focus {
+            border-color: #087e78;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        thead {
+            background: #f0f7f5;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #54736d;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 17px 15px;
+            border-bottom: 1px solid #edf2f0;
+            font-size: 13px;
+        }
+
+        tbody tr:hover {
+            background: #f8fbfa;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #123e3a;
+        }
+
+        .price {
+            font-weight: 700;
+            color: #087e78;
+        }
+
+        .status,
+        .approval {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .active,
+        .approved {
+            background: #e1f5ed;
+            color: #168052;
+        }
+
+        .inactive,
+        .rejected {
+            background: #fce9e7;
+            color: #bd5147;
+        }
+
+        .pending {
+            background: #fff3d9;
+            color: #a66c00;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 55px 20px;
+            color: #78918c;
+        }
+
+        .empty-state h3 {
+            color: #123e3a;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 25px;
+            color: #78918c;
+        }
+
+        @media(max-width: 650px) {
+            .main-content {
+                padding: 20px 14px;
+            }
+
+            .page-header {
+                padding: 18px;
+            }
+
+            .heading h1 {
+                font-size: 23px;
+            }
+
+            .products-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="page-header">
+        <div>
+            <h2>My Products</h2>
+            <p>Manage and monitor your store products.</p>
+        </div>
+
+        <div>
+            <strong th:text="${vendor.firstName + ' ' + vendor.lastName}">
+                Vendor Name
+            </strong>
+            <p>Vendor Account</p>
+        </div>
+    </header>
+
+    <main class="main-content">
+
+        <section class="heading">
+            <div>
+                <h1>My Products</h1>
+                <p>
+                    Welcome,
+                    <strong th:text="${vendor.businessName != null and !#strings.isEmpty(vendor.businessName)
+                        ? vendor.businessName : vendor.firstName}">
+                        Vendor
+                    </strong>.
+                    Manage all your listed products here.
+                </p>
+            </div>
+
+            <a th:href="@{/vendor/products/add}" class="add-btn">
+                + Add New Product
+            </a>
+        </section>
+
+        <section class="summary-card">
+            <span>Total Products Listed</span>
+            <h2 th:text="${totalProducts}">0</h2>
+        </section>
+
+        <section class="products-container">
+
+            <div class="toolbar">
+                <input type="text"
+                       id="searchInput"
+                       placeholder="Search by product name or ID...">
+
+                <select id="statusFilter">
+                    <option value="">All Product Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+
+                <select id="approvalFilter">
+                    <option value="">All Approval Status</option>
+                    <option value="approved">Approved</option>
+                    <option value="pending">Pending</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+
+            <div class="empty-state" th:if="${#lists.isEmpty(products)}">
+                <h3>No products added yet</h3>
+                <p>Start building your store by adding your first product.</p>
+
+                <a th:href="@{/vendor/products/add}" class="add-btn">
+                    Add Your First Product
+                </a>
+            </div>
+
+            <div class="table-wrapper"
+                 th:unless="${#lists.isEmpty(products)}">
+
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Product Status</th>
+                            <th>Approval</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="product : ${products}"
+                            th:attr="data-name=${product.productName},
+                                     data-id=${product.productId},
+                                     data-status=${product.productStatus},
+                                     data-approval=${product.approvalStatus}">
+
+                            <td th:text="${product.productId}">1</td>
+
+                            <td class="product-name"
+                                th:text="${product.productName}">
+                                Product Name
+                            </td>
+
+                            <td th:text="${product.category}">
+                                Category
+                            </td>
+
+                            <td class="price">
+                                ₹<span th:text="${product.price}">0</span>
+                            </td>
+
+                            <td th:text="${product.stockQuantity}">0</td>
+
+                            <td>
+                                <span class="status"
+                                      th:classappend="${#strings.equalsIgnoreCase(product.productStatus, 'active')}
+                                      ? ' active' : ' inactive'"
+                                      th:text="${product.productStatus}">
+                                    Active
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="approval"
+                                      th:classappend="${#strings.equalsIgnoreCase(product.approvalStatus, 'approved')}
+                                      ? ' approved'
+                                      : (${#strings.equalsIgnoreCase(product.approvalStatus, 'pending')}
+                                      ? ' pending' : ' rejected')"
+                                      th:text="${product.approvalStatus}">
+                                    Pending
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="no-results" id="noResults">
+                    No matching products found.
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const statusFilter = document.getElementById("statusFilter");
+        const approvalFilter = document.getElementById("approvalFilter");
+
+        function filterProducts() {
+
+            const searchValue = searchInput.value.toLowerCase().trim();
+            const statusValue = statusFilter.value.toLowerCase();
+            const approvalValue = approvalFilter.value.toLowerCase();
+
+            const rows = document.querySelectorAll("#productsTable tbody tr");
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+
+                const name = (row.dataset.name || "").toLowerCase();
+                const id = (row.dataset.id || "").toLowerCase();
+                const status = (row.dataset.status || "").toLowerCase();
+                const approval = (row.dataset.approval || "").toLowerCase();
+
+                const matchesSearch =
+                    name.includes(searchValue) || id.includes(searchValue);
+
+                const matchesStatus =
+                    statusValue === "" || status === statusValue;
+
+                const matchesApproval =
+                    approvalValue === "" || approval === approvalValue;
+
+                const visible =
+                    matchesSearch && matchesStatus && matchesApproval;
+
+                row.style.display = visible ? "" : "none";
+
+                if (visible) {
+                    visibleCount++;
+                }
+            });
+
+            const noResults = document.getElementById("noResults");
+
+            if (noResults) {
+                noResults.style.display =
+                    visibleCount === 0 ? "block" : "none";
+            }
+        }
+
+        searchInput.addEventListener("input", filterProducts);
+        statusFilter.addEventListener("change", filterProducts);
+        approvalFilter.addEventListener("change", filterProducts);
+    </script>
+
+</body>
+</html>

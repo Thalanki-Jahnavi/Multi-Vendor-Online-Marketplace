@@ -1,0 +1,331 @@
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | OneCart</title>
+    <link rel="stylesheet" th:href="@{/css/signup.css}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <a class="brand" th:href="@{/}">One<span>Cart</span></a>
+    <a class="back-link" th:href="@{/}">← Back to home</a>
+</header>
+
+<main class="signup-layout">
+
+    <section class="welcome-panel">
+        <p class="eyebrow">JOIN ONECART</p>
+        <h1>Your next great find is just around the corner.</h1>
+        <p>Create an account to shop your favorites or start selling with OneCart.</p>
+
+        <div class="benefit-list">
+            <div class="benefit">
+                <span class="check">✓</span>
+                <span>Discover products from multiple vendors</span>
+            </div>
+
+            <div class="benefit">
+                <span class="check">✓</span>
+                <span>Keep your orders and account in one place</span>
+            </div>
+
+            <div class="benefit">
+                <span class="check">✓</span>
+                <span>Build your store as a OneCart vendor</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="signup-panel">
+
+        <div class="signup-card">
+
+            <p class="eyebrow">GET STARTED</p>
+            <h2>Create your account</h2>
+            <p class="intro">Enter your details below to sign up.</p>
+
+            <div class="alert error-alert"
+                 th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+            <form th:action="@{/signup}" method="post" id="signupForm">
+
+                <!-- PERSONAL DETAILS -->
+
+                <h3 class="form-section-title">Personal Information</h3>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="firstName">First name</label>
+                        <input type="text"
+                               id="firstName"
+                               name="firstName"
+                               placeholder="First name"
+                               autocomplete="given-name"
+                               maxlength="100"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last name</label>
+                        <input type="text"
+                               id="lastName"
+                               name="lastName"
+                               placeholder="Last name"
+                               autocomplete="family-name"
+                               maxlength="100"
+                               required>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           placeholder="you@example.com"
+                           autocomplete="email"
+                           maxlength="255"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone number</label>
+                    <input type="tel"
+                           id="phone"
+                           name="phone"
+                           placeholder="Enter your 10-digit phone number"
+                           autocomplete="tel"
+                           pattern="[0-9]{10}"
+                           maxlength="10"
+                           inputmode="numeric"
+                           required>
+                    <small>Enter a valid 10-digit mobile number.</small>
+                </div>
+
+
+                <!-- ACCOUNT TYPE -->
+
+                <h3 class="form-section-title">Account Information</h3>
+
+                <div class="form-group">
+                    <label for="accountType">I want to</label>
+
+                    <select id="accountType" name="role" required>
+                        <option value="" disabled selected>Choose account type</option>
+                        <option value="customer">Shop as a customer</option>
+                        <option value="vendor">Sell as a vendor</option>
+                    </select>
+                </div>
+
+
+                <!-- VENDOR DETAILS -->
+
+                <div class="vendor-field" id="vendorDetailsGroup" hidden>
+
+                    <h3 class="form-section-title">Business Information</h3>
+
+                    <div class="form-group">
+                        <label for="businessName">Business / Store name</label>
+                        <input type="text"
+                               id="businessName"
+                               name="businessName"
+                               placeholder="Enter your store name"
+                               maxlength="255">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gstNumber">GST Number (Optional)</label>
+                        <input type="text"
+                               id="gstNumber"
+                               name="gstNumber"
+                               placeholder="Enter GST number if available"
+                               maxlength="50">
+                    </div>
+
+                </div>
+
+
+                <!-- ADDRESS DETAILS -->
+
+                <h3 class="form-section-title">Address Information</h3>
+
+                <div class="form-group">
+                    <label for="addressLine">Street Address</label>
+                    <textarea id="addressLine"
+                              name="addressLine"
+                              placeholder="House / Flat number, street, area"
+                              autocomplete="street-address"
+                              rows="3"
+                              maxlength="500"
+                              required></textarea>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text"
+                               id="city"
+                               name="city"
+                               placeholder="Enter city"
+                               autocomplete="address-level2"
+                               maxlength="100"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text"
+                               id="state"
+                               name="state"
+                               placeholder="Enter state"
+                               autocomplete="address-level1"
+                               maxlength="100"
+                               required>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="postalCode">PIN Code</label>
+                    <input type="text"
+                           id="postalCode"
+                           name="postalCode"
+                           placeholder="Enter 6-digit PIN code"
+                           autocomplete="postal-code"
+                           pattern="[0-9]{6}"
+                           maxlength="6"
+                           inputmode="numeric"
+                           required>
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <h3 class="form-section-title">Security Information</h3>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           placeholder="Create a password"
+                           autocomplete="new-password"
+                           minlength="8"
+                           required>
+                    <small>Use at least 8 characters.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm password</label>
+                    <input type="password"
+                           id="confirmPassword"
+                           name="confirmPassword"
+                           placeholder="Enter your password again"
+                           autocomplete="new-password"
+                           minlength="8"
+                           required>
+
+                    <small class="password-error"
+                           id="passwordError"
+                           hidden>
+                        Passwords do not match.
+                    </small>
+                </div>
+
+                <button type="submit" class="submit-button">
+                    Create account
+                </button>
+
+            </form>
+
+            <p class="signin-text">
+                Already have an account?
+                <a th:href="@{/login}">Sign in</a>
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script>
+
+    const accountType = document.getElementById("accountType");
+
+    const vendorDetailsGroup =
+        document.getElementById("vendorDetailsGroup");
+
+    const businessName =
+        document.getElementById("businessName");
+
+    const signupForm =
+        document.getElementById("signupForm");
+
+    const password =
+        document.getElementById("password");
+
+    const confirmPassword =
+        document.getElementById("confirmPassword");
+
+    const passwordError =
+        document.getElementById("passwordError");
+
+
+    // Show business details only for vendors
+
+    function updateBusinessField() {
+
+        const isVendor = accountType.value === "vendor";
+
+        vendorDetailsGroup.hidden = !isVendor;
+
+        businessName.required = isVendor;
+    }
+
+    accountType.addEventListener("change", updateBusinessField);
+
+
+    // Validate password confirmation
+
+    signupForm.addEventListener("submit", function (event) {
+
+        if (password.value !== confirmPassword.value) {
+
+            event.preventDefault();
+
+            passwordError.hidden = false;
+
+            confirmPassword.focus();
+
+            return;
+        }
+
+        passwordError.hidden = true;
+    });
+
+
+    confirmPassword.addEventListener("input", function () {
+        passwordError.hidden = true;
+    });
+
+
+    // Keep vendor fields correct on initial page load
+
+    updateBusinessField();
+
+</script>
+
+</body>
+</html>
+```

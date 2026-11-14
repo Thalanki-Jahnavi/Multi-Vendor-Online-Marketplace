@@ -1,0 +1,416 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | OneCart Seller Center</title>
+
+    <!-- Profile-specific styles -->
+    <link rel="stylesheet" th:href="@{/css/vendor-profile.css}">
+
+    <!-- Shared Vendor Dashboard layout and sidebar -->
+    <link rel="stylesheet" th:href="@{/css/vendor-dashboard.css}">
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <!-- BRAND -->
+        <div class="brand">
+            <div class="brand-icon">O</div>
+
+            <div>
+                <h2>OneCart</h2>
+                <span>SELLER CENTER</span>
+            </div>
+        </div>
+
+        <!-- STORE INFORMATION -->
+        <div class="store-info">
+
+            <div class="store-avatar">🏪</div>
+
+            <div class="store-text">
+                <strong th:text="${vendor.businessName != null and !vendor.businessName.isEmpty() ? vendor.businessName : 'My Store'}">
+                    My Store
+                </strong>
+
+                <small>Vendor Account</small>
+            </div>
+
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="sidebar-nav">
+
+            <p class="nav-heading">MAIN MENU</p>
+
+            <a th:href="@{/vendor/dashboard}" class="nav-link">
+                <span class="nav-icon">▦</span>
+                Dashboard
+            </a>
+
+            <p class="nav-heading">STORE MANAGEMENT</p>
+
+            <a th:href="@{/vendor/store}" class="nav-link">
+                <span class="nav-icon">🏬</span>
+                My Store
+            </a>
+
+            <a th:href="@{/vendor/products}" class="nav-link">
+                <span class="nav-icon">▣</span>
+                Products
+            </a>
+
+            <!-- Add Product removed from sidebar -->
+
+            <a th:href="@{/vendor/inventory}" class="nav-link">
+                <span class="nav-icon">▤</span>
+                Inventory
+            </a>
+
+            <p class="nav-heading">BUSINESS</p>
+
+			
+			<a th:href="@{/vendor/orders}" class="nav-link">
+			    <span class="nav-icon">▧</span>
+			    Orders
+			</a>
+
+            <p class="nav-heading">ACCOUNT</p>
+
+            <a th:href="@{/vendor/profile}" class="nav-link active">
+                <span class="nav-icon">♙</span>
+                My Profile
+            </a>
+
+        </nav>
+
+        <!-- SIDEBAR BOTTOM -->
+        <div class="sidebar-bottom">
+
+            <div class="help-card">
+                <div class="help-icon">?</div>
+
+                <strong>Need help?</strong>
+
+                <p>
+                    Manage your store with OneCart Seller Center.
+                </p>
+            </div>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-button">
+                    ↪ Logout
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div>
+                <h2>My Profile</h2>
+                <p>Manage your personal and business information.</p>
+            </div>
+
+            <div class="profile-area">
+
+                <div class="profile-avatar">
+                    <span th:text="${#strings.substring(vendor.firstName, 0, 1)}">
+                        V
+                    </span>
+                </div>
+
+                <div class="profile-details">
+
+                    <strong th:text="${vendor.firstName + ' ' + vendor.lastName}">
+                        Vendor Name
+                    </strong>
+
+                    <small>Vendor</small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+        <section class="page-content profile-page-content">
+
+            <!-- PAGE INTRO -->
+            <div class="welcome-section">
+
+                <div>
+                    <span class="eyebrow">ACCOUNT SETTINGS</span>
+
+                    <h1>My Profile</h1>
+
+                    <p>
+                        View and update your registered vendor information.
+                    </p>
+                </div>
+
+                <div class="store-status">
+                    <span class="status-dot"></span>
+                    Vendor Account
+                </div>
+
+            </div>
+
+
+            <!-- SUCCESS MESSAGE -->
+            <div class="alert success-alert"
+                 th:if="${success}"
+                 th:text="${success}">
+            </div>
+
+
+            <!-- ERROR MESSAGE -->
+            <div class="alert error-alert"
+                 th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+
+            <!-- PROFILE FORM -->
+            <form th:action="@{/vendor/profile/update}"
+                  method="post"
+                  class="profile-form">
+
+
+                <!-- PERSONAL INFORMATION -->
+                <section class="profile-card">
+
+                    <div class="card-heading">
+
+                        <div>
+                            <span class="card-icon">♙</span>
+                            <h2>Personal Information</h2>
+                        </div>
+
+                        <p>Your registered account details</p>
+
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+
+                            <label>First Name *</label>
+
+                            <input type="text"
+                                   name="firstName"
+                                   th:value="${vendor.firstName}"
+                                   required>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>Last Name *</label>
+
+                            <input type="text"
+                                   name="lastName"
+                                   th:value="${vendor.lastName}"
+                                   required>
+
+                        </div>
+
+
+                        <div class="form-group full-width">
+
+                            <label>Email Address</label>
+
+                            <input type="email"
+                                   th:value="${vendor.email}"
+                                   readonly>
+
+                            <small>
+                                Email is used for login and cannot be changed here.
+                            </small>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>Phone Number</label>
+
+                            <input type="tel"
+                                   name="phone"
+                                   th:value="${vendor.phone}"
+                                   maxlength="15"
+                                   placeholder="Enter phone number">
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- BUSINESS INFORMATION -->
+                <section class="profile-card">
+
+                    <div class="card-heading">
+
+                        <div>
+                            <span class="card-icon">🏪</span>
+                            <h2>Business Information</h2>
+                        </div>
+
+                        <p>Your registered store details</p>
+
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+
+                            <label>Business Name *</label>
+
+                            <input type="text"
+                                   name="businessName"
+                                   th:value="${vendor.businessName}"
+                                   required
+                                   placeholder="Enter business name">
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>GST Number</label>
+
+                            <input type="text"
+                                   name="gstNumber"
+                                   th:value="${vendor.gstNumber}"
+                                   maxlength="50"
+                                   placeholder="Enter GST number">
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- BUSINESS ADDRESS -->
+                <section class="profile-card">
+
+                    <div class="card-heading">
+
+                        <div>
+                            <span class="card-icon">⌖</span>
+                            <h2>Business Address</h2>
+                        </div>
+
+                        <p>Your registered business location</p>
+
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div class="form-group full-width">
+
+                            <label>Address Line</label>
+
+                            <input type="text"
+                                   name="addressLine"
+                                   th:value="${vendor.addressLine}"
+                                   placeholder="House number, street, area">
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>City</label>
+
+                            <input type="text"
+                                   name="city"
+                                   th:value="${vendor.city}"
+                                   placeholder="Enter city">
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>State</label>
+
+                            <input type="text"
+                                   name="state"
+                                   th:value="${vendor.state}"
+                                   placeholder="Enter state">
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>Postal Code</label>
+
+                            <input type="text"
+                                   name="postalCode"
+                                   th:value="${vendor.postalCode}"
+                                   maxlength="20"
+                                   placeholder="Enter postal code">
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- FORM ACTIONS -->
+                <div class="form-actions">
+
+                    <a th:href="@{/vendor/dashboard}"
+                       class="cancel-button">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="save-button">
+                        Save Changes →
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <!-- FOOTER -->
+            <footer class="footer">
+                © 2026 OneCart. Vendor Seller Center.
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script th:src="@{/js/vendor-dashboard.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+
+<aside class="sidebar" th:fragment="sidebar">
+
+    <!-- BRAND -->
+    <div class="brand">
+        <div class="brand-logo">O</div>
+        <div class="brand-name">
+            <h2>OneCart</h2>
+        </div>
+    </div>
+
+    <!-- MAIN MENU -->
+    <div class="sidebar-label">MAIN MENU</div>
+
+    <a th:href="@{/admin/dashboard}"
+       class="nav-link"
+       th:classappend="${activePage == 'dashboard'} ? ' active' : ''">
+        <span class="nav-icon">⌂</span>
+        <span>Dashboard</span>
+    </a>
+
+    <!-- MARKETPLACE MANAGEMENT -->
+    <div class="sidebar-label">MARKETPLACE MANAGEMENT</div>
+
+    <a th:href="@{/admin/customers}"
+       class="nav-link"
+       th:classappend="${activePage == 'customers'} ? ' active' : ''">
+        <span class="nav-icon">♙</span>
+        <span>Customers</span>
+    </a>
+
+    <a th:href="@{/admin/vendors}"
+       class="nav-link"
+       th:classappend="${activePage == 'vendors'} ? ' active' : ''">
+        <span class="nav-icon">♧</span>
+        <span>Vendors</span>
+    </a>
+
+    <a th:href="@{/admin/products}"
+       class="nav-link"
+       th:classappend="${activePage == 'products'} ? ' active' : ''">
+        <span class="nav-icon">▦</span>
+        <span>Products</span>
+    </a>
+
+    <a th:href="@{/admin/product-approvals}"
+       class="nav-link"
+       th:classappend="${activePage == 'approvals'} ? ' active' : ''">
+        <span class="nav-icon">✓</span>
+        <span>Product Approvals</span>
+    </a>
+
+    <a th:href="@{/admin/categories}"
+       class="nav-link"
+       th:classappend="${activePage == 'categories'} ? ' active' : ''">
+        <span class="nav-icon">▤</span>
+        <span>Categories</span>
+    </a>
+
+    <a th:href="@{/admin/orders}"
+       class="nav-link"
+       th:classappend="${activePage == 'orders'} ? ' active' : ''">
+        <span class="nav-icon">▧</span>
+        <span>Orders</span>
+    </a>
+
+    <!-- ANALYTICS -->
+    <div class="sidebar-label">ANALYTICS</div>
+
+    <a th:href="@{/admin/reports}"
+       class="nav-link"
+       th:classappend="${activePage == 'reports'} ? ' active' : ''">
+        <span class="nav-icon">▥</span>
+        <span>Reports &amp; Analytics</span>
+    </a>
+
+    <!-- ACCOUNT -->
+    <div class="sidebar-bottom">
+
+        <a th:href="@{/admin/profile}"
+           class="nav-link"
+           th:classappend="${activePage == 'profile'} ? ' active' : ''">
+            <span class="nav-icon">⚙</span>
+            <span>My Profile</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="nav-link logout-link">
+                <span class="nav-icon">↪</span>
+                <span>Logout</span>
+            </button>
+        </form>
+
+    </div>
+
+</aside>
